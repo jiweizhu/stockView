@@ -1,0 +1,13 @@
+1.eightHourQuery method would run every day at 8:00, to get 10day avg price.
+2.realTimeQuery method run every 10min(can config) to monitor
+3.if the date yyyy-MM-dd is equal, it means the market is started!
+
+
+In the end at 18:00, send a summary report: higher/lower than XX day price
+
+
+==================
+to judge if exceeds 10 day price
+1.yesterday's end price lower than or equals 10 day price:
+    this to avoid yesterday's price already higher than 10 day price
+2.real price exceeds 10 day price
