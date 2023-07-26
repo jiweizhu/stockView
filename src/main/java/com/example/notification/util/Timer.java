@@ -22,7 +22,7 @@ public class Timer {
             logger.info("Start eightHourQuery=====");
             // also need to clear the upTenDayList, meaning that the notification email is sent today
             KLineService.clearCollect();
-            kLineService.startToQueryRealTimePrice();
+            kLineService.getAvgPrice();
 
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);

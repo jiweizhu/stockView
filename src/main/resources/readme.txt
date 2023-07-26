@@ -1,3 +1,8 @@
+issues:
+1.The decimal place is wrong
+2.sz002916 and sh002916 both exist!
+
+=================================
 1.eightHourQuery method would run every day at 8:00, to get 10day avg price.
 2.realTimeQuery method run every 10min(can config) to monitor
 3.if the date yyyy-MM-dd is equal, it means the market is started!

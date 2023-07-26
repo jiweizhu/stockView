@@ -57,7 +57,7 @@ public class EmailUtil {
         message.setSubject(title);
         String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
         message.setContent("Now the time is "+ nowTime +" , this is a important message!" +
-                "Exceed 10 day avg price is "+ stockNameVO.getIdentifier() +", "+ stockNameVO.getChineseName(), "text/html;charset=utf-8");
+                " Exceed 10 day avg price is "+ stockNameVO.getStockId() +", "+ stockNameVO.getStockName(), "text/html;charset=utf-8");
 
         // send mail
         ts.sendMessage(message, message.getAllRecipients());

@@ -26,7 +26,7 @@ public class KLineService {
     private static ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String localStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum.txt";
+    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum.txt";
 
     private static ArrayList<StockNameVO> stockNameList = new ArrayList<>();
 
@@ -47,17 +47,19 @@ public class KLineService {
 
     //load stock list
     private void readStockFile() {
+        stockNameList.clear();
         BufferedReader reader = null;
         String line;
         try {
-            if (null == stockFile || "".equals(stockFile)) {
-                stockFile = localStockFile;
+            String os = System.getenv("OS");
+            if (null != os && os.toLowerCase().contains("windows")) {
+                stockFile = localTestStockFile;
             }
             FileReader fileReader = new FileReader(stockFile);
             reader = new BufferedReader(fileReader);
             while ((line = reader.readLine()) != null) {
                 StockNameVO stockNameVO = new StockNameVO();
-                stockNameVO.setIdentifier(line.toLowerCase());
+                stockNameVO.setStockId(line.toLowerCase());
                 stockNameList.add(stockNameVO);
             }
             logger.info("Successfully read stock name file !!");
@@ -77,33 +79,33 @@ public class KLineService {
     @Autowired
     private RestRequest restRequest;
 
-    public void startToQueryRealTimePrice() throws InterruptedException, JsonProcessingException {
+    public void getAvgPrice() throws InterruptedException, JsonProcessingException {
         readStockFile();
         //iterator to query 20day price history and calculate 10day 20day price, and store in db
         for (StockNameVO stockNameVO : stockNameList) {
             //slow down the speech, just intend to avoid website protection
             Thread.sleep(100);
-            if (stockNameVO.getIdentifier().contains("sh") || stockNameVO.getIdentifier().contains("sz")) {
+            if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
                 if (upTenDayList.contains(stockNameVO)) {
                     //meaning that the email is sent today
                     return;
                 }
 
                 WebQueryParam webQueryParam = new WebQueryParam();
-                webQueryParam.setIdentifier(stockNameVO.getIdentifier());
+                webQueryParam.setIdentifier(stockNameVO.getStockId());
                 DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
                 calculateDayAvgPrice(dailyQueryResponse, webQueryParam, stockNameVO);
             }
         }
 
         dayAvgMap.forEach((k, v) -> {
-            logger.info("key: "+k+"Value: "+ v.toString());
+            logger.info(k+","+ v.getStockName()+"="+v.getTenDayAvgPrice()+";");
         });
     }
 
 
     public void calculateDayAvgPrice(DailyQueryResponseVO dailyQueryResponse, WebQueryParam webQueryParam, StockNameVO stockNameVO) throws JsonProcessingException {
-        List dailyPriceList = getDayList(dailyQueryResponse, webQueryParam, stockNameVO);
+        List<OneDayPrice> dailyPriceList = getDayList(dailyQueryResponse, webQueryParam, stockNameVO);
         if (dailyPriceList == null) return;
         double totalPrice = 0;
         double tenDaysAvg = 0;
@@ -120,39 +122,50 @@ public class KLineService {
             }
         }
 
+        //keep three decimals
         BigDecimal tempPrice = new BigDecimal(tenDaysAvg);
-        dayAvgVO.setTenDayAvgPrice(tempPrice.setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue());
-        dayAvgVO.setTwentyDayAvgPrice(0);
-        dayAvgVO.setThirtyDayAvgPrice(0);
+        BigDecimal bigDecimal = tempPrice.setScale(3, BigDecimal.ROUND_HALF_UP);
+        if(!stockNameVO.getStockName().toLowerCase().contains("etf")){
+            bigDecimal = tempPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+        dayAvgVO.setTenDayAvgPrice(bigDecimal.doubleValue());
+        dayAvgVO.setStockName(stockNameVO.getStockName());
         dayAvgMap.put(webQueryParam.getIdentifier(), dayAvgVO);
         putCache(dayAvgVO);
     }
 
-    private static List getDayList(DailyQueryResponseVO dailyQueryResponse, WebQueryParam webQueryParam, StockNameVO stockNameVO) throws JsonProcessingException {
+    private static List<OneDayPrice> getDayList(DailyQueryResponseVO dailyQueryResponse, WebQueryParam webQueryParam, StockNameVO stockNameVO) throws JsonProcessingException {
         if (Objects.isNull(dailyQueryResponse)) {
             return null;
         }
-        Map map = (Map) dailyQueryResponse.getData().get(webQueryParam.getIdentifier().toLowerCase());
-        Object dayListObj = map.get("day");
+        Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(webQueryParam.getIdentifier().toLowerCase());
+        Object dayListObj = dataMap.get("day");
         if (Objects.isNull(dayListObj)) {
-            dayListObj = map.get("qfqday");
+            dayListObj = dataMap.get("qfqday");
         }
         List<OneDayPrice> dayList = objectMapper.readValue(objectMapper.writeValueAsString(dayListObj), List.class);
         if (Objects.isNull(dayList)) {
             return null;
         }
-        String stockChineseName = ((List) (((Map) map.get("qt")).get(webQueryParam.getIdentifier()))).get(1).toString();
-        stockNameVO.setChineseName(stockChineseName);
+        List identifierList = (List)((Map) dataMap.get("qt")).get(webQueryParam.getIdentifier());
+        if(identifierList.size() == 0 ){
+            logger.error("==============ERROR ===== Input Stock Name must be wrong: " + webQueryParam.getIdentifier());
+            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param="+ webQueryParam.getIdentifier()+",day,,,10,qfq");
+            return null;
+        }
+        Object stockChineseNameObject =  identifierList.get(1);
+        String stockChineseName = stockChineseNameObject.toString();
+        stockNameVO.setStockName(stockChineseName);
         return dayList;
     }
 
     public void filterUpTenDayPriceStock(DailyQueryResponseVO dailyQueryResponse, WebQueryParam webQueryParam, StockNameVO stockNameVO) throws JsonProcessingException {
-        List dayList = getDayList(dailyQueryResponse, webQueryParam, stockNameVO);
-        if (!checkIfTodayData(dayList)) {
+        List<OneDayPrice> dayList = getDayList(dailyQueryResponse, webQueryParam, stockNameVO);
+        if (dayList == null || !checkIfTodayData(dayList)) {
             return;
         }
 
-        double tenDayAvgPrice = dayAvgMap.get(stockNameVO.getIdentifier()).getTenDayAvgPrice();
+        double tenDayAvgPrice = dayAvgMap.get(stockNameVO.getStockId()).getTenDayAvgPrice();
         double lastDayPrice = Double.valueOf(((List) dayList.get(dayList.size() - 2)).get(2).toString());
         if (lastDayPrice > tenDayAvgPrice) {
             return;
@@ -174,12 +187,12 @@ public class KLineService {
 
     }
 
-    private boolean checkIfTodayData(List dayList) {
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    private boolean checkIfTodayData(List<OneDayPrice> dayList) {
         String date = ((List) dayList.get(dayList.size() - 1)).get(0).toString();
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String today = format.format(new Date());
         //if the date yyyy-MM-dd is equal, it means the market is started!
-        if (today.equals(date)) {
+        if (today == date) {
             return false;
         }
         return true;
@@ -188,10 +201,11 @@ public class KLineService {
 
     public void realTimeQuery() throws JsonProcessingException {
         for (StockNameVO stockNameVO : stockNameList) {
-            if (stockNameVO.getIdentifier().contains("sh") || stockNameVO.getIdentifier().contains("sz")) {
+            if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
                 WebQueryParam webQueryParam = new WebQueryParam();
-                stockNameVO.setIdentifier(stockNameVO.getIdentifier());
-                webQueryParam.setDaysToQuery(1);
+                stockNameVO.setStockId(stockNameVO.getStockId());
+                webQueryParam.setIdentifier(stockNameVO.getStockId());
+                webQueryParam.setDaysToQuery(2);
 
                 DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
 

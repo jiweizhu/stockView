@@ -4,9 +4,11 @@ import lombok.Data;
 
 @Data
 public class DayAvgVO {
-    private double lastDayPrice;
-    private double tenDayAvgPrice;
-    private double twentyDayAvgPrice;
-    private double thirtyDayAvgPrice;
+    private String stockId;
+    private String stockName;
+    private Double lastDayPrice;
+    private Double tenDayAvgPrice;
+    private Double twentyDayAvgPrice;
+    private Double thirtyDayAvgPrice;
 
 }

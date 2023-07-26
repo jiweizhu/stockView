@@ -13,17 +13,17 @@ public class Controller {
     @Autowired
     private KLineService kLineService;
 
-    @RequestMapping(value= {"/","/index"})
+    @RequestMapping(value= {"/real","/index"})
     @ResponseBody
-    public String getIndex() throws JsonProcessingException {
+    public String realTimeQuery() throws JsonProcessingException {
          kLineService.realTimeQuery();
         return "ok";
     }
 
-    @RequestMapping(value= {"/aa"})
+    @RequestMapping(value= {"/avg"})
     @ResponseBody
-    public String getIndex2() throws InterruptedException, JsonProcessingException {
-        kLineService.startToQueryRealTimePrice();
+    public String getAvgPrice() throws InterruptedException, JsonProcessingException {
+        kLineService.getAvgPrice();
         return "ok";
     }
 
