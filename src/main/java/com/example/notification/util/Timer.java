@@ -30,10 +30,8 @@ public class Timer {
     }
 
 
-    //  real time query, every 10min
-    //    每天的7点到21点都执行一次：0 0 7-21 * * ?
-//    @Scheduled(cron = "0/10 * 9-15 * * ?") // for debug
-    @Scheduled(cron = "* 0/15 9-15 * * ?")
+    //  real time query, every 15min
+    @Scheduled(cron = "30 0/15 9-15 * * ?")
     public void realTimeQuery() {
         try {
             logger.info("===== Start realTimeQuery ====");

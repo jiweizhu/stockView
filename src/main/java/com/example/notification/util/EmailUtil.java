@@ -86,7 +86,7 @@ public class EmailUtil {
         return nowTime;
     }
 
-    public static void sendMail(Map<String, StockNameVO> stockNameVOMap) throws Exception {
+    public static void sendMail(Map<String, StockNameVO> upTenDayMap, Map<String, StockNameVO> downTenDayMap) throws Exception {
         Session session = Session.getDefaultInstance(prop, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -104,23 +104,34 @@ public class EmailUtil {
         message.setSubject(title);
 
 
-        String nowTime = setMapMessage(stockNameVOMap, message);
+        String nowTime = setMapMessage(upTenDayMap, downTenDayMap, message);
 
         // send mail
         ts.sendMessage(message, message.getAllRecipients());
-        logger.info("Mail sent successfully=====" + nowTime + "===={}", stockNameVOMap);
+        logger.info("Mail sent successfully=====" + nowTime + "=upTenDayMap==={},========downTenDayMap==={}", upTenDayMap, downTenDayMap);
         // release resource
         ts.close();
     }
 
-    private static String setMapMessage(Map<String, StockNameVO> stockNameVOMap, MimeMessage message) throws MessagingException {
+    private static String setMapMessage(Map<String, StockNameVO> upTenDayMap, Map<String, StockNameVO> downTenDayMap, MimeMessage message) throws MessagingException {
         String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        AtomicInteger count = new AtomicInteger(0);
-        final StringBuffer stockStr = new StringBuffer();
-        stockNameVOMap.keySet().forEach(k -> {
-            stockStr.append(" " + count.incrementAndGet() + "==" + k + "==" + stockNameVOMap.get(k)).append("\n");
+        AtomicInteger upCount = new AtomicInteger(0);
+        final StringBuffer upTenDayStock = new StringBuffer();
+        upTenDayMap.keySet().forEach(k -> {
+            upTenDayStock.append(" " + upCount.incrementAndGet() + "." + upTenDayMap.get(k)).append("<br>");
         });
-        message.setContent("Now the time is " + nowTime + " , this is a important message!" + " Exceed 10 day avg price is " + stockStr, "text/html;charset=utf-8");
+
+        AtomicInteger downCount = new AtomicInteger(0);
+        final StringBuffer downTenDayStock = new StringBuffer();
+        downTenDayMap.keySet().forEach(k -> {
+            downTenDayStock.append(" " + downCount.incrementAndGet() + "." + downTenDayMap.get(k)).append("<br>");
+        });
+        message.setContent("Now the time is <b>" + nowTime + "</b>, this is a important message!<br>" +
+                        "=================================<br>" +
+                        "<b>Down 10 day avg price: </b><br>" + downTenDayStock +
+                        "=================================<br>" +
+                        "<b>Exceed 10 day avg price: </b><br>" + upTenDayStock,
+                "text/html;charset=utf-8");
         return nowTime;
     }
 
