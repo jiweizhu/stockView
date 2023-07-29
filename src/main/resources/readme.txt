@@ -3,6 +3,17 @@ issues:
 2.sz002916 and sh002916 both exist!
 
 =================================
+
+need to do:
+1.down 10days price
+
+Function:
+=====
+20230729
+just after the realTime loops to send an email. Reduce to send many emails! This to prevent qq mail to ban me sending email.
+
+========
+20230701
 1.eightHourQuery method would run every day at 8:00, to get 10day avg price.
 2.realTimeQuery method run every 10min(can config) to monitor
 3.if the date yyyy-MM-dd is equal, it means the market is started!
