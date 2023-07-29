@@ -32,10 +32,11 @@ public class Timer {
 
     //  real time query, every 10min
     //    每天的7点到21点都执行一次：0 0 7-21 * * ?
-    @Scheduled(cron = "0/10 0 9-15 * * ?")
+//    @Scheduled(cron = "0/10 * 9-15 * * ?") // for debug
+    @Scheduled(cron = "* 0/15 9-15 * * ?")
     public void realTimeQuery() {
         try {
-            logger.info("Start realTimeQuery====");
+            logger.info("===== Start realTimeQuery ====");
             kLineService.realTimeQuery();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);

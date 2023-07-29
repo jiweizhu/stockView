@@ -26,20 +26,18 @@ public class KLineService {
     private static ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum.txt";
+    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum_test.txt";
 
     private static ArrayList<StockNameVO> stockNameList = new ArrayList<>();
 
-    private static List<StockNameVO> upTenDayList = new ArrayList<>();
-    private static List<StockNameVO> downTenDayList = new ArrayList<>();
-    private static List<StockNameVO> twentyDayList = new ArrayList<>();
-    private static List<StockNameVO> thirtyDayList = new ArrayList<>();
+    private static Map<String, StockNameVO> exceedTenDayMap = new HashMap<>();
+    private static Map<String, StockNameVO> downTenDayMap = new HashMap<>();
     private static List<StockNameVO> downTriggerOnePointFivePercentList = new ArrayList<>();
     private static Map<String, DayAvgVO> dayAvgMap = new HashMap<>();
 
     public static void clearCollect() {
-        upTenDayList.clear();
-        downTenDayList.clear();
+        exceedTenDayMap.clear();
+        downTenDayMap.clear();
     }
 
     @Value("${notification.monitor.file}")
@@ -51,8 +49,8 @@ public class KLineService {
         BufferedReader reader = null;
         String line;
         try {
-            String os = System.getenv("OS");
-            if (null != os && os.toLowerCase().contains("windows")) {
+            boolean winSystem = isWinSystem();
+            if (winSystem) {
                 stockFile = localTestStockFile;
             }
             FileReader fileReader = new FileReader(stockFile);
@@ -76,6 +74,14 @@ public class KLineService {
         }
     }
 
+    private boolean isWinSystem() {
+        String os = System.getenv("OS");
+        if (null != os && os.toLowerCase().contains("windows")) {
+            return true;
+        }
+        return false;
+    }
+
     @Autowired
     private RestRequest restRequest;
 
@@ -86,11 +92,6 @@ public class KLineService {
             //slow down the speech, just intend to avoid website protection
             Thread.sleep(100);
             if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
-                if (upTenDayList.contains(stockNameVO)) {
-                    //meaning that the email is sent today
-                    return;
-                }
-
                 WebQueryParam webQueryParam = new WebQueryParam();
                 webQueryParam.setIdentifier(stockNameVO.getStockId());
                 DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
@@ -99,7 +100,7 @@ public class KLineService {
         }
 
         dayAvgMap.forEach((k, v) -> {
-            logger.info(k+","+ v.getStockName()+"="+v.getTenDayAvgPrice()+";");
+            logger.info(k + "," + v.getStockName() + "=" + v.getTenDayAvgPrice() + ";");
         });
     }
 
@@ -125,7 +126,8 @@ public class KLineService {
         //keep three decimals
         BigDecimal tempPrice = new BigDecimal(tenDaysAvg);
         BigDecimal bigDecimal = tempPrice.setScale(3, BigDecimal.ROUND_HALF_UP);
-        if(!stockNameVO.getStockName().toLowerCase().contains("etf")){
+        String lowerCase = stockNameVO.getStockName().toLowerCase();
+        if (!lowerCase.contains("etf") && !lowerCase.contains("lof")) {
             bigDecimal = tempPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         dayAvgVO.setTenDayAvgPrice(bigDecimal.doubleValue());
@@ -147,13 +149,13 @@ public class KLineService {
         if (Objects.isNull(dayList)) {
             return null;
         }
-        List identifierList = (List)((Map) dataMap.get("qt")).get(webQueryParam.getIdentifier());
-        if(identifierList.size() == 0 ){
+        List identifierList = (List) ((Map) dataMap.get("qt")).get(webQueryParam.getIdentifier());
+        if (identifierList.size() == 0) {
             logger.error("==============ERROR ===== Input Stock Name must be wrong: " + webQueryParam.getIdentifier());
-            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param="+ webQueryParam.getIdentifier()+",day,,,10,qfq");
+            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=" + webQueryParam.getIdentifier() + ",day,,,10,qfq");
             return null;
         }
-        Object stockChineseNameObject =  identifierList.get(1);
+        Object stockChineseNameObject = identifierList.get(1);
         String stockChineseName = stockChineseNameObject.toString();
         stockNameVO.setStockName(stockChineseName);
         return dayList;
@@ -172,15 +174,33 @@ public class KLineService {
         }
         double realPrice = Double.valueOf(((List) dayList.get(dayList.size() - 1)).get(2).toString());
         if (tenDayAvgPrice < realPrice) {
-            upTenDayList.add(stockNameVO);
-            sendAlarmEmail(stockNameVO);
+            exceedTenDayMap.put(stockNameVO.getStockId(), stockNameVO);
         }
+    }
+
+    private void sendAlarmEmail(Map<String, StockNameVO> stockNameVOMap) {
+        try {
+            logger.info("start to send email!====size ==={}", stockNameVOMap.size());
+            logger.info("start to send email!====VOs are ====={}", stockNameVOMap);
+            if (isWinSystem()) {
+                //locally just for debug, no need to send real email.
+                return;
+            }
+            EmailUtil.sendMail(stockNameVOMap);
+        } catch (Exception e) {
+            logger.error("Fail to send email! ===", e);
+        }
+
     }
 
     private void sendAlarmEmail(StockNameVO stockNameVO) {
         try {
-            logger.info("start to send email!====", stockNameVO);
-            EmailUtil.sendMail(stockNameVO);
+            logger.info("start to send email!===={}", stockNameVO);
+            if (isWinSystem()) {
+                //locally just for debug, no need to send real email.
+                return;
+            }
+            EmailUtil.sendMailSingle(stockNameVO);
         } catch (Exception e) {
             logger.error("Fail to send email! ===", e);
         }
@@ -188,6 +208,7 @@ public class KLineService {
     }
 
     private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
     private boolean checkIfTodayData(List<OneDayPrice> dayList) {
         String date = ((List) dayList.get(dayList.size() - 1)).get(0).toString();
         String today = format.format(new Date());
@@ -199,8 +220,13 @@ public class KLineService {
     }
 
 
-    public void realTimeQuery() throws JsonProcessingException {
+    public void realTimeQuery() throws Exception {
+        int exceedTenDayMapSize = exceedTenDayMap.size();
         for (StockNameVO stockNameVO : stockNameList) {
+            if (exceedTenDayMap.containsKey(stockNameVO.getStockId())){
+                //email already sent today!
+                return;
+            }
             if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
                 WebQueryParam webQueryParam = new WebQueryParam();
                 stockNameVO.setStockId(stockNameVO.getStockId());
@@ -214,6 +240,14 @@ public class KLineService {
 
                 filterUpTenDayPriceStock(dailyQueryResponse, webQueryParam, stockNameVO);
             }
+        }
+        if(exceedTenDayMapSize < exceedTenDayMap.size()){
+            boolean winSystem = isWinSystem();
+            if (winSystem) {
+               return;
+            }
+            //means that after this loop, new Stock needs to be alarmed.
+            EmailUtil.sendMail(exceedTenDayMap);
         }
     }
 
