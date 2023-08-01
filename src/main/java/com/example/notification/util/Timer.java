@@ -30,6 +30,19 @@ public class Timer {
     }
 
 
+    //every day at 9:30:30
+    @Scheduled(cron = "30 30 9 * * ?")
+    public void checkIfMarketOpen() {
+        try {
+            logger.info("Start checkIfMarketOpen=====");
+            kLineService.checkIfMarketOpenToday();
+
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+    }
+
+
     //  real time query, every 15min
     @Scheduled(cron = "30 0/15 9-15 * * ?")
     public void realTimeQuery() {

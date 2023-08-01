@@ -1,11 +1,17 @@
+Note:
+1.avg price is calculated by last X day. Not including today real price!
+
+====================
 issues:
 1.The decimal place is wrong
-2.sz002916 and sh002916 both exist!
+2.sz002916 and sh002916 both exist! how to filter?
 
 =================================
 
 need to do:
-1.down 10days price
+3.IMPORTANT!----calculate the upAndDown program! to choose which ETF is the best to do upAndDown!----有色？酒？芯片太弱了！这里需有注意，就是网格要在底部安全区域做！否则不断加仓会疯！
+2.if not a opening day, skip to do realtime query! In order to void sending the same email as yesterday's.
+1.down 10days price---done;20230729
 
 Function:
 =====
