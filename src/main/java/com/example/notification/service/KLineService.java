@@ -33,10 +33,10 @@ public class KLineService {
 
     private static Map<String, StockNameVO> exceedFiveDayMap = new HashMap<>();
     private static Map<String, StockNameVO> exceedTenDayMap = new HashMap<>();
-    private static Map<String, StockNameVO> downTenDayMap = new HashMap<>();
+    private static Map<String, StockNameVO> exceedTwentyDayMap = new HashMap<>();
     private static Map<String, StockNameVO> downFiveDayMap = new HashMap<>();
-    private static Map<String, StockNameVO> collectTenDayMap = new HashMap<>();
-    private static List<StockNameVO> downTriggerOnePointFivePercentList = new ArrayList<>();
+    private static Map<String, StockNameVO> downTenDayMap = new HashMap<>();
+    private static Map<String, StockNameVO> downTwentyDayMap = new HashMap<>();
     private static Map<String, DayAvgVO> dayAvgMap = new HashMap<>();
     private static Map<String, List<ArrayList<String>>> daysPriceMap = new HashMap<>();
 
@@ -122,9 +122,9 @@ public class KLineService {
     public void calculateDayAvgPrice(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         List<ArrayList<String>> dailyPriceList = getLastThirtyDaysList(dailyQueryResponse, stockNameVO);
         if (dailyPriceList == null) return;
-        //if the last one is today, remove today
         int size = dailyPriceList.size();
         if (dailyPriceList.get(size - 1).get(0).equals(Utils.todayDate())) {
+            //if the last one is today, remove today
             dailyPriceList.remove(size - 1);
         }
 
@@ -208,87 +208,59 @@ public class KLineService {
 
     public void realTimeQuery() throws Exception {
         logger.info("======start realTimeQuery=======");
-        int exceedTenDayMapSize = exceedTenDayMap.size();
-        int downTenDayMapSize = downTenDayMap.size();
+        MailMaps.resetSendEmailMaps();
         for (String stockId : dayAvgMap.keySet()) {
-            if (exceedTenDayMap.containsKey(stockId) || downTenDayMap.containsKey(stockId)) {
-                //email already sent today!
+            WebQueryParam webQueryParam = new WebQueryParam();
+            webQueryParam.setIdentifier(stockId);
+            //at least 2 days to query, because need to check if avg price is between real price and yesterday's price
+            webQueryParam.setDaysToQuery(2);
+
+            DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+
+            List<ArrayList<String>> twoDayList = getRealPriceList(dailyQueryResponse, stockId);
+            if (twoDayList == null || !checkIfTodayData(twoDayList)) {
                 continue;
             }
-            if (stockId.contains("sh") || stockId.contains("sz")) {
-                WebQueryParam webQueryParam = new WebQueryParam();
-                webQueryParam.setIdentifier(stockId);
-                //at least 2 days to query, because need to check if avg price is between real price and yesterday's price
-                webQueryParam.setDaysToQuery(2);
 
-                DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+            StockNameVO stockNameVO = dayAvgMap.get(stockId).getStockNameVO();
+            filterExceedPriceStock(twoDayList, exceedFiveDayMap, dayAvgMap.get(stockId).getFiveDayPrice(), stockNameVO, "up5day");
+            filterExceedPriceStock(twoDayList, exceedTenDayMap, dayAvgMap.get(stockId).getTenDayAvgPrice(), stockNameVO, "up10day");
+            filterExceedPriceStock(twoDayList, exceedTwentyDayMap, dayAvgMap.get(stockId).getTwentyDayAvgPrice(), stockNameVO, "up20day");
+            filterDownPriceStock(twoDayList, downFiveDayMap, dayAvgMap.get(stockId).getFiveDayPrice(), stockNameVO, "down5day");
+            filterDownPriceStock(twoDayList, downTenDayMap, dayAvgMap.get(stockId).getTenDayAvgPrice(), stockNameVO, "down10day");
+            filterDownPriceStock(twoDayList, downTwentyDayMap, dayAvgMap.get(stockId).getTwentyDayAvgPrice(), stockNameVO, "down20day");
+        }
+        logger.info("============exceedFiveDayMap======={}",exceedFiveDayMap);
+        logger.info("============exceedTenDayMap======={}",exceedTenDayMap);
+        logger.info("============downFiveDayMap======={}",downFiveDayMap);
+        logger.info("============downTenDayMap======={}",downTenDayMap);
+        EmailUtil.sendMail();
+    }
 
-                List<ArrayList<String>> twoDayList = getRealPriceList(dailyQueryResponse, stockId);
-                if (twoDayList == null || !checkIfTodayData(twoDayList)) {
-                    continue;
-                }
 
-                filterUpTenDayPriceStock(twoDayList, stockId);
-                filterDownFiveDayPriceStock(twoDayList, stockId);
-//                filterDownTenDayPriceStock(dailyQueryResponse, webQueryParam, stockNameVO);
+    public void filterExceedPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, double avgPrice, StockNameVO stockNameVO, String mailListIndex) {
+        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
+        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
+        if (lastDayPrice <= avgPrice && avgPrice <= realPrice) {
+            if (dayMap.get(stockNameVO.getStockId()) == null) {
+                dayMap.put(stockNameVO.getStockId(), stockNameVO);
+                MailMaps.getNamingMap().put(mailListIndex, dayMap);
+                MailMaps.needToSendEmail();
             }
         }
+    }
 
-        logger.info("=========downFiveDayMap===={}", downFiveDayMap);
-        if (exceedTenDayMapSize < exceedTenDayMap.size() || downTenDayMapSize < downTenDayMap.size()) {
-            boolean winSystem = Utils.isWinSystem();
-            if (winSystem) {
-                logger.info("====Send an emial !!===={}", exceedTenDayMap);
-                return;
+    private void filterDownPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, Double avgPrice, StockNameVO stockNameVO, String mailListIndex) {
+        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
+        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
+        if (realPrice <= avgPrice && avgPrice <= lastDayPrice) {
+            if (dayMap.get(stockNameVO.getStockId()) == null) {
+                dayMap.put(stockNameVO.getStockId(), stockNameVO);
+                MailMaps.getNamingMap().put(mailListIndex, dayMap);
+                MailMaps.needToSendEmail();
             }
-
-            //means that after this loop, new Stock needs to be alarmed.
-            EmailUtil.sendMail(exceedTenDayMap, downTenDayMap);
         }
     }
-
-
-
-    public void filterUpTenDayPriceStock(List<ArrayList<String>> twoDayList, String stockId) {
-        double tenDayAvgPrice = dayAvgMap.get(stockId).getTenDayAvgPrice();
-        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
-        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
-        if (lastDayPrice > tenDayAvgPrice) {
-            return;
-        }
-        if (tenDayAvgPrice < realPrice) {
-            exceedTenDayMap.put(stockId, dayAvgMap.get(stockId).getStockNameVO());
-            logger.info("=========exceedTenDayMap===={}", exceedTenDayMap);
-        }
-    }
-
-    private void filterDownFiveDayPriceStock(List<ArrayList<String>> twoDayList, String stockId) {
-        double fiveDayPrice = dayAvgMap.get(stockId).getFiveDayPrice();
-        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
-        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
-        if (lastDayPrice > fiveDayPrice) {
-            return;
-        }
-        if (fiveDayPrice < realPrice) {
-            downFiveDayMap.put(stockId, dayAvgMap.get(stockId).getStockNameVO());
-            logger.info("=========downFiveDayMap===={}", downFiveDayMap);
-        }
-    }
-
-
-    private void filterDownTenDayPriceStock(List<ArrayList<String>> twoDayList, StockNameVO stockNameVO) {
-        double tenDayAvgPrice = dayAvgMap.get(stockNameVO.getStockId()).getTenDayAvgPrice();
-        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
-        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
-        if (lastDayPrice > tenDayAvgPrice) {
-            return;
-        }
-        if (tenDayAvgPrice > realPrice) {
-            downTenDayMap.put(stockNameVO.getStockId(), stockNameVO);
-            logger.info("=========downTenDayMap===={}", downTenDayMap);
-        }
-    }
-
 
     private List<ArrayList<String>> getRealPriceList(DailyQueryResponseVO dailyQueryResponse, String stockId) throws JsonProcessingException {
         if (dailyQueryResponse == null) {

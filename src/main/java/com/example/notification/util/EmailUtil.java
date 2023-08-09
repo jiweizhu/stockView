@@ -1,5 +1,6 @@
 package com.example.notification.util;
 
+import com.example.notification.vo.MailMaps;
 import com.example.notification.vo.StockNameVO;
 import com.sun.mail.util.MailSSLSocketFactory;
 import org.slf4j.Logger;
@@ -126,13 +127,62 @@ public class EmailUtil {
         downTenDayMap.keySet().forEach(k -> {
             downTenDayStock.append(" " + downCount.incrementAndGet() + "." + downTenDayMap.get(k)).append("<br>");
         });
-        message.setContent("Now the time is <b>" + nowTime + "</b>, this is a important message!<br>" +
-                        "=================================<br>" +
-                        "<b>Down 10 day avg price: </b><br>" + downTenDayStock +
-                        "=================================<br>" +
-                        "<b>Exceed 10 day avg price: </b><br>" + upTenDayStock,
-                "text/html;charset=utf-8");
+        message.setContent("Now the time is <b>" + nowTime + "</b>, this is a important message!<br>" + "=================================<br>" + "<b>Down 10 day avg price: </b><br>" + downTenDayStock + "=================================<br>" + "<b>Exceed 10 day avg price: </b><br>" + upTenDayStock, "text/html;charset=utf-8");
         return nowTime;
     }
 
+    public static void sendMail() throws MessagingException {
+        if (!MailMaps.getIfNeedToSend()) {
+            return;
+        }
+        Session session = Session.getDefaultInstance(prop, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+//        session.setDebug(true);
+        Transport ts = session.getTransport();
+        ts.connect(host, username, password);
+
+        //create mail content
+        MimeMessage message = new MimeMessage(session);
+        message.setFrom(new InternetAddress(from));
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
+        message.setSubject(title);
+
+
+        String mailContent = constructMailContent();
+        message.setContent(mailContent, "text/html;charset=utf-8");
+        // send mail
+        ts.sendMessage(message, message.getAllRecipients());
+        logger.info("Mail sent successfully====={}", mailContent);
+        // release resource
+        ts.close();
+
+
+    }
+
+    private static String constructMailContent() {
+        String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        StringBuffer mailContent = new StringBuffer("Now the time is <b>" + nowTime + "</b>, this is a important message!<br>" + "=================================<br>");
+
+
+        AtomicInteger lineNumber = new AtomicInteger(0);
+        Map<String, Map<String, StockNameVO>> namingMap = MailMaps.getNamingMap();
+        namingMap.forEach((k, v) -> {
+                    final StringBuffer downTenDayStock = new StringBuffer();
+                    Map<String, StockNameVO> stockNameVOMap = v;
+                    if (v == null) {
+                        return;
+                    }
+                    stockNameVOMap.keySet().forEach(x -> {
+                        downTenDayStock.append(" " + lineNumber.incrementAndGet() + "." + stockNameVOMap.get(x)).append("<br>");
+                    });
+                    lineNumber.set(0);
+                    mailContent.append("<b>" + k + " avg price: </b><br>" + downTenDayStock + "=================================<br>");
+                }
+        );
+        return mailContent.toString();
+    }
 }
