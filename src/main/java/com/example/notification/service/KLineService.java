@@ -25,7 +25,7 @@ public class KLineService {
     private static final Logger logger = LoggerFactory.getLogger(KLineService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum.txt";
+    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum_test.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
 
@@ -222,18 +222,19 @@ public class KLineService {
                 continue;
             }
 
-            StockNameVO stockNameVO = dayAvgMap.get(stockId).getStockNameVO();
-            filterExceedPriceStock(twoDayList, exceedFiveDayMap, dayAvgMap.get(stockId).getFiveDayPrice(), stockNameVO, "up5day");
-            filterExceedPriceStock(twoDayList, exceedTenDayMap, dayAvgMap.get(stockId).getTenDayAvgPrice(), stockNameVO, "up10day");
-            filterExceedPriceStock(twoDayList, exceedTwentyDayMap, dayAvgMap.get(stockId).getTwentyDayAvgPrice(), stockNameVO, "up20day");
-            filterDownPriceStock(twoDayList, downFiveDayMap, dayAvgMap.get(stockId).getFiveDayPrice(), stockNameVO, "down5day");
-            filterDownPriceStock(twoDayList, downTenDayMap, dayAvgMap.get(stockId).getTenDayAvgPrice(), stockNameVO, "down10day");
-            filterDownPriceStock(twoDayList, downTwentyDayMap, dayAvgMap.get(stockId).getTwentyDayAvgPrice(), stockNameVO, "down20day");
+            DayAvgVO dayAvgVO = dayAvgMap.get(stockId);
+            StockNameVO stockNameVO = dayAvgVO.getStockNameVO();
+            filterExceedPriceStock(twoDayList, exceedFiveDayMap, dayAvgVO.getFiveDayPrice(), stockNameVO, "up5day");
+            filterExceedPriceStock(twoDayList, exceedTenDayMap, dayAvgVO.getTenDayAvgPrice(), stockNameVO, "up10day");
+            filterExceedPriceStock(twoDayList, exceedTwentyDayMap, dayAvgVO.getTwentyDayAvgPrice(), stockNameVO, "up20day");
+            filterDownPriceStock(twoDayList, downFiveDayMap, dayAvgVO.getFiveDayPrice(), stockNameVO, "down5day");
+            filterDownPriceStock(twoDayList, downTenDayMap, dayAvgVO.getTenDayAvgPrice(), stockNameVO, "down10day");
+            filterDownPriceStock(twoDayList, downTwentyDayMap, dayAvgVO.getTwentyDayAvgPrice(), stockNameVO, "down20day");
         }
-        logger.info("============exceedFiveDayMap======={}",exceedFiveDayMap);
-        logger.info("============exceedTenDayMap======={}",exceedTenDayMap);
-        logger.info("============downFiveDayMap======={}",downFiveDayMap);
-        logger.info("============downTenDayMap======={}",downTenDayMap);
+        logger.info("============exceedFiveDayMap======={}", exceedFiveDayMap);
+        logger.info("============exceedTenDayMap======={}", exceedTenDayMap);
+        logger.info("============downFiveDayMap======={}", downFiveDayMap);
+        logger.info("============downTenDayMap======={}", downTenDayMap);
         EmailUtil.sendMail();
     }
 
@@ -243,6 +244,7 @@ public class KLineService {
         double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
         if (lastDayPrice <= avgPrice && avgPrice <= realPrice) {
             if (dayMap.get(stockNameVO.getStockId()) == null) {
+                stockNameVO.setStockName(stockNameVO.getStockName() + "_" + Utils.getHourMinuteTime());
                 dayMap.put(stockNameVO.getStockId(), stockNameVO);
                 MailMaps.getNamingMap().put(mailListIndex, dayMap);
                 MailMaps.needToSendEmail();
@@ -255,6 +257,7 @@ public class KLineService {
         double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
         if (realPrice <= avgPrice && avgPrice <= lastDayPrice) {
             if (dayMap.get(stockNameVO.getStockId()) == null) {
+                stockNameVO.setStockName(stockNameVO.getStockName() + "_" + Utils.getHourMinuteTime());
                 dayMap.put(stockNameVO.getStockId(), stockNameVO);
                 MailMaps.getNamingMap().put(mailListIndex, dayMap);
                 MailMaps.needToSendEmail();

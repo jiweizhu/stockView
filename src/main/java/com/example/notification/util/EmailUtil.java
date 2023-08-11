@@ -165,7 +165,7 @@ public class EmailUtil {
 
     private static String constructMailContent() {
         String nowTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        StringBuffer mailContent = new StringBuffer("Now the time is <b>" + nowTime + "</b>, this is a important message!<br>" + "=================================<br>");
+        StringBuffer mailContent = new StringBuffer("<font size =\"2\">Now the time is <b>" + nowTime + "</b>, this is an important message!<br>" + "=================================<br></font>");
 
 
         AtomicInteger lineNumber = new AtomicInteger(0);
@@ -177,10 +177,10 @@ public class EmailUtil {
                         return;
                     }
                     stockNameVOMap.keySet().forEach(x -> {
-                        downTenDayStock.append(" " + lineNumber.incrementAndGet() + "." + stockNameVOMap.get(x)).append("<br>");
+                        downTenDayStock.append("<font size =\"1\"> " + lineNumber.incrementAndGet() + "." + stockNameVOMap.get(x)).append("</font><br>");
                     });
                     lineNumber.set(0);
-                    mailContent.append("<b>" + k + " avg price: </b><br>" + downTenDayStock + "=================================<br>");
+                    mailContent.append("<font size =\"2\"> <b>" + k + " avg price: </b><br>" + downTenDayStock + "=================================</font><br>");
                 }
         );
         return mailContent.toString();
