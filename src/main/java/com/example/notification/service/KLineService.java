@@ -18,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -138,8 +139,8 @@ public class KLineService {
         if (dayCount > dailyPriceList.size()) {
             return;
         }
-        double totalPrice = 0;
-        double daysAvg = 0;
+        BigDecimal totalPrice = new BigDecimal(0);
+        BigDecimal daysAvg = new BigDecimal(0);
         DayAvgVO dayAvgVO = dayAvgMap.get(stockNameVO.getStockId());
         if (dayAvgVO == null) {
             dayAvgVO = new DayAvgVO();
@@ -149,12 +150,12 @@ public class KLineService {
         int size = dailyPriceList.size();
         for (int i = size - 1; i > (size - dayCount - 1); i--) {
             List<String> day = dailyPriceList.get(i);
-            String dayEndPrice = day.get(2);
-            totalPrice = totalPrice + Double.valueOf(dayEndPrice);
+            BigDecimal dayEndPrice = new BigDecimal(day.get(2));
+            totalPrice = totalPrice.add(dayEndPrice);
         }
-        daysAvg = totalPrice / dayCount;
+        daysAvg = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
         //keep three decimals
-        BigDecimal tempPrice = new BigDecimal(daysAvg);
+        BigDecimal tempPrice = daysAvg;
         BigDecimal bigDecimal = tempPrice.setScale(3, BigDecimal.ROUND_HALF_UP);
         String stockName = stockNameVO.getStockName();
         String lowerCase = stockName.toLowerCase();
@@ -162,16 +163,16 @@ public class KLineService {
             bigDecimal = tempPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         if (dayCount == 5) {
-            dayAvgVO.setFiveDayPrice(bigDecimal.doubleValue());
+            dayAvgVO.setFiveDayPrice(bigDecimal);
         }
         if (dayCount == 10) {
-            dayAvgVO.setTenDayAvgPrice(bigDecimal.doubleValue());
+            dayAvgVO.setTenDayAvgPrice(bigDecimal);
         }
         if (dayCount == 20) {
-            dayAvgVO.setTwentyDayAvgPrice(bigDecimal.doubleValue());
+            dayAvgVO.setTwentyDayAvgPrice(bigDecimal);
         }
         if (dayCount == 30) {
-            dayAvgVO.setThirtyDayAvgPrice(bigDecimal.doubleValue());
+            dayAvgVO.setThirtyDayAvgPrice(bigDecimal);
         }
         dayAvgVO.getStockNameVO().setStockName(stockNameVO.getStockName());
         putCache(dayAvgVO);
@@ -239,10 +240,10 @@ public class KLineService {
     }
 
 
-    public void filterExceedPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, double avgPrice, StockNameVO stockNameVO, String mailListIndex) {
-        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
-        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
-        if (lastDayPrice <= avgPrice && avgPrice <= realPrice) {
+    public void filterExceedPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, BigDecimal avgPrice, StockNameVO stockNameVO, String mailListIndex) {
+        BigDecimal lastDayPrice = new BigDecimal(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
+        BigDecimal realPrice = new BigDecimal(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
+        if (lastDayPrice.compareTo(avgPrice) <= 0 && avgPrice.compareTo(realPrice) <= 0) {
             if (dayMap.get(stockNameVO.getStockId()) == null) {
                 stockNameVO.setStockName(stockNameVO.getStockName() + "_" + Utils.getHourMinuteTime());
                 dayMap.put(stockNameVO.getStockId(), stockNameVO);
@@ -252,10 +253,10 @@ public class KLineService {
         }
     }
 
-    private void filterDownPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, Double avgPrice, StockNameVO stockNameVO, String mailListIndex) {
-        double lastDayPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
-        double realPrice = Double.valueOf(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
-        if (realPrice <= avgPrice && avgPrice <= lastDayPrice) {
+    private void filterDownPriceStock(List<ArrayList<String>> twoDayList, Map<String, StockNameVO> dayMap, BigDecimal avgPrice, StockNameVO stockNameVO, String mailListIndex) {
+        BigDecimal lastDayPrice = new BigDecimal(((List) twoDayList.get(twoDayList.size() - 2)).get(2).toString());
+        BigDecimal realPrice = new BigDecimal(((List) twoDayList.get(twoDayList.size() - 1)).get(2).toString());
+        if (realPrice.compareTo(avgPrice) <= 0 && avgPrice.compareTo(lastDayPrice) <= 0) {
             if (dayMap.get(stockNameVO.getStockId()) == null) {
                 stockNameVO.setStockName(stockNameVO.getStockName() + "_" + Utils.getHourMinuteTime());
                 dayMap.put(stockNameVO.getStockId(), stockNameVO);
