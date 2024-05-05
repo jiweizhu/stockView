@@ -140,7 +140,6 @@ public class KLineService {
             return;
         }
         BigDecimal totalPrice = new BigDecimal(0);
-        BigDecimal daysAvg = new BigDecimal(0);
         DayAvgVO dayAvgVO = dayAvgMap.get(stockNameVO.getStockId());
         if (dayAvgVO == null) {
             dayAvgVO = new DayAvgVO();
@@ -153,14 +152,12 @@ public class KLineService {
             BigDecimal dayEndPrice = new BigDecimal(day.get(2));
             totalPrice = totalPrice.add(dayEndPrice);
         }
-        daysAvg = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
         //keep three decimals
-        BigDecimal tempPrice = daysAvg;
-        BigDecimal bigDecimal = tempPrice.setScale(3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimal = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
         String stockName = stockNameVO.getStockName();
         String lowerCase = stockName.toLowerCase();
         if (!lowerCase.contains("etf") && !lowerCase.contains("lof")) {
-            bigDecimal = tempPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+            bigDecimal = bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         if (dayCount == 5) {
             dayAvgVO.setFiveDayPrice(bigDecimal);

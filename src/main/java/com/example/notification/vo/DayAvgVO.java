@@ -2,14 +2,16 @@ package com.example.notification.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class DayAvgVO {
     private StockNameVO stockNameVO;
-    private Double lastDayPrice;
-    private Double fiveDayPrice;
-    private Double tenDayAvgPrice;
-    private Double twentyDayAvgPrice;
-    private Double thirtyDayAvgPrice;
+    private BigDecimal lastDayPrice;
+    private BigDecimal fiveDayPrice;
+    private BigDecimal tenDayAvgPrice;
+    private BigDecimal twentyDayAvgPrice;
+    private BigDecimal thirtyDayAvgPrice;
 
     public DayAvgVO() {
         this.stockNameVO = new StockNameVO();
