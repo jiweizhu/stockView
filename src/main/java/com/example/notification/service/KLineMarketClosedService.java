@@ -82,9 +82,19 @@ public class KLineMarketClosedService {
             FileReader fileReader = new FileReader(stockFile);
             reader = new BufferedReader(fileReader);
             while ((line = reader.readLine()) != null) {
-                StockNameVO stockNameVO = new StockNameVO();
-                stockNameVO.setStockId(line.toLowerCase());
-                stockFileList.add(stockNameVO);
+                if(line.startsWith("#")) continue;
+                String[] split = line.split(",");
+                for (int i = 0; i < split.length; i++) {
+                    String str = split[i];
+                    StockNameVO stockNameVO = new StockNameVO();
+                    if(str.startsWith("s")){
+                        String[] id_name = str.split("_");
+                        stockNameVO.setStockId(id_name[0].toLowerCase());
+                    }else {
+                        stockNameVO.setStockId(str.toLowerCase());
+                    }
+                    stockFileList.add(stockNameVO);
+                }
             }
             logger.info("Successfully read stock name file !!");
         } catch (IOException e) {
@@ -206,13 +216,23 @@ public class KLineMarketClosedService {
     }
 
     public Object stockJsonData(String stockId) throws JsonProcessingException {
-        logger.info("stockJsonData stockId=============" + stockId);
+        logger.info("enter stockJsonData stockId=============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
         List resultList = entityManager.createNativeQuery("select day, closing_price from daily_price where stock_id=?1 ").setParameter(1, stockId).getResultList();
 
         return objectMapper.writeValueAsString(resultList);
+    }
+
+    public Object listEtfs()  throws JsonProcessingException {
+            logger.info("enter listEtfs ====");
+        List<StockNameVO> resultList = stockDao.findAll();
+        StringBuffer ret = new StringBuffer("");
+        for (StockNameVO stockVo : resultList) {
+            ret.append(stockVo.getStockId()+"_"+stockVo.getStockName()+"<br/>");
+        }
+        return ret;
     }
 }
 
