@@ -120,15 +120,13 @@ public class KLineMarketClosedService {
             if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
                 WebQueryParam webQueryParam = new WebQueryParam();
                 webQueryParam.setIdentifier(stockNameVO.getStockId());
-                StockNameVO nameVO = new StockNameVO();
-                nameVO.setStockId(stockNameVO.getStockId());
                 DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
-                List<ArrayList<String>> dailyPriceList = getLastThirtyDaysList(dailyQueryResponse, stockNameVO);
+                List<ArrayList<String>> dailyPriceList = storeInDbAndReturnKlines(dailyQueryResponse, stockNameVO);
             }
         }
     }
 
-    private List<ArrayList<String>> getLastThirtyDaysList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+    private List<ArrayList<String>> storeInDbAndReturnKlines(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
         Object dayListObj = dataMap.get("day");
         if (Objects.isNull(dayListObj)) {
