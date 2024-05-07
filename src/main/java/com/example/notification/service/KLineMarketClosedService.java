@@ -35,6 +35,7 @@ public class KLineMarketClosedService {
     public static Boolean ifMarketOpen = Boolean.FALSE;
 
     private static ArrayList<StockNameVO> stockFileList = new ArrayList<>();
+    private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
 
     private static Map<String, StockNameVO> exceedFiveDayMap = new HashMap<>();
     private static Map<String, StockNameVO> exceedTenDayMap = new HashMap<>();
@@ -66,6 +67,20 @@ public class KLineMarketClosedService {
         stockDao.saveAll(stockFileList);
     }
 
+    public List<StockNameVO> getAllEtfs() {
+        if (CollectionUtils.isEmpty(storedETFs)) {
+            List<StockNameVO> stockDaoAll = stockDao.findAll();
+            for (StockNameVO id_name : stockDaoAll) {
+                if (!id_name.getStockId().startsWith("s")) continue;
+                if (id_name.getStockName().toLowerCase().contains("etf")) {
+                    storedETFs.add(id_name);
+                }
+            }
+        }
+        return storedETFs;
+    }
+
+
     //load stock list
     private void readStockFile() {
         if (!CollectionUtils.isEmpty(stockFileList)) {
@@ -82,15 +97,16 @@ public class KLineMarketClosedService {
             FileReader fileReader = new FileReader(stockFile);
             reader = new BufferedReader(fileReader);
             while ((line = reader.readLine()) != null) {
-                if(line.startsWith("#")) continue;
+                if (line.startsWith("#")) continue;
                 String[] split = line.split(",");
                 for (int i = 0; i < split.length; i++) {
                     String str = split[i];
                     StockNameVO stockNameVO = new StockNameVO();
-                    if(str.startsWith("s")){
+                    if (str.startsWith("s")) {
                         String[] id_name = str.split("_");
                         stockNameVO.setStockId(id_name[0].toLowerCase());
-                    }else {
+                        stockNameVO.setStockName(id_name[1]);
+                    } else {
                         stockNameVO.setStockId(str.toLowerCase());
                     }
                     stockFileList.add(stockNameVO);
@@ -141,18 +157,26 @@ public class KLineMarketClosedService {
         extractStockName(stockNameVO, dataMap);
         daysPriceMap.put(stockNameVO.getStockId(), dayList);
 
+        BigDecimal beforeDay_FiveDayAvgPrice = null;
+        BigDecimal beforeDay_TenDayAvgPrice = null;
         for (int i = 0; i < dayList.size(); i++) {
             ArrayList<String> dayPrice = dayList.get(i);
             StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
             //get 5 day avg, before 4 days, set to 0
             if (i >= 4) {
-                BigDecimal avgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 5);
-                stockDailyVO.setFiveDayAvg(avgPrice);
+                BigDecimal fiveDayAvgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 5);
+                stockDailyVO.setFiveDayAvg(fiveDayAvgPrice);
+                BigDecimal dayDiff = calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
+                stockDailyVO.setFiveDayDiff(dayDiff);
+                beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
             }
             //get 10 day avg
             if (i >= 9) {
-                BigDecimal avgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 10);
-                stockDailyVO.setTenDayAvg(avgPrice);
+                BigDecimal tenDayAvgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 10);
+                stockDailyVO.setTenDayAvg(tenDayAvgPrice);
+                BigDecimal dayDiff = calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
+                stockDailyVO.setTenDayDiff(dayDiff);
+                beforeDay_TenDayAvgPrice = tenDayAvgPrice;
             }
 
             stockDailyDao.save(stockDailyVO);
@@ -162,13 +186,20 @@ public class KLineMarketClosedService {
         return dayList;
     }
 
+    private BigDecimal calculateDayGainPercentage(BigDecimal dayAvgPrice, BigDecimal beforeDayAvgPrice) {
+        if (beforeDayAvgPrice == null) {
+            return new BigDecimal(0);
+        }
+        BigDecimal subtract = dayAvgPrice.subtract(beforeDayAvgPrice).multiply(BigDecimal.valueOf(100));
+        BigDecimal gainPercentage = subtract.divide(beforeDayAvgPrice, 2, BigDecimal.ROUND_HALF_UP);
+        return gainPercentage;
+    }
 
     private BigDecimal calculateDayAvg(String stockName, int index, List<ArrayList<String>> dailyPriceList, Integer dayCount) {
         if (dayCount > dailyPriceList.size()) {
             return BigDecimal.valueOf(0);
         }
         BigDecimal totalPrice = new BigDecimal(0);
-        int size = dailyPriceList.size();
         for (int y = 0; y < dayCount; y++) {
             List<String> day = dailyPriceList.get(index - y);
             BigDecimal dayEndPrice = new BigDecimal(day.get(2));
@@ -214,7 +245,7 @@ public class KLineMarketClosedService {
     }
 
     public Object stockJsonData(String stockId) throws JsonProcessingException {
-        logger.info("enter stockJsonData stockId=============" + stockId);
+        logger.debug("enter stockJsonData stockId=============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
@@ -223,14 +254,41 @@ public class KLineMarketClosedService {
         return objectMapper.writeValueAsString(resultList);
     }
 
-    public Object listEtfs()  throws JsonProcessingException {
-            logger.info("enter listEtfs ====");
+    public Object listEtfs() throws JsonProcessingException {
+        logger.debug("enter listEtfs ====");
         List<StockNameVO> resultList = stockDao.findAll();
         StringBuffer ret = new StringBuffer("");
         for (StockNameVO stockVo : resultList) {
-            ret.append(stockVo.getStockId()+"_"+stockVo.getStockName()+"<br/>");
+            if(!stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            ret.append(stockVo.getStockId() + "_" + stockVo.getStockName() + "<br/>");
         }
         return ret;
     }
+
+    public Object report() {
+        logger.debug("enter report ====");
+        List<StockNameVO> allEtfs = getAllEtfs();
+        for (StockNameVO stockNameVO : allEtfs) {
+            //loop to calculate each etf
+            String stockId = stockNameVO.getStockId();
+            List<StockDailyVO> etfPriceList = entityManager.createNativeQuery("select day, closing_price from daily_price where stock_id=?1 limit 60 ").setParameter(1, stockId).getResultList();
+            analysisData(etfPriceList, 5);
+        }
+        return null;
+    }
+
+    private void analysisData(List<StockDailyVO> etfPriceList, Integer dayToAnalysis) {
+        if (etfPriceList.size() == 0) return;
+        BigDecimal daydiff;
+        for (int i = etfPriceList.size() - 1; i > dayToAnalysis; i--) {
+            StockDailyVO day = etfPriceList.get(i);
+            StockDailyVO beforeDay = etfPriceList.get(i - 1);
+            daydiff = day.getClosingPrice().subtract(beforeDay.getClosingPrice());
+            if (daydiff.compareTo(BigDecimal.ZERO) <= 0) {
+
+            }
+        }
+    }
+
 }
 
