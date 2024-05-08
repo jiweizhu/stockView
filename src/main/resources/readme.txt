@@ -1,6 +1,10 @@
 Note:
 1.avg price is calculated by last X day. Not including today real price!
 
+Reporter content: 5 day indicator: just to notice curve raising.
+
+
+
 ====================
 issues:
 1.The decimal place is wrong

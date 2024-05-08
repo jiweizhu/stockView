@@ -1,24 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+<head>
     <meta charset="utf-8">
-    <title>Stocks curve 图表</title>
+    <title>第一个 Highcharts 图表</title>
 </head>
 <body>
-
-
-<script src="https://code.highcharts.com/stock/highstock.js"></script>
-<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
-<script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
-
-
-<div id="container"></div>
-
+<!-- 图表容器 DOM -->
+<div id="container" style="width: 600px;height:400px;"></div>
+<!-- 引入 highcharts.js -->
+<script src="https://code.hcharts.cn/highcharts.js"></script>
 <script>
-      (async () => {
+     (async () => {
 
-      const names = ['sh560080_中药ETF', 'sz000538_云南白药', 'sz000423_东阿阿胶','sh600285_羚锐制药'];
+    const names = ['MSFT', 'AAPL', 'GOOG'];
 
     /**
      * Create the chart when all data is loaded
@@ -64,7 +61,8 @@
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                'http://localhost:8888/stock/'+ name.toLowerCase()
+                'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/' +
+                'samples/data/' + name.toLowerCase() + '-c.json'
             )
                 .then(response => response.json());
             resolve({ name, data });
@@ -75,6 +73,6 @@
     createChart(series);
 
 })();
-</script>
+    </script>
 </body>
 </html>

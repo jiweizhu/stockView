@@ -42,6 +42,12 @@ public class StockDailyVO {
     @Column(name = "tenDayAvg")
     private BigDecimal tenDayAvg = BigDecimal.valueOf(0);
 
+    @Column(name = "five_day_diff")
+    private BigDecimal fiveDayDiff = BigDecimal.valueOf(0);
+
+    @Column(name = "ten_day_diff")
+    private BigDecimal tenDayDiff = BigDecimal.valueOf(0);
+
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
         this.stockId = stockId;
         this.day = Date.valueOf(day);

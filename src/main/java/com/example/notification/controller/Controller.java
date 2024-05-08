@@ -29,6 +29,14 @@ public class Controller {
     }
 
 
+    @RequestMapping(value = {"/stock/list"})
+    @ResponseBody
+    public ResponseEntity listAllETFs() throws JsonProcessingException {
+        Object body = kLineMarketClosedService.listEtfs();
+        return ResponseEntity.ofNullable(body);
+    }
+
+
     @RequestMapping(value = {"/stock/{stockId}"})
     @ResponseBody
     public ResponseEntity stockDataById(@PathVariable String stockId) throws InterruptedException, JsonProcessingException {
@@ -59,6 +67,13 @@ public class Controller {
         stockNameVO.setStockName("testStockName");
         EmailUtil.sendMailSingle(stockNameVO);
         return "ok";
+    }
+
+    @RequestMapping(value = {"/report"})
+    @ResponseBody
+    public ResponseEntity report() throws Exception {
+        Object body = kLineMarketClosedService.report();
+        return ResponseEntity.ofNullable(body);
     }
 
 }

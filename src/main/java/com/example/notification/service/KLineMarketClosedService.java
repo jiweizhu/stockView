@@ -4,7 +4,10 @@ import com.example.notification.http.RestRequest;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
 import com.example.notification.util.Utils;
-import com.example.notification.vo.*;
+import com.example.notification.vo.DailyQueryResponseVO;
+import com.example.notification.vo.StockDailyVO;
+import com.example.notification.vo.StockNameVO;
+import com.example.notification.vo.WebQueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -237,11 +241,7 @@ public class KLineMarketClosedService {
                 //need to calculate
             }
         }
-
-
         //if not, query last 5 or 10 days price, calculate and in db.
-
-
     }
 
     public Object stockJsonData(String stockId) throws JsonProcessingException {
@@ -259,7 +259,7 @@ public class KLineMarketClosedService {
         List<StockNameVO> resultList = stockDao.findAll();
         StringBuffer ret = new StringBuffer("");
         for (StockNameVO stockVo : resultList) {
-            if(!stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
             ret.append(stockVo.getStockId() + "_" + stockVo.getStockName() + "<br/>");
         }
         return ret;
@@ -271,24 +271,61 @@ public class KLineMarketClosedService {
         for (StockNameVO stockNameVO : allEtfs) {
             //loop to calculate each etf
             String stockId = stockNameVO.getStockId();
-            List<StockDailyVO> etfPriceList = entityManager.createNativeQuery("select day, closing_price from daily_price where stock_id=?1 limit 60 ").setParameter(1, stockId).getResultList();
-            analysisData(etfPriceList, 5);
+//            List<Object[]> etfPriceList = entityManager.createNativeQuery("select five_day_avg, five_day_diff, ten_day_avg, ten_day_diff from daily_price where stock_id=?1 limit 60 ").setParameter(1, stockId).;
+            List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, Pageable.ofSize(60)).stream().toList();
+            analysisUpwardDays(etfPriceList, stockNameVO);
+
         }
         return null;
     }
 
-    private void analysisData(List<StockDailyVO> etfPriceList, Integer dayToAnalysis) {
+    private void analysisUpwardDays(List<StockDailyVO> etfPriceList, StockNameVO stockNameVO) {
         if (etfPriceList.size() == 0) return;
-        BigDecimal daydiff;
-        for (int i = etfPriceList.size() - 1; i > dayToAnalysis; i--) {
-            StockDailyVO day = etfPriceList.get(i);
-            StockDailyVO beforeDay = etfPriceList.get(i - 1);
-            daydiff = day.getClosingPrice().subtract(beforeDay.getClosingPrice());
-            if (daydiff.compareTo(BigDecimal.ZERO) <= 0) {
+        Integer fiveDayUpwardDays = 0;
+        Integer loopCount = 0;
+        Boolean markKlineUpward = Boolean.TRUE;
 
+        if (etfPriceList.get(etfPriceList.size() - 1).getFiveDayDiff().compareTo(BigDecimal.ZERO) < 0) {
+            markKlineUpward = Boolean.FALSE;
+        }
+        //set today upwardDay count = 0!
+        for (int index = etfPriceList.size() - 1; index > 0; index--) {
+            StockDailyVO today = etfPriceList.get(index);
+            StockDailyVO beforeDay = etfPriceList.get(index - 1);
+            if (beforeDay.getFiveDayDiff() == null) {
+                break;
+            }
+            if (beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) >= 0 && markKlineUpward == Boolean.TRUE) {
+                fiveDayUpwardDays++;
+            } else {
+                fiveDayUpwardDays--;
+            }
+            loopCount++;
+            System.out.println("loopCount = " + loopCount);
+            System.out.println("today = " + today);
+            if (!loopCount.equals(Math.abs(fiveDayUpwardDays))) {
+                System.out.println("today = " + today);
+                break;
             }
         }
+        BigDecimal gainPercentBeforeDays = getGainPercentBeforeDays(etfPriceList, loopCount);
+        stockNameVO.setFiveGainPercent(gainPercentBeforeDays);
+        stockNameVO.setFiveDayUpwardDays(loopCount);
+        stockDao.save(stockNameVO);
     }
+
+    private BigDecimal getGainPercentBeforeDays(List<StockDailyVO> etfPriceList, int index) {
+        StockDailyVO todayPrice = etfPriceList.get(etfPriceList.size() - 1);
+        StockDailyVO beforePrice = etfPriceList.get(etfPriceList.size() - 1 - index);
+        if (beforePrice.getFiveDayAvg().equals(BigDecimal.ZERO)) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal subtract = todayPrice.getFiveDayAvg().subtract(beforePrice.getFiveDayAvg()).multiply(BigDecimal.valueOf(100));
+        System.out.println("beforePrice ========== " + beforePrice);
+        BigDecimal gainPercentage = subtract.divide(beforePrice.getFiveDayAvg(), 1, BigDecimal.ROUND_HALF_UP);
+        return gainPercentage;
+    }
+
 
 }
 

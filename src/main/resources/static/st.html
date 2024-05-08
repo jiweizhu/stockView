@@ -18,7 +18,7 @@
 <script>
       (async () => {
 
-      const names = ['sh560080_中药ETF', 'sz000538_云南白药', 'sz000423_东阿阿胶','sh600285_羚锐制药'];
+    const names = ['sh560080_中药ETF', 'sz159565_汽车零部件ETF'];
 
     /**
      * Create the chart when all data is loaded
@@ -64,7 +64,8 @@
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                'http://localhost:8888/stock/'+ name.toLowerCase()
+                'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/' +
+                'samples/data/' + name.toLowerCase() + '-c.json'
             )
                 .then(response => response.json());
             resolve({ name, data });
