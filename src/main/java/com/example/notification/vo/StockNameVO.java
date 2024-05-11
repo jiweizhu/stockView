@@ -19,17 +19,17 @@ public class StockNameVO {
     @Column(name = "stockName")
     private String stockName;
 
-    @Column(name = "fiveDayUpwardDays")
-    private Integer fiveDayUpwardDays = 0;
+    @Column(name = "upwardDaysFive")
+    private Integer upwardDaysFive = 0;
 
-    @Column(name = "tenDayUpwardDays")
-    private Integer tenDayUpwardDays = 0;
+    @Column(name = "gainPercentFive")
+    private BigDecimal gainPercentFive;
 
-    @Column(name = "fiveGainPercent")
-    private BigDecimal fiveGainPercent;
+    @Column(name = "flipUpwardDaysFive")
+    private Integer flipUpwardDaysFive = 0;
 
-    @Column(name = "tenGainPercent")
-    private BigDecimal tenGainPercent;
+    @Column(name = "flipGainPercentFive")
+    private BigDecimal flipGainPercentFive;
 
     @Override
     public String toString() {

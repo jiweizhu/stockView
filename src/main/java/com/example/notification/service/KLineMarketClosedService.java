@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -171,7 +172,7 @@ public class KLineMarketClosedService {
                 BigDecimal fiveDayAvgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 5);
                 stockDailyVO.setFiveDayAvg(fiveDayAvgPrice);
                 BigDecimal dayDiff = calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
-                stockDailyVO.setFiveDayDiff(dayDiff);
+                stockDailyVO.setDayGainOfFive(dayDiff);
                 beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
             }
             //get 10 day avg
@@ -179,7 +180,7 @@ public class KLineMarketClosedService {
                 BigDecimal tenDayAvgPrice = calculateDayAvg(stockNameVO.getStockName(), i, dayList, 10);
                 stockDailyVO.setTenDayAvg(tenDayAvgPrice);
                 BigDecimal dayDiff = calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
-                stockDailyVO.setTenDayDiff(dayDiff);
+                stockDailyVO.setDayGainOfTen(dayDiff);
                 beforeDay_TenDayAvgPrice = tenDayAvgPrice;
             }
 
@@ -257,7 +258,7 @@ public class KLineMarketClosedService {
     public Object listEtfs() throws JsonProcessingException {
         logger.debug("enter listEtfs ====");
         List<StockNameVO> resultList = stockDao.findAll();
-        StringBuffer ret = new StringBuffer("");
+        StringBuilder ret = new StringBuilder("");
         for (StockNameVO stockVo : resultList) {
             if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
             ret.append(stockVo.getStockId() + "_" + stockVo.getStockName() + "<br/>");
@@ -273,59 +274,189 @@ public class KLineMarketClosedService {
             String stockId = stockNameVO.getStockId();
 //            List<Object[]> etfPriceList = entityManager.createNativeQuery("select five_day_avg, five_day_diff, ten_day_avg, ten_day_diff from daily_price where stock_id=?1 limit 60 ").setParameter(1, stockId).;
             List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, Pageable.ofSize(60)).stream().toList();
-            analysisUpwardDays(etfPriceList, stockNameVO);
-
+            List<Integer> flipDay = analysisFlipDay(etfPriceList, "getDayGainOfFive");
+            setUpwardDaysAndGainFive(etfPriceList, stockNameVO, flipDay.get(0), flipDay.get(1));
+            stockDao.save(stockNameVO);
         }
-        return null;
+        return "ok";
     }
 
-    private void analysisUpwardDays(List<StockDailyVO> etfPriceList, StockNameVO stockNameVO) {
-        if (etfPriceList.size() == 0) return;
-        Integer fiveDayUpwardDays = 0;
+    private List<Integer> analysisFlipDay(List<StockDailyVO> etfPriceList, String methodName) {
+        if (etfPriceList.size() == 0) return null;
+        Integer flipBeginIndex = 0;
+        Integer flipEndIndex = 0;
         Integer loopCount = 0;
-        Boolean markKlineUpward = Boolean.TRUE;
+        Boolean countFlip = Boolean.FALSE;
+        Boolean todayKLineUpward = Boolean.TRUE;
 
-        if (etfPriceList.get(etfPriceList.size() - 1).getFiveDayDiff().compareTo(BigDecimal.ZERO) < 0) {
-            markKlineUpward = Boolean.FALSE;
+        StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
+        if (today.getDayGainOfFive().compareTo(BigDecimal.ZERO) < 0) {
+            //today is downward!
+            todayKLineUpward = Boolean.FALSE;
         }
         //set today upwardDay count = 0!
         for (int index = etfPriceList.size() - 1; index > 0; index--) {
-            StockDailyVO today = etfPriceList.get(index);
-            StockDailyVO beforeDay = etfPriceList.get(index - 1);
-            if (beforeDay.getFiveDayDiff() == null) {
+            StockDailyVO indexDay = etfPriceList.get(index);
+            if (indexDay.getDayGainOfFive() == null) {
                 break;
-            }
-            if (beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) >= 0 && markKlineUpward == Boolean.TRUE) {
-                fiveDayUpwardDays++;
-            } else {
-                fiveDayUpwardDays--;
             }
             loopCount++;
-            System.out.println("loopCount = " + loopCount);
-            System.out.println("today = " + today);
-            if (!loopCount.equals(Math.abs(fiveDayUpwardDays))) {
-                System.out.println("today = " + today);
-                break;
+            boolean indexDayPositive = indexDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0;
+            System.out.println("indexDay = " + indexDay);
+            if (!todayKLineUpward.equals(indexDayPositive)) {
+                //start to find adjustment days, turn the opposite
+                if (countFlip.equals(Boolean.FALSE)) {
+                    flipBeginIndex = loopCount - 1;
+                }
+                if (countFlip.equals(Boolean.TRUE)) {
+                    flipEndIndex = loopCount - 1;
+                    break;
+                }
+                countFlip = Boolean.TRUE;
+                if (todayKLineUpward.equals(Boolean.TRUE)) {
+                    todayKLineUpward = Boolean.FALSE;
+                } else {
+                    todayKLineUpward = Boolean.TRUE;
+                }
             }
         }
-        BigDecimal gainPercentBeforeDays = getGainPercentBeforeDays(etfPriceList, loopCount);
-        stockNameVO.setFiveGainPercent(gainPercentBeforeDays);
-        stockNameVO.setFiveDayUpwardDays(loopCount);
-        stockDao.save(stockNameVO);
+        List<Integer> flipDayList = new ArrayList<>();
+        flipDayList.add(flipBeginIndex);
+        flipDayList.add(flipEndIndex);
+        return flipDayList;
     }
 
-    private BigDecimal getGainPercentBeforeDays(List<StockDailyVO> etfPriceList, int index) {
+    private static Integer upwardDayPlus(Integer fiveDayUpwardDays, Boolean todayKLineUpward, StockDailyVO beforeDay) {
+        if (beforeDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0 && todayKLineUpward == Boolean.TRUE) {
+            fiveDayUpwardDays++;
+        }
+//            else if (todayKLineUpward == Boolean.FALSE && beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) >= 0) {
+//                ifNeedToBreak = Boolean.TRUE;
+//            } else if (todayKLineUpward == Boolean.TRUE && beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) < 0) {
+//                ifNeedToBreak = Boolean.TRUE;
+        if (beforeDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) < 0 && todayKLineUpward == Boolean.FALSE) {
+            fiveDayUpwardDays--;
+        }
+        return fiveDayUpwardDays;
+    }
+
+    private void setUpwardDaysAndGainFive(List<StockDailyVO> etfPriceList, StockNameVO stockNameVO, Integer flipBeginIndex, Integer flipEndIndex) {
+        System.out.println("flipBeginIndex = " + flipBeginIndex);
+        System.out.println("flipEndIndex = " + flipEndIndex);
+        int listSize = etfPriceList.size();
+        StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
+        StockDailyVO flipDay = etfPriceList.get(listSize - flipBeginIndex - 1);
+        BigDecimal gainPercent = getGainPercent(today, flipDay);
+
+        StockDailyVO flipEndDay = etfPriceList.get(listSize - flipEndIndex - 1);
+        BigDecimal gainPercentFlip = getGainPercent(flipDay, flipEndDay);
+
+        boolean todayUpward = today.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0;
+        if (todayUpward) {
+            stockNameVO.setUpwardDaysFive(flipBeginIndex);
+            stockNameVO.setGainPercentFive(gainPercent);
+
+            stockNameVO.setFlipUpwardDaysFive(flipBeginIndex - flipEndIndex);
+            stockNameVO.setFlipGainPercentFive(gainPercentFlip);
+        } else {
+            stockNameVO.setUpwardDaysFive(-flipBeginIndex);
+            stockNameVO.setGainPercentFive(gainPercent);
+
+            stockNameVO.setFlipUpwardDaysFive(flipEndIndex - flipBeginIndex);
+            stockNameVO.setFlipGainPercentFive(gainPercentFlip);
+        }
+    }
+
+    private BigDecimal getGainPercent(StockDailyVO newPrice, StockDailyVO oldPrice) {
+        BigDecimal subtract = newPrice.getFiveDayAvg().subtract(oldPrice.getFiveDayAvg()).multiply(BigDecimal.valueOf(100));
+        System.out.println("newPrice ========== " + newPrice);
+        System.out.println("oldPrice ========== " + oldPrice);
+        BigDecimal gainPercentage = subtract.divide(oldPrice.getFiveDayAvg(), 2, BigDecimal.ROUND_HALF_UP);
+        return gainPercentage;
+    }
+
+    private BigDecimal getGainPercent(List<StockDailyVO> etfPriceList, int index) {
         StockDailyVO todayPrice = etfPriceList.get(etfPriceList.size() - 1);
         StockDailyVO beforePrice = etfPriceList.get(etfPriceList.size() - 1 - index);
         if (beforePrice.getFiveDayAvg().equals(BigDecimal.ZERO)) {
             return BigDecimal.ZERO;
         }
         BigDecimal subtract = todayPrice.getFiveDayAvg().subtract(beforePrice.getFiveDayAvg()).multiply(BigDecimal.valueOf(100));
+        System.out.println("todayPrice ========== " + todayPrice);
         System.out.println("beforePrice ========== " + beforePrice);
-        BigDecimal gainPercentage = subtract.divide(beforePrice.getFiveDayAvg(), 1, BigDecimal.ROUND_HALF_UP);
+        BigDecimal gainPercentage = subtract.divide(beforePrice.getFiveDayAvg(), 2, BigDecimal.ROUND_HALF_UP);
         return gainPercentage;
     }
 
 
+    public Object findAllEtfSort(String avgDay, String flip) {
+        String sort_1 = avgDay;
+        String sort_2 = flip;
+
+        List<StockNameVO> fiveDayUpwardDays = stockDao.findAll(Sort.by("flipUpwardDaysFive", "flipGainPercentFive").descending());
+        if (CollectionUtils.isEmpty(fiveDayUpwardDays)) {
+            return "No data found!";
+        }
+        StringBuilder html = new StringBuilder();
+        html.append("<table border=\"1\">\n");
+        html.append("<tr><th>ETF Name</th><th>Upward Days of Five</th><th>Gain Percent of Five(%)</th>" + "<th>Flip Upward Days of Five</th><th>Flip Gain Percent of Five(%)</th></tr>\n");
+        List<String> lightColors = generateLightColors();
+        Integer loopCount = 0;
+        String color = lightColors.get(loopCount);
+        Integer temp = 0;
+        for (StockNameVO stockVo : fiveDayUpwardDays) {
+            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            if (!stockVo.getUpwardDaysFive().equals(temp)) {
+                loopCount++;
+                temp = stockVo.getUpwardDaysFive();
+                if (loopCount >= lightColors.size()) {
+                    loopCount = 0;
+                }
+                color = lightColors.get(loopCount);
+            }
+            html.append("<tr style=\"background-color:").append(color).append("\">");
+            html.append("<td>").append(stockVo.getStockId() + "_" + stockVo.getStockName()).append("</td>");
+            html.append("<td>").append(stockVo.getUpwardDaysFive()).append("</td>");
+            html.append("<td>").append(stockVo.getGainPercentFive()).append("</td>");
+            html.append("<td>").append(stockVo.getFlipUpwardDaysFive()).append("</td>");
+            html.append("<td>").append(stockVo.getFlipGainPercentFive()).append("</td>");
+            html.append("</tr>\n");
+        }
+        html.append("</table>");
+        return html;
+    }
+
+
+    private static String generateRandomColor() {
+        Random random = new Random();
+        int r, g, b;
+
+        // Ensure that each RGB component is greater than 200
+        do {
+            r = random.nextInt(256);
+            g = random.nextInt(256);
+            b = random.nextInt(256);
+        } while (r < 200 || g < 200 || b < 200);
+
+        // Format the RGB components into hexadecimal and return the color string
+        return String.format("#%02X%02X%02X", r, g, b);
+    }
+
+    private static List<String> generateLightColors() {
+        List<String> colors = new ArrayList<>();
+        colors.add("#FFCCCC");
+        colors.add("#FFE5CC");
+        colors.add("#FFFFCC");
+        colors.add("#E5FFCC");
+        colors.add("#CCFFCC");
+        colors.add("#CCFFE5");
+        colors.add("#CCFFFF");
+        colors.add("#CCE5FF");
+        colors.add("#CCCCFF");
+        colors.add("#E5CCFF");
+        colors.add("#FFCCFF");
+        colors.add("#FFCCE5");
+        return colors;
+    }
 }
 

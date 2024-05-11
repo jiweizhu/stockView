@@ -45,6 +45,14 @@ public class Controller {
     }
 
 
+    @RequestMapping(value = {"/etfs/{avgDay}/{flip}"})
+    @ResponseBody
+    public ResponseEntity findAllEtfSort(@PathVariable String avgDay, @PathVariable String flip) throws InterruptedException, JsonProcessingException {
+        Object body = kLineMarketClosedService.findAllEtfSort(avgDay, flip);
+        return ResponseEntity.ofNullable(body);
+    }
+
+
     @RequestMapping(value = {"/import"})
     @ResponseBody
     public String importETF() throws InterruptedException, JsonProcessingException {
