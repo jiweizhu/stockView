@@ -6,75 +6,72 @@
 </head>
 <body>
 
-
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
 
-
 <div id="container"></div>
+<button onclick="modifyScriptContent()">Modify Script</button>
 
 <script>
-      (async () => {
+let names = ['sh560080_中药ETF', 'sz000538_云南白药'];
+        async function updateChart() {
+            // Define the function to create the chart
+            function createChart(series) {
+                Highcharts.stockChart('container', {
+                    rangeSelector: {
+                        selected: 4
+                    },
+                    yAxis: {
+                        labels: {
+                            format: '{#if (gt value 0)}+{/if}{value}%'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 2,
+                            color: 'silver'
+                        }]
+                    },
+                    plotOptions: {
+                        series: {
+                            compare: 'percent',
+                            showInNavigator: true
+                        }
+                    },
+                    tooltip: {
+                        pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                        valueDecimals: 2,
+                        split: true
+                    },
+                    series
+                });
+            }
 
-      const names = ['sh560080_中药ETF', 'sz000538_云南白药', 'sz000423_东阿阿胶','sh600285_羚锐制药'];
+            // Fetch data for each name
+            const promises = names.map(name => new Promise(resolve => {
+                (async () => {
+                    const data = await fetch(
+                         'http://localhost:8888/stock/'+ name.toLowerCase()
+                    )
+                        .then(response => response.json());
+                    resolve({ name, data });
+                })();
+            }));
 
-    /**
-     * Create the chart when all data is loaded
-     * @return {undefined}
-     */
-    function createChart(series) {
+            // Wait for all promises to resolve and create the chart
+            const series = await Promise.all(promises);
+            createChart(series);
+        }
 
-        Highcharts.stockChart('container', {
-
-            rangeSelector: {
-                selected: 4
-            },
-
-            yAxis: {
-                labels: {
-                    format: '{#if (gt value 0)}+{/if}{value}%'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 2,
-                    color: 'silver'
-                }]
-            },
-
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-
-            tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-                valueDecimals: 2,
-                split: true
-            },
-
-            series
-        });
-
-    }
-
-    const promises = names.map(name => new Promise(resolve => {
-        (async () => {
-            const data = await fetch(
-                'http://localhost:8888/stock/'+ name.toLowerCase()
-            )
-                .then(response => response.json());
-            resolve({ name, data });
-        })();
-    }));
-
-    const series = await Promise.all(promises);
-    createChart(series);
-
-})();
+        // Call the function to create the initial chart
+        updateChart();
+</script>
+<script>
+function modifyScriptContent() {
+    names = ['sh560080_中药ETF', 'sz000538_云南白药', 'sh600285_羚锐制药'];
+    updateChart();
+}
 </script>
 </body>
 </html>
