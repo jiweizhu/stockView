@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -26,20 +25,24 @@ import org.springframework.util.StringUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class KLineMarketClosedService {
     private static final Logger logger = LoggerFactory.getLogger(KLineMarketClosedService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum_test.txt";
+    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import_stock.txt";
+    static String etfViewFile = "C:\\code\\tools\\notification\\src\\main\\resources\\etfs_view.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
 
-    private static ArrayList<StockNameVO> stockFileList = new ArrayList<>();
+    private static ArrayList<String> importStockFileList = new ArrayList<>();
     private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
 
     private static Map<String, StockNameVO> exceedFiveDayMap = new HashMap<>();
@@ -47,14 +50,17 @@ public class KLineMarketClosedService {
     private static Map<String, StockNameVO> downFiveDayMap = new HashMap<>();
     private static Map<String, StockNameVO> downTenDayMap = new HashMap<>();
     private static Map<String, List<ArrayList<String>>> daysPriceMap = new HashMap<>();
-
     public static void clearCollect() {
         exceedTenDayMap.clear();
         downTenDayMap.clear();
     }
 
-    @Value("${notification.monitor.file}")
-    private String stockFile;
+
+    @Value("${notification.import.file}")
+    private String importFileInCloud;
+
+    @Value("${notification.etfView.file}")
+    private String etfViewFileInCloud;
 
     @Autowired
     private RestRequest restRequest;
@@ -65,18 +71,54 @@ public class KLineMarketClosedService {
     @Autowired
     private StockDailyDao stockDailyDao;
 
+    // 1.importStocks,
+    // format: stockId_name or stockId
 
-    // 1.importStocks
-    public void importStocks() {
-        readStockFile();
-        stockDao.saveAll(stockFileList);
+    public String importStocks() throws JsonProcessingException {
+        readImportFileStocks();
+        List<String> storedStocks = storedStockIds();
+        List<String> newImportStock = importStockFileList.stream().filter(stock -> !storedStocks.contains(stock)).collect(Collectors.toList());
+
+        ArrayList<StockNameVO> newToAdd = new ArrayList<>();
+        ArrayList<String> wrongInputStockId = new ArrayList<>();
+        StringBuilder ret = new StringBuilder("<h2>Input stock wrong, please check: ");
+        for (String stockid : newImportStock) {
+            StockNameVO stockIdVo = new StockNameVO(stockid);
+            DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(new WebQueryParam(1, stockid));
+            if (dailyQueryResponse == null) {
+                wrongInputStockId.add(stockid);
+                ret.append(stockid);
+                return ret.append("</h2>").toString();
+            }
+            List<ArrayList<String>> dayPriceList = getDayPriceList(dailyQueryResponse, stockIdVo);
+            if (CollectionUtils.isEmpty(dayPriceList)) {
+                wrongInputStockId.add(stockid);
+                ret.append(stockid);
+                return ret.append("</h2>").toString();
+            }
+            newToAdd.add(stockIdVo);
+        }
+        if (CollectionUtils.isEmpty(newToAdd)) {
+            return "<h2>All are imported, Please check!</h2>";
+        }
+        stockDao.saveAll(newToAdd);
+        return "<h2>Success imported: " + Arrays.asList(newToAdd) + "</h2>";
+    }
+    public List<String> storedStockIds() {
+        List<String> storedStockIds = stockDao.findStockIds();
+        return storedStockIds;
+    }
+
+    public List<StockNameVO> storedStocks() {
+        List<StockNameVO> storedStocks = stockDao.findAll();
+        return storedStocks;
     }
 
     public List<StockNameVO> getAllEtfs() {
         if (CollectionUtils.isEmpty(storedETFs)) {
             List<StockNameVO> stockDaoAll = stockDao.findAll();
             for (StockNameVO id_name : stockDaoAll) {
-                if (!id_name.getStockId().startsWith("s")) continue;
+                if (!id_name.getStockId().toLowerCase().startsWith("s")) continue;
                 if (id_name.getStockName().toLowerCase().contains("etf")) {
                     storedETFs.add(id_name);
                 }
@@ -85,39 +127,35 @@ public class KLineMarketClosedService {
         return storedETFs;
     }
 
-
+    private static ArrayList<String> importedFileLine = new ArrayList<>();
     //load stock list
-    private void readStockFile() {
-        if (!CollectionUtils.isEmpty(stockFileList)) {
-            return;
-        }
-        stockFileList.clear();
+    private void readImportFileStocks() {
+        importStockFileList.clear();
         BufferedReader reader = null;
         String line;
         try {
             boolean winSystem = Utils.isWinSystem();
             if (winSystem) {
-                stockFile = localTestStockFile;
+                importFileInCloud = importStockFile;
             }
-            FileReader fileReader = new FileReader(stockFile);
+            FileReader fileReader = new FileReader(importFileInCloud);
             reader = new BufferedReader(fileReader);
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("#")) continue;
+                importedFileLine.add(line);
                 String[] split = line.split(",");
                 for (int i = 0; i < split.length; i++) {
                     String str = split[i];
-                    StockNameVO stockNameVO = new StockNameVO();
+                    String stock_id;
                     if (str.startsWith("s")) {
                         String[] id_name = str.split("_");
-                        stockNameVO.setStockId(id_name[0].toLowerCase());
-                        stockNameVO.setStockName(id_name[1]);
-                    } else {
-                        stockNameVO.setStockId(str.toLowerCase());
+                        stock_id = id_name[0].toLowerCase();
+//                   }
+                        importStockFileList.add(stock_id);
                     }
-                    stockFileList.add(stockNameVO);
                 }
+                logger.info("Successfully read stock name file !!");
             }
-            logger.info("Successfully read stock name file !!");
         } catch (IOException e) {
             logger.error("Fail read stock name file !!", e);
         } finally {
@@ -131,36 +169,66 @@ public class KLineMarketClosedService {
         }
     }
 
+    private static ArrayList<String> etfViewLine = new ArrayList<>();
+    private void readETFFile() {
+        BufferedReader reader = null;
+        String line;
+        try {
+            boolean winSystem = Utils.isWinSystem();
+            if (winSystem) {
+                etfViewFileInCloud = etfViewFile;
+            }
+            FileReader fileReader = new FileReader(etfViewFileInCloud);
+            reader = new BufferedReader(fileReader);
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("#")) continue;
+                etfViewLine.add(line);
+                logger.info("Successfully read etfView file !!");
+            }
+        } catch (IOException e) {
+            logger.error("Fail read etfView file !!", e);
+        } finally {
+            try {
+                if (null != reader) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                logger.error("error occurs. ", e);
+            }
+        }
+    }
     //2.getDaysPriceOnLineAndStoreInDb
-    public void getDaysPriceOnLineAndStoreInDb() throws InterruptedException, JsonProcessingException {
-        readStockFile();
-        //iterator to query 20day price history and calculate 10day 20day price, and store in db
-        for (StockNameVO stockNameVO : stockFileList) {
+
+    public String getHistoryPriceOnLineAndStoreInDb(Integer daysToGet) throws InterruptedException, JsonProcessingException {
+        ArrayList<StockNameVO> getHistoryPriceStocks = new ArrayList<>();
+
+        //iterator to query 50day price history and calculate 10day price, and store in db
+        List<StockNameVO> storedStocks = storedStocks();
+        for (StockNameVO stockNameVO : storedStocks) {
+            if (stockNameVO.getGainPercentFive() != null) {
+                continue;
+            }
+
+            getHistoryPriceStocks.add(stockNameVO);
             //slow down the speech, just intend to avoid website protection
             Thread.sleep(100);
             if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
                 WebQueryParam webQueryParam = new WebQueryParam();
+                if (daysToGet == null) {
+                    daysToGet = 50;
+                }
+                webQueryParam.setDaysToQuery(daysToGet);
                 webQueryParam.setIdentifier(stockNameVO.getStockId());
                 DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
                 List<ArrayList<String>> dailyPriceList = storeInDbAndReturnKlines(dailyQueryResponse, stockNameVO);
             }
         }
+        return "getHistoryPriceStocks: " + getHistoryPriceStocks.toString();
     }
 
     private List<ArrayList<String>> storeInDbAndReturnKlines(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
-        Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
-        Object dayListObj = dataMap.get("day");
-        if (Objects.isNull(dayListObj)) {
-            dayListObj = dataMap.get("qfqday");
-        }
-        List<ArrayList<String>> dayList = objectMapper.readValue(objectMapper.writeValueAsString(dayListObj), List.class);
-        if (dayList.size() == 0) {
-            logger.error("==============ERROR ===== Input Stock Name must be wrong: " + stockNameVO.getStockId());
-            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=" + stockNameVO.getStockId() + ",day,,,10,qfq");
-            return null;
-        }
-        extractStockName(stockNameVO, dataMap);
-        daysPriceMap.put(stockNameVO.getStockId(), dayList);
+        List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
+        if (dayList == null) return null;
 
         BigDecimal beforeDay_FiveDayAvgPrice = null;
         BigDecimal beforeDay_TenDayAvgPrice = null;
@@ -183,11 +251,27 @@ public class KLineMarketClosedService {
                 stockDailyVO.setDayGainOfTen(dayDiff);
                 beforeDay_TenDayAvgPrice = tenDayAvgPrice;
             }
-
             stockDailyDao.save(stockDailyVO);
         }
 
 
+        return dayList;
+    }
+
+    private static List<ArrayList<String>> getDayPriceList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+        Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
+        Object dayListObj = dataMap.get("day");
+        if (Objects.isNull(dayListObj)) {
+            dayListObj = dataMap.get("qfqday");
+        }
+        List<ArrayList<String>> dayList = objectMapper.readValue(objectMapper.writeValueAsString(dayListObj), List.class);
+        if (dayList.size() == 0) {
+            logger.error("==============ERROR ===== Input Stock Name must be wrong: " + stockNameVO.getStockId());
+            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=" + stockNameVO.getStockId() + ",day,,,10,qfq");
+            return null;
+        }
+        extractStockName(stockNameVO, dataMap);
+        daysPriceMap.put(stockNameVO.getStockId(), dayList);
         return dayList;
     }
 
@@ -266,22 +350,26 @@ public class KLineMarketClosedService {
         return ret;
     }
 
-    public Object report() {
+    public Object handleStocksAvg() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.debug("enter report ====");
-        List<StockNameVO> allEtfs = getAllEtfs();
-        for (StockNameVO stockNameVO : allEtfs) {
+        StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
+        List<StockNameVO> stocks = storedStocks();
+        for (StockNameVO stockNameVO : stocks) {
             //loop to calculate each etf
             String stockId = stockNameVO.getStockId();
 //            List<Object[]> etfPriceList = entityManager.createNativeQuery("select five_day_avg, five_day_diff, ten_day_avg, ten_day_diff from daily_price where stock_id=?1 limit 60 ").setParameter(1, stockId).;
             List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, Pageable.ofSize(60)).stream().toList();
-            List<Integer> flipDay = analysisFlipDay(etfPriceList, "getDayGainOfFive");
-            setUpwardDaysAndGainFive(etfPriceList, stockNameVO, flipDay.get(0), flipDay.get(1));
+            List<Integer> flipDayFive = analysisFlipDay(etfPriceList, "getDayGainOfFive");
+            List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
+            setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
+            setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
             stockDao.save(stockNameVO);
+            retStr.append(stockNameVO.getStockId() + "_" + stockNameVO.getStockName() + "</br>");
         }
-        return "ok";
+        return retStr;
     }
 
-    private List<Integer> analysisFlipDay(List<StockDailyVO> etfPriceList, String methodName) {
+    private List<Integer> analysisFlipDay(List<StockDailyVO> etfPriceList, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (etfPriceList.size() == 0) return null;
         Integer flipBeginIndex = 0;
         Integer flipEndIndex = 0;
@@ -290,19 +378,25 @@ public class KLineMarketClosedService {
         Boolean todayKLineUpward = Boolean.TRUE;
 
         StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
-        if (today.getDayGainOfFive().compareTo(BigDecimal.ZERO) < 0) {
+        Method getDayGainMethod = today.getClass().getMethod(methodName);
+        BigDecimal gainValue = (BigDecimal) getDayGainMethod.invoke(today);
+        if (gainValue.compareTo(BigDecimal.ZERO) < 0) {
             //today is downward!
             todayKLineUpward = Boolean.FALSE;
         }
         //set today upwardDay count = 0!
         for (int index = etfPriceList.size() - 1; index > 0; index--) {
             StockDailyVO indexDay = etfPriceList.get(index);
-            if (indexDay.getDayGainOfFive() == null) {
+            loopCount++;
+            BigDecimal dayGainPercent = (BigDecimal) getDayGainMethod.invoke(indexDay);
+            if (dayGainPercent == null) {
+                flipBeginIndex = loopCount;
                 break;
             }
-            loopCount++;
-            boolean indexDayPositive = indexDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0;
-            System.out.println("indexDay = " + indexDay);
+            boolean indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) >= 0;
+            if(countFlip == Boolean.TRUE){
+                indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) > 0;
+            }
             if (!todayKLineUpward.equals(indexDayPositive)) {
                 //start to find adjustment days, turn the opposite
                 if (countFlip.equals(Boolean.FALSE)) {
@@ -320,29 +414,14 @@ public class KLineMarketClosedService {
                 }
             }
         }
-        List<Integer> flipDayList = new ArrayList<>();
-        flipDayList.add(flipBeginIndex);
-        flipDayList.add(flipEndIndex);
+        List<Integer> flipDayList = Arrays.asList(flipBeginIndex, flipEndIndex);
         return flipDayList;
     }
 
-    private static Integer upwardDayPlus(Integer fiveDayUpwardDays, Boolean todayKLineUpward, StockDailyVO beforeDay) {
-        if (beforeDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0 && todayKLineUpward == Boolean.TRUE) {
-            fiveDayUpwardDays++;
-        }
-//            else if (todayKLineUpward == Boolean.FALSE && beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) >= 0) {
-//                ifNeedToBreak = Boolean.TRUE;
-//            } else if (todayKLineUpward == Boolean.TRUE && beforeDay.getFiveDayDiff().compareTo(BigDecimal.ZERO) < 0) {
-//                ifNeedToBreak = Boolean.TRUE;
-        if (beforeDay.getDayGainOfFive().compareTo(BigDecimal.ZERO) < 0 && todayKLineUpward == Boolean.FALSE) {
-            fiveDayUpwardDays--;
-        }
-        return fiveDayUpwardDays;
-    }
-
-    private void setUpwardDaysAndGainFive(List<StockDailyVO> etfPriceList, StockNameVO stockNameVO, Integer flipBeginIndex, Integer flipEndIndex) {
+    private void setUpwardDaysAndGain(List<StockDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, StockNameVO stockNameVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         System.out.println("flipBeginIndex = " + flipBeginIndex);
         System.out.println("flipEndIndex = " + flipEndIndex);
+        System.out.println("dayIdentify = " + dayIdentify);
         int listSize = etfPriceList.size();
         StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
         StockDailyVO flipDay = etfPriceList.get(listSize - flipBeginIndex - 1);
@@ -351,20 +430,22 @@ public class KLineMarketClosedService {
         StockDailyVO flipEndDay = etfPriceList.get(listSize - flipEndIndex - 1);
         BigDecimal gainPercentFlip = getGainPercent(flipDay, flipEndDay);
 
-        boolean todayUpward = today.getDayGainOfFive().compareTo(BigDecimal.ZERO) >= 0;
-        if (todayUpward) {
-            stockNameVO.setUpwardDaysFive(flipBeginIndex);
-            stockNameVO.setGainPercentFive(gainPercent);
+        String methodName = "getDayGainOf" + dayIdentify;
+        Method getDayGainMethod = today.getClass().getMethod(methodName);
+        BigDecimal gainValue = (BigDecimal) getDayGainMethod.invoke(today);
+        boolean todayUpward = gainValue.compareTo(BigDecimal.ZERO) >= 0;
 
-            stockNameVO.setFlipUpwardDaysFive(flipBeginIndex - flipEndIndex);
-            stockNameVO.setFlipGainPercentFive(gainPercentFlip);
-        } else {
-            stockNameVO.setUpwardDaysFive(-flipBeginIndex);
-            stockNameVO.setGainPercentFive(gainPercent);
-
-            stockNameVO.setFlipUpwardDaysFive(flipEndIndex - flipBeginIndex);
-            stockNameVO.setFlipGainPercentFive(gainPercentFlip);
+        int flipUpwardDays = flipBeginIndex - flipEndIndex;
+        if (!todayUpward) {
+            flipBeginIndex = -flipBeginIndex;
+            flipUpwardDays = -flipUpwardDays;
         }
+
+        Class<? extends StockNameVO> aClass = stockNameVO.getClass();
+        aClass.getMethod("setUpwardDays" + dayIdentify, Integer.class).invoke(stockNameVO, flipBeginIndex);
+        aClass.getMethod("setGainPercent" + dayIdentify, BigDecimal.class).invoke(stockNameVO, gainPercent);
+        aClass.getMethod("setFlipUpwardDays" + dayIdentify, Integer.class).invoke(stockNameVO, flipUpwardDays);
+        aClass.getMethod("setFlipGainPercent" + dayIdentify, BigDecimal.class).invoke(stockNameVO, gainPercentFlip);
     }
 
     private BigDecimal getGainPercent(StockDailyVO newPrice, StockDailyVO oldPrice) {
@@ -389,74 +470,28 @@ public class KLineMarketClosedService {
     }
 
 
-    public Object findAllEtfSort(String avgDay, String flip) {
-        String sort_1 = avgDay;
-        String sort_2 = flip;
-
-        List<StockNameVO> fiveDayUpwardDays = stockDao.findAll(Sort.by("flipUpwardDaysFive", "flipGainPercentFive").descending());
-        if (CollectionUtils.isEmpty(fiveDayUpwardDays)) {
-            return "No data found!";
+    public Object etfsCurveView() {
+        logger.debug("enter listImport ====");
+        if (CollectionUtils.isEmpty(etfViewLine)) {
+            readETFFile();
         }
-        StringBuilder html = new StringBuilder();
-        html.append("<table border=\"1\">\n");
-        html.append("<tr><th>ETF Name</th><th>Upward Days of Five</th><th>Gain Percent of Five(%)</th>" + "<th>Flip Upward Days of Five</th><th>Flip Gain Percent of Five(%)</th></tr>\n");
-        List<String> lightColors = generateLightColors();
-        Integer loopCount = 0;
-        String color = lightColors.get(loopCount);
-        Integer temp = 0;
-        for (StockNameVO stockVo : fiveDayUpwardDays) {
-            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
-            if (!stockVo.getUpwardDaysFive().equals(temp)) {
-                loopCount++;
-                temp = stockVo.getUpwardDaysFive();
-                if (loopCount >= lightColors.size()) {
-                    loopCount = 0;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String fileLine : etfViewLine) {
+            stringBuilder.append("<tr>");
+            String[] split = fileLine.split(",");
+            for (int index = 0; index < split.length; index++) {
+//                stringBuilder.append("<td><a href=\"javascript:addOrRemove(").append(split[index]).append(")\">").append(split[index]).append("</a>").append(",").append("</td>");
+                String str = split[index];
+                int eftIndex = str.indexOf("ETF");
+                if (eftIndex > 0) {
+                    str = str.substring(0, eftIndex + 3);
                 }
-                color = lightColors.get(loopCount);
+                stringBuilder.append("<span class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</span>");
             }
-            html.append("<tr style=\"background-color:").append(color).append("\">");
-            html.append("<td>").append(stockVo.getStockId() + "_" + stockVo.getStockName()).append("</td>");
-            html.append("<td>").append(stockVo.getUpwardDaysFive()).append("</td>");
-            html.append("<td>").append(stockVo.getGainPercentFive()).append("</td>");
-            html.append("<td>").append(stockVo.getFlipUpwardDaysFive()).append("</td>");
-            html.append("<td>").append(stockVo.getFlipGainPercentFive()).append("</td>");
-            html.append("</tr>\n");
+            stringBuilder.append("</tr>");
+            stringBuilder.append("</br>");
         }
-        html.append("</table>");
-        return html;
-    }
-
-
-    private static String generateRandomColor() {
-        Random random = new Random();
-        int r, g, b;
-
-        // Ensure that each RGB component is greater than 200
-        do {
-            r = random.nextInt(256);
-            g = random.nextInt(256);
-            b = random.nextInt(256);
-        } while (r < 200 || g < 200 || b < 200);
-
-        // Format the RGB components into hexadecimal and return the color string
-        return String.format("#%02X%02X%02X", r, g, b);
-    }
-
-    private static List<String> generateLightColors() {
-        List<String> colors = new ArrayList<>();
-        colors.add("#FFCCCC");
-        colors.add("#FFE5CC");
-        colors.add("#FFFFCC");
-        colors.add("#E5FFCC");
-        colors.add("#CCFFCC");
-        colors.add("#CCFFE5");
-        colors.add("#CCFFFF");
-        colors.add("#CCE5FF");
-        colors.add("#CCCCFF");
-        colors.add("#E5CCFF");
-        colors.add("#FFCCFF");
-        colors.add("#FFCCE5");
-        return colors;
+        return stringBuilder;
     }
 }
 

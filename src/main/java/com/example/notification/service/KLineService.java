@@ -26,7 +26,7 @@ public class KLineService {
     private static final Logger logger = LoggerFactory.getLogger(KLineService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String localTestStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\sNum_test.txt";
+    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import_stock.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
 
@@ -60,7 +60,7 @@ public class KLineService {
         try {
             boolean winSystem = Utils.isWinSystem();
             if (winSystem) {
-                stockFile = localTestStockFile;
+                stockFile = importStockFile;
             }
             FileReader fileReader = new FileReader(stockFile);
             reader = new BufferedReader(fileReader);
@@ -83,19 +83,18 @@ public class KLineService {
         }
     }
 
-
-    public void checkIfMarketOpenToday() throws JsonProcessingException {
+    public Boolean checkIfMarketOpenToday() throws JsonProcessingException {
         readStockFile();
         WebQueryParam webQueryParam = new WebQueryParam();
         webQueryParam.setDaysToQuery(1);
         DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
         List<ArrayList<String>> dailyPriceList = getRealPriceList(dailyQueryResponse, webQueryParam.getIdentifier());
         String date = dailyPriceList.get(dailyPriceList.size() - 1).get(0);
-        if (date == Utils.todayDate()) {
+        if (Utils.todayDate().equals(date)) {
             ifMarketOpen = Boolean.TRUE;
         }
+        return ifMarketOpen;
     }
-
 
     //every one day to run
     public void getAvgPrice() throws InterruptedException, JsonProcessingException {
@@ -298,4 +297,5 @@ public class KLineService {
     public DayAvgVO putCache(DayAvgVO dayAvgVO) {
         return dayAvgVO;
     }
+
 }

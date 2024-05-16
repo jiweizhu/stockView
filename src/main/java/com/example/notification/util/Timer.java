@@ -1,5 +1,6 @@
 package com.example.notification.util;
 
+import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,9 @@ public class Timer {
     @Autowired
     private KLineService kLineService;
 
+    @Autowired
+    private ETFViewService etfViewService;
+
 //   every day in 8:00
     @Scheduled(cron = "0 0 8 * * ?")
     public void eightHourQuery() {
@@ -29,22 +33,20 @@ public class Timer {
         }
     }
 
-
-    //every day at 9:30:30
-    @Scheduled(cron = "30 30 9 * * ?")
-    public void checkIfMarketOpen() {
+    @Scheduled(cron = "0 10 15 * * ?")
+    public void generateReportEveryMarketDay() {
         try {
-            logger.info("Start checkIfMarketOpen=====");
-            kLineService.checkIfMarketOpenToday();
-
+            logger.info("Start generateReportEveryMarketDay=====");
+            etfViewService.generateReportEveryDay();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
     }
 
 
+
     //  real time query, every 15min
-    @Scheduled(cron = "30 0/15 9-15 * * ?")
+//    @Scheduled(cron = "30 0/15 9-15 * * ?")
     public void realTimeQuery() {
         try {
             logger.info("===== Start realTimeQuery ====");

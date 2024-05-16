@@ -1,5 +1,6 @@
 package com.example.notification.controller;
 
+import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
 import com.example.notification.util.EmailUtil;
@@ -20,6 +21,8 @@ public class Controller {
 
     @Autowired
     private KLineService kLineService;
+    @Autowired
+    private ETFViewService etfViewService;
 
     @RequestMapping(value = {"/real", "/index"})
     @ResponseBody
@@ -28,11 +31,17 @@ public class Controller {
         return "ok";
     }
 
-
     @RequestMapping(value = {"/stock/list"})
     @ResponseBody
     public ResponseEntity listAllETFs() throws JsonProcessingException {
         Object body = kLineMarketClosedService.listEtfs();
+        return ResponseEntity.ofNullable(body);
+    }
+
+    @RequestMapping(value = {"/etfsCurveView"})
+    @ResponseBody
+    public ResponseEntity etfsCurveView() throws JsonProcessingException {
+        Object body = kLineMarketClosedService.etfsCurveView();
         return ResponseEntity.ofNullable(body);
     }
 
@@ -45,10 +54,24 @@ public class Controller {
     }
 
 
-    @RequestMapping(value = {"/etfs/{avgDay}/{flip}"})
+    @RequestMapping(value = {"/etfs/selfview"})
     @ResponseBody
-    public ResponseEntity findAllEtfSort(@PathVariable String avgDay, @PathVariable String flip) throws InterruptedException, JsonProcessingException {
-        Object body = kLineMarketClosedService.findAllEtfSort(avgDay, flip);
+    public ResponseEntity findAllEtfSort() throws InterruptedException, JsonProcessingException {
+        Object body = etfViewService.findAllEtfSortView();
+        return ResponseEntity.ofNullable(body);
+    }
+
+    @RequestMapping(value = {"/etfs/five/noflip"})
+    @ResponseBody
+    public ResponseEntity fiveDayAdjusted() throws InterruptedException, JsonProcessingException {
+        Object body = etfViewService.fiveDayAdjustedView();
+        return ResponseEntity.ofNullable(body);
+    }
+
+    @RequestMapping(value = {"/etfs/ten"})
+    @ResponseBody
+    public ResponseEntity tenDayAdjusted() throws InterruptedException, JsonProcessingException {
+        Object body = etfViewService.tenDayAdjustedView();
         return ResponseEntity.ofNullable(body);
     }
 
@@ -56,15 +79,15 @@ public class Controller {
     @RequestMapping(value = {"/import"})
     @ResponseBody
     public String importETF() throws InterruptedException, JsonProcessingException {
-        kLineMarketClosedService.importStocks();
-        return "ok";
+        String result = kLineMarketClosedService.importStocks();
+        return result;
     }
 
-    @RequestMapping(value = {"/avg"})
+    @RequestMapping(value = {"/storeHistoryData"})
     @ResponseBody
-    public String getAvgPrice() throws InterruptedException, JsonProcessingException {
-        kLineMarketClosedService.getDaysPriceOnLineAndStoreInDb();
-        return "ok";
+    public String storeHistoryData() throws InterruptedException, JsonProcessingException {
+        String historyPriceOnLineAndStoreInDb = kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(100);
+        return historyPriceOnLineAndStoreInDb;
     }
 
     @RequestMapping(value = {"/mail"})
@@ -77,10 +100,10 @@ public class Controller {
         return "ok";
     }
 
-    @RequestMapping(value = {"/report"})
+    @RequestMapping(value = {"/handleEtfsAvg"})
     @ResponseBody
-    public ResponseEntity report() throws Exception {
-        Object body = kLineMarketClosedService.report();
+    public ResponseEntity handleEtfsAvg() throws Exception {
+        Object body = kLineMarketClosedService.handleStocksAvg();
         return ResponseEntity.ofNullable(body);
     }
 
