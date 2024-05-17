@@ -13,4 +13,10 @@ public interface StockDao extends JpaRepository<StockNameVO, String>, JpaSpecifi
 
     @Query(value = "SELECT stock_id FROM stock ", nativeQuery = true)
     List<String> findStockIds();
+
+    @Query(value = "SELECT * FROM stock s where s.upward_days_five >=0 and s.upward_days_ten >=0 ", nativeQuery = true)
+    List<StockNameVO> findupwardDaysStock();
+
+    @Query(value = "SELECT * FROM stock s where s.upward_days_five < 0 or s.upward_days_ten < 0 ", nativeQuery = true)
+    List<StockNameVO> findDownwardDaysStock();
 }

@@ -7,14 +7,20 @@ import com.example.notification.util.EmailUtil;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.InvocationTargetException;
+
 @RestController
 public class Controller {
+
+    @Value("${notification.init.history.price.day}")
+    private Integer initHistoryPriceDay;
 
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
@@ -61,6 +67,22 @@ public class Controller {
         return ResponseEntity.ofNullable(body);
     }
 
+
+    @RequestMapping(value = {"/etfs/table1"})
+    @ResponseBody
+    public ResponseEntity findAllEtfsForTable_1() throws JsonProcessingException {
+        Object body = etfViewService.findAllEtfsForTable(1);
+        return ResponseEntity.ofNullable(body);
+    }
+
+    @RequestMapping(value = {"/etfs/table2"})
+    @ResponseBody
+    public ResponseEntity findAllEtfsForTable_2() throws JsonProcessingException {
+        Object body = etfViewService.findAllEtfsForTable(2);
+        return ResponseEntity.ofNullable(body);
+    }
+
+
     @RequestMapping(value = {"/etfs/five/noflip"})
     @ResponseBody
     public ResponseEntity fiveDayAdjusted() throws InterruptedException, JsonProcessingException {
@@ -83,10 +105,17 @@ public class Controller {
         return result;
     }
 
+    @RequestMapping(value = {"/generateReportEveryDay"})
+    @ResponseBody
+    public String generateReportEveryDay() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, JsonProcessingException, InterruptedException {
+        etfViewService.generateReportEveryDay();
+        return "ok";
+    }
+
     @RequestMapping(value = {"/storeHistoryData"})
     @ResponseBody
     public String storeHistoryData() throws InterruptedException, JsonProcessingException {
-        String historyPriceOnLineAndStoreInDb = kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(100);
+        String historyPriceOnLineAndStoreInDb = kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(initHistoryPriceDay);
         return historyPriceOnLineAndStoreInDb;
     }
 

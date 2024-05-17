@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +34,12 @@ public class StockNameVO {
     @Column(name = "flipGainPercentFive")
     private BigDecimal flipGainPercentFive;
 
+    @Column(name = "flipDayFive")
+    private Date flipDayFive;
+
+    @Column(name = "flipEndDayFive")
+    private Date flipEndDayFive;
+
     @Column(name = "upwardDaysTen")
     private Integer upwardDaysTen = 0;
 
@@ -41,6 +48,12 @@ public class StockNameVO {
 
     @Column(name = "flipUpwardDaysTen")
     private Integer flipUpwardDaysTen = 0;
+
+    @Column(name = "flipDayTen")
+    private Date flipDayTen;
+
+    @Column(name = "flipEndDayTen")
+    private Date flipEndDayTen;
 
     @Column(name = "flipGainPercentTen")
     private BigDecimal flipGainPercentTen;
@@ -64,6 +77,18 @@ public class StockNameVO {
 
     @Override
     public String toString() {
-        return stockId + "_" + stockName;
+        return "\"" + stockId + "_" + stockName +"\""+
+                ",\"" + upwardDaysFive +"\""+
+                ",\"" + gainPercentFive+"\""+
+                ",\"" + flipUpwardDaysFive +"\""+
+                ",\"" + flipGainPercentFive + "\"]";
+//                ",'" + flipDayFive +"'"+
+//                ", " + flipEndDayFive +"'"+
+//                ", " + upwardDaysTen +"'"+
+//                ", " + gainPercentTen +"'"+
+//                ", " + flipUpwardDaysTen+"'"+
+//                ", " + flipDayTen +
+//                ", " + flipEndDayTen +
+//                ", " + flipGainPercentTen ;
     }
 }

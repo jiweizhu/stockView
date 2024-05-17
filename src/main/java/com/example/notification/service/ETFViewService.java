@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.example.notification.constant.Constants.MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY;
 
 @Service
 public class ETFViewService {
@@ -32,11 +35,11 @@ public class ETFViewService {
     public void generateReportEveryDay() throws JsonProcessingException, InterruptedException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         //check if today market day open
         Boolean ifMarketOpenToday = kLineService.checkIfMarketOpenToday();
-        if(!ifMarketOpenToday){
+        if (!ifMarketOpenToday) {
             return;
         }
         //just need to get all stocks from stock table, and then get today's kline price to store in db and calculate avg data
-        kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(1);
+        kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY);
         kLineMarketClosedService.handleStocksAvg();
     }
 
@@ -57,8 +60,12 @@ public class ETFViewService {
         Integer loopCount = 0;
         String color = lightColors.get(loopCount);
         Integer temp = 0;
+
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd");
+
         for (StockNameVO stockVo : fiveDayUpwardDays) {
-            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            String stockName = stockVo.getStockName();
+            if (stockName == null || !stockName.toLowerCase().contains("etf")) continue;
             if (!stockVo.getUpwardDaysFive().equals(temp)) {
                 loopCount++;
                 temp = stockVo.getUpwardDaysFive();
@@ -67,18 +74,18 @@ public class ETFViewService {
                 }
                 color = lightColors.get(loopCount);
             }
+
             html.append("<tr style=\"background-color:").append(color).append("\">");
-            html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-"+stockVo.getStockId().substring(2)+"\">")
-                    .append(stockVo.getStockId() + "_" + stockVo.getStockName()).append("</a></td>");
-            html.append("<td>").append(stockVo.getUpwardDaysFive()).append("</td>");
+            html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">").append(stockVo.getStockId() + "_" + stockName).append("</a></td>");
+            html.append("<td>").append(stockVo.getUpwardDaysFive()).append("(").append(formatter.format(stockVo.getFlipDayFive())).append(")").append("</td>");
             html.append("<td>").append(stockVo.getGainPercentFive()).append("</td>");
-            html.append("<td>").append(stockVo.getFlipUpwardDaysFive()).append("</td>");
+            html.append("<td>").append(stockVo.getFlipUpwardDaysFive()).append("(").append(formatter.format(stockVo.getFlipEndDayFive())).append(")").append("</td>");
             html.append("<td>").append(stockVo.getFlipGainPercentFive()).append("</td>");
             html.append("<td style=\"background-color: #708090;\"").append("8888").append("</td>");
 
-            html.append("<td>").append(stockVo.getUpwardDaysTen()).append("</td>");
+            html.append("<td>").append(stockVo.getUpwardDaysTen()).append("(").append(formatter.format(stockVo.getFlipDayTen())).append(")").append("</td>");
             html.append("<td>").append(stockVo.getGainPercentTen()).append("</td>");
-            html.append("<td>").append(stockVo.getFlipUpwardDaysTen()).append("</td>");
+            html.append("<td>").append(stockVo.getFlipUpwardDaysTen()).append("(").append(formatter.format(stockVo.getFlipEndDayTen())).append(")").append("</td>");
             html.append("<td>").append(stockVo.getFlipGainPercentTen()).append("</td>");
             html.append("</tr>\n");
         }
@@ -162,5 +169,37 @@ public class ETFViewService {
         return result;
     }
 
+    private static SimpleDateFormat formatter = new SimpleDateFormat("MM-dd");
 
+    public Object findAllEtfsForTable(int i) {
+        List<StockNameVO> fiveDayUpwardDays = Collections.emptyList();
+        if (i == 1) {
+            //find 5day 10 day both upward
+            fiveDayUpwardDays = stockDao.findupwardDaysStock();
+        } else {
+            //findDownwardDaysStock
+            fiveDayUpwardDays = stockDao.findDownwardDaysStock();
+        }
+        Map<String, Object> result = new HashMap<>();
+        ArrayList<String[]> list = new ArrayList<>();
+        for (StockNameVO day : fiveDayUpwardDays) {
+            String[] fieldValues = new String[9];
+            String stockId_name = day.getStockId() + "_" + day.getStockName();
+            fieldValues[0] = "<a href=\"https://gushitong.baidu.com/fund/ab-" + stockId_name + "\">" + stockId_name + "</a>";
+
+            fieldValues[1] = formatter.format(day.getFlipDayFive()) + "|" + day.getUpwardDaysFive().toString();
+            fieldValues[2] = day.getGainPercentFive().toString();
+            fieldValues[3] = formatter.format(day.getFlipEndDayFive()) + "|" + day.getFlipUpwardDaysFive();
+            fieldValues[4] = day.getFlipGainPercentFive().toString();
+
+            fieldValues[5] = formatter.format(day.getFlipDayTen()) + "|" + day.getUpwardDaysTen().toString();
+            fieldValues[6] = day.getGainPercentTen().toString();
+            fieldValues[7] = formatter.format(day.getFlipEndDayTen()) + "|" + day.getFlipUpwardDaysTen();
+            fieldValues[8] = day.getFlipGainPercentTen().toString();
+
+            list.add(fieldValues);
+        }
+        result.put("data", list);
+        return result;
+    }
 }

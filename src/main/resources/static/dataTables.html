@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="js/datatables.min.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <script src="js/datatables.min.js"></script>
+    <meta charset="utf-8">
+    <title>主入口</title>
+<style>
+    div.container {
+    width: 80%;
+}
+</style>
+</head>
+<body>
+<h2>ETFs 5 day Upward list</h2>
+<table id="table1" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th>ETF Name</th>
+        <th>5日上涨天数</th>
+        <th>5日上涨(%)</th>
+        <th>5日回调天数</th>
+        <th>5日回调(%)</th>
+        <th>10日上涨天数</th>
+        <th>10日上涨(%)</th>
+        <th>10日回调天数</th>
+        <th>10日回调(%)</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>ETF Name</th>
+        <th>5日上涨天数</th>
+        <th>5日上涨(%)</th>
+        <th>5日回调天数</th>
+        <th>5日回调(%)</th>
+        <th>10日上涨天数</th>
+        <th>10日上涨(%)</th>
+        <th>10日回调天数</th>
+        <th>10日回调(%)</th>
+    </tr>
+    </tfoot>
+</table>
+
+<h2>ETFs downward list</h2>
+<table id="table2" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th>ETF Name</th>
+        <th>5日上涨天数</th>
+        <th>5日上涨(%)</th>
+        <th>5日回调天数</th>
+        <th>5日回调(%)</th>
+        <th>10日上涨天数</th>
+        <th>10日上涨(%)</th>
+        <th>10日回调天数</th>
+        <th>10日回调(%)</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th>ETF Name</th>
+        <th>5日上涨天数</th>
+        <th>5日上涨(%)</th>
+        <th>5日回调天数</th>
+        <th>5日回调(%)</th>
+        <th>10日上涨天数</th>
+        <th>10日上涨(%)</th>
+        <th>10日回调天数</th>
+        <th>10日回调(%)</th>
+    </tr>
+    </tfoot>
+</table>
+<script>
+new DataTable('#table1', {
+  order: [[1, 'desc']],
+  ajax: 'http://localhost:8888/etfs/table1',
+  columnDefs: [
+        {
+            targets: [0],
+            orderData: [1, 2]
+        }]
+
+});
+new DataTable('#table2', {
+  order: [[1, 'desc']],
+  ajax: 'http://localhost:8888/etfs/table2',
+  columnDefs: [
+        {
+            targets: [0],
+            orderData: [1, 2]
+        }]
+
+});
+
+</script>
+</body>
+</html>

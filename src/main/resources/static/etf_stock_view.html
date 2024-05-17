@@ -64,7 +64,7 @@ async function updateChart() {
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                 'http://localhost:8888/stock/'+ name
+                 'http://127.0.0.1:8888/stock/'+ name
             )
                 .then(response => response.json());
             resolve({ name, data });
@@ -80,7 +80,7 @@ async function updateChart() {
 updateChart();
 
 function fetchData() {
-    fetch('http://localhost:8888/etfsCurveView')
+    fetch('http://127.0.0.1:8888/etfsCurveView')
     .then(response => response.text())
         .then(data => { const dataContainer = document.getElementById('myTable');
     dataContainer.innerHTML = data; })

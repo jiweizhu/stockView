@@ -36,11 +36,11 @@ public class StockDailyVO {
     @Column(name = "intradayLow")
     private BigDecimal intradayLow;
 
-    @Column(name = "fiveDayAvg")
-    private BigDecimal fiveDayAvg;
+    @Column(name = "dayAvgFive")
+    private BigDecimal dayAvgFive;
 
-    @Column(name = "tenDayAvg")
-    private BigDecimal tenDayAvg;
+    @Column(name = "dayAvgTen")
+    private BigDecimal dayAvgTen;
 
     @Column(name = "day_gain_of_five")
     private BigDecimal dayGainOfFive;
