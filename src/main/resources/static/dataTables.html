@@ -11,6 +11,9 @@
     div.container {
     width: 80%;
 }
+const isProduction = process.env.NODE_ENV === 'production';
+const apiUrl = isProduction ? 'http://124.71.19.6:8888' : 'http://localhost:8888';
+
 </style>
 </head>
 <body>
@@ -75,24 +78,11 @@
 </table>
 <script>
 new DataTable('#table1', {
-  order: [[1, 'desc']],
-  ajax: 'http://localhost:8888/etfs/table1',
-  columnDefs: [
-        {
-            targets: [0],
-            orderData: [1, 2]
-        }]
+  ajax: 'http://localhost:8888/etfs/table1'
 
 });
 new DataTable('#table2', {
-  order: [[1, 'desc']],
-  ajax: 'http://localhost:8888/etfs/table2',
-  columnDefs: [
-        {
-            targets: [0],
-            orderData: [1, 2]
-        }]
-
+  ajax: 'http://localhost:8888/etfs/table2'
 });
 
 </script>

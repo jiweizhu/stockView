@@ -31,6 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class KLineMarketClosedService {
     private static final Logger logger = LoggerFactory.getLogger(KLineMarketClosedService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import_stock.txt";
+    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import.txt";
     static String etfViewFile = "C:\\code\\tools\\notification\\src\\main\\resources\\etfs_view.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
@@ -236,7 +237,8 @@ public class KLineMarketClosedService {
 
         BigDecimal beforeDay_FiveDayAvgPrice = null;
         BigDecimal beforeDay_TenDayAvgPrice = null;
-        for (int i = 0; i < dayList.size(); i++) {
+        int size = dayList.size();
+        for (int i = 0; i < size; i++) {
             ArrayList<String> dayPrice = dayList.get(i);
             StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
             //get 5 day avg, before 4 days, set to 0
@@ -245,6 +247,7 @@ public class KLineMarketClosedService {
                 continue;
             }
 
+            logger.debug("dayPrice =========" + dayPrice);
             //calculate 5 day avg, need at least 5 day price list
             if (i >= 4) {
                 BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, dayList, 5);
@@ -261,12 +264,66 @@ public class KLineMarketClosedService {
                 stockDailyVO.setDayGainOfTen(dayDiff);
                 beforeDay_TenDayAvgPrice = tenDayAvgPrice;
             }
+            if (size == MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY) {
+                //remove other days except today to save
+                if (i == (size - 1)) {
+                    stockDailyDao.save(stockDailyVO);
+                    break;
+                }
+                continue;
+            }
             stockDailyDao.save(stockDailyVO);
         }
-
-
+        StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), Date.valueOf(dayList.get(dayList.size() - 1).get(0)));
+        stockDao.save(lastUpdateDay);
         return dayList;
     }
+
+
+    private List<ArrayList<String>> storeInDbAndReturnKlines_backup(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+        List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
+        if (dayList == null) return null;
+
+        BigDecimal indexNextDayPriceFive = null;
+        BigDecimal indexNextDayPriceTen = null;
+
+        //handle daily price, here handle today first, invert to handle
+        int size = dayList.size();
+        for (int indexDay = size - 1; indexDay > 0; indexDay--) {
+            if (size == (MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY) && (indexDay == size - 2)) {
+                //it is every day update price job
+                break;
+            }
+            ArrayList<String> dayPrice = dayList.get(indexDay);
+            StockDailyVO newDailyPriceVo = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
+            //get 5 day avg, before 4 days, set to 0
+            String stockName = stockNameVO.getStockName();
+            if (stockName == null) {
+                continue;
+            }
+
+            logger.debug("dayPrice =========" + dayPrice);
+            //calculate 5 day avg, need at least 5 day price list
+            if (indexDay >= 4) {
+                BigDecimal indexDayPriceFive = calculateDayAvg(stockName, indexDay, dayList, 5);
+                newDailyPriceVo.setDayAvgFive(indexDayPriceFive);
+                BigDecimal dayGainPercentage = calculateDayGainPercentage(indexDayPriceFive, indexNextDayPriceFive);
+                newDailyPriceVo.setDayGainOfFive(dayGainPercentage);
+                indexNextDayPriceFive = indexDayPriceFive;
+            }
+            //get 10 day avg
+            if (indexDay >= 9) {
+                BigDecimal indexDayPriceTen = calculateDayAvg(stockName, indexDay, dayList, 10);
+                newDailyPriceVo.setDayAvgTen(indexDayPriceTen);
+                BigDecimal dayGainPercentage = calculateDayGainPercentage(indexDayPriceTen, indexNextDayPriceTen);
+                newDailyPriceVo.setDayGainOfTen(dayGainPercentage);
+                indexNextDayPriceTen = indexDayPriceTen;
+            }
+            stockDailyDao.save(newDailyPriceVo);
+        }
+        return dayList;
+    }
+
 
     private static List<ArrayList<String>> getDayPriceList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
@@ -285,12 +342,12 @@ public class KLineMarketClosedService {
         return dayList;
     }
 
-    private BigDecimal calculateDayGainPercentage(BigDecimal dayAvgPrice, BigDecimal beforeDayAvgPrice) {
-        if (beforeDayAvgPrice == null) {
+    private BigDecimal calculateDayGainPercentage(BigDecimal dayAvgPrice, BigDecimal indexNextDayPrice) {
+        if (indexNextDayPrice == null) {
             return new BigDecimal(0);
         }
-        BigDecimal subtract = dayAvgPrice.subtract(beforeDayAvgPrice).multiply(BigDecimal.valueOf(100));
-        BigDecimal gainPercentage = subtract.divide(beforeDayAvgPrice, 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal subtract = dayAvgPrice.subtract(indexNextDayPrice).multiply(BigDecimal.valueOf(100));
+        BigDecimal gainPercentage = subtract.divide(indexNextDayPrice, 2, BigDecimal.ROUND_HALF_UP);
         return gainPercentage;
     }
 
@@ -308,6 +365,7 @@ public class KLineMarketClosedService {
         BigDecimal avgPrice = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
         String lowerCase = stockName.toLowerCase();
         if (!lowerCase.contains("etf") && !lowerCase.contains("lof")) {
+            //if it is not etf or lof, it is stock price
             avgPrice = avgPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         return avgPrice;
@@ -363,7 +421,7 @@ public class KLineMarketClosedService {
         return ret;
     }
 
-    public Object handleStocksAvg() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.debug("enter report ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
@@ -437,11 +495,12 @@ public class KLineMarketClosedService {
     }
 
     private void setUpwardDaysAndGain(List<StockDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, StockNameVO stockNameVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.out.println("flipBeginIndex = " + flipBeginIndex);
-        System.out.println("flipEndIndex = " + flipEndIndex);
-        System.out.println("dayIdentify = " + dayIdentify);
         int listSize = etfPriceList.size();
         StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
+        logger.debug("today = " + today);
+        logger.debug("flipBeginIndex = " + flipBeginIndex);
+        logger.debug("flipEndIndex = " + flipEndIndex);
+        logger.debug("dayIdentify = " + dayIdentify);
         StockDailyVO flipDay = etfPriceList.get(listSize - flipBeginIndex - 1);
         BigDecimal gainPercent = getGainPercent(today, flipDay, dayIdentify);
 
@@ -470,9 +529,9 @@ public class KLineMarketClosedService {
 
     private BigDecimal getGainPercent(StockDailyVO newPrice, StockDailyVO oldPrice, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Class<? extends StockDailyVO> aClass = newPrice.getClass();
-        BigDecimal newPriceValue = ((BigDecimal)aClass.getMethod("getDayAvg" + dayIdentify).invoke(newPrice));
-        BigDecimal oldPriceValue = ((BigDecimal)aClass.getMethod("getDayAvg" + dayIdentify).invoke(oldPrice));
-        if(newPriceValue == null || oldPriceValue == null){
+        BigDecimal newPriceValue = ((BigDecimal) aClass.getMethod("getDayAvg" + dayIdentify).invoke(newPrice));
+        BigDecimal oldPriceValue = ((BigDecimal) aClass.getMethod("getDayAvg" + dayIdentify).invoke(oldPrice));
+        if (newPriceValue == null || oldPriceValue == null) {
             return BigDecimal.ZERO;
         }
         BigDecimal subtract = newPriceValue.subtract(oldPriceValue).multiply(BigDecimal.valueOf(100));

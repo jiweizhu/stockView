@@ -26,7 +26,7 @@ public class KLineService {
     private static final Logger logger = LoggerFactory.getLogger(KLineService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import_stock.txt";
+    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
 

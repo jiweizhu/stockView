@@ -58,12 +58,12 @@
         2. root配置日志的根节点
         -->
 
-        <Logger name="com.example.notification" additivity="false" level="info" includeLocation="true">
+        <Logger name="com.example.notification" additivity="false" level="debug" includeLocation="true">
             <AppenderRef ref="Console"/>
         </Logger>
 
         <root level="info">
-<!--            <AppenderRef ref="Console"/>-->
+            <AppenderRef ref="Console"/>
             <AppenderRef ref="RollingFile"/>
         </root>
     </Loggers>

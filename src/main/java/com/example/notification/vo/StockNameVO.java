@@ -58,6 +58,9 @@ public class StockNameVO {
     @Column(name = "flipGainPercentTen")
     private BigDecimal flipGainPercentTen;
 
+    @Column(name = "lastUpdatedDay")
+    private Date lastUpdatedDay;
+
     static Map<String, String[]> sortArrayMap = new HashMap<>();
 
     public StockNameVO() {
@@ -65,6 +68,12 @@ public class StockNameVO {
 
     public StockNameVO(String stockId) {
         this.stockId = stockId;
+    }
+
+    public StockNameVO(String stockId, String stockName, Date day) {
+        this.stockId = stockId;
+        this.stockName = stockName;
+        this.lastUpdatedDay = day;
     }
 
     public static Map<String, String[]> getSortArrayMap() {
@@ -77,18 +86,9 @@ public class StockNameVO {
 
     @Override
     public String toString() {
-        return "\"" + stockId + "_" + stockName +"\""+
-                ",\"" + upwardDaysFive +"\""+
-                ",\"" + gainPercentFive+"\""+
-                ",\"" + flipUpwardDaysFive +"\""+
-                ",\"" + flipGainPercentFive + "\"]";
-//                ",'" + flipDayFive +"'"+
-//                ", " + flipEndDayFive +"'"+
-//                ", " + upwardDaysTen +"'"+
-//                ", " + gainPercentTen +"'"+
-//                ", " + flipUpwardDaysTen+"'"+
-//                ", " + flipDayTen +
-//                ", " + flipEndDayTen +
-//                ", " + flipGainPercentTen ;
+        return "StockNameVO{" +
+                "stockId='" + stockId + '\'' +
+                ", stockName='" + stockName + '\'' +
+                '}';
     }
 }
