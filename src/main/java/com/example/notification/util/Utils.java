@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Utils {
 
-    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:MM");
 
     public static boolean isWinSystem() {

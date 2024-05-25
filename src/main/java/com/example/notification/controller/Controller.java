@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 
 @RestController
 public class Controller {
@@ -48,7 +49,7 @@ public class Controller {
 
     @RequestMapping(value = {"/etfsCurveView"})
     @ResponseBody
-    public ResponseEntity etfsCurveView() throws JsonProcessingException {
+    public ResponseEntity etfsCurveView() {
         Object body = kLineMarketClosedService.etfsCurveView();
         return ResponseEntity.ofNullable(body);
     }
@@ -56,24 +57,36 @@ public class Controller {
 
     @RequestMapping(value = {"/stock/{stockId}"})
     @ResponseBody
-    public ResponseEntity stockDataById(@PathVariable String stockId) throws InterruptedException, JsonProcessingException {
+    public ResponseEntity stockDataById(@PathVariable String stockId) throws JsonProcessingException, ParseException {
         Object body = kLineMarketClosedService.stockJsonData(stockId);
+        return ResponseEntity.ofNullable(body);
+    }
+
+    @RequestMapping(value = {"/multiK/{stockId}"})
+    @ResponseBody
+    public ResponseEntity multiK(@PathVariable String stockId) {
+        Object body = kLineMarketClosedService.multiK(stockId);
         return ResponseEntity.ofNullable(body);
     }
 
 
     @RequestMapping(value = {"/etfs/{num}"})
     @ResponseBody
-    public ResponseEntity findAllEtfSort(@PathVariable String num) throws InterruptedException, JsonProcessingException {
-        logger.info("Enter method findAllEtfSort===="+num);
-        Object body = etfViewService.findAllEtfSortView(num);
+    public ResponseEntity findAllEtfSort(@PathVariable String num) {
+        logger.info("Enter method findAllEtfSort====" + num);
+        Object body = "";
+        if (num.equals("3")) {
+            body = etfViewService.findAllEtfSortView_new(num);
+        } else {
+            body = etfViewService.findAllEtfSortView(num);
+        }
         return ResponseEntity.ofNullable(body);
     }
 
 
     @RequestMapping(value = {"/etfs/table1"})
     @ResponseBody
-    public ResponseEntity findAllEtfsForTable_1() throws JsonProcessingException {
+    public ResponseEntity findAllEtfsForTable_1() {
         logger.info("Enter method findAllEtfsForTable_1====");
         Object body = etfViewService.findAllEtfsForTable(1);
         return ResponseEntity.ofNullable(body);

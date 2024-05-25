@@ -64,7 +64,7 @@ async function updateChart() {
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                 'http://124.71.19.6:8888/stock/'+ name
+                 'http://124.71.19.6:8888/multiK/'+ name
             )
                 .then(response => response.json());
             resolve({ name, data });

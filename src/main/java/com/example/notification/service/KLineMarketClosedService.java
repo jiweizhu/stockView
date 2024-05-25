@@ -11,8 +11,6 @@ import com.example.notification.vo.WebQueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -32,6 +29,8 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,7 +77,6 @@ public class KLineMarketClosedService {
 
     // 1.importStocks,
     // format: stockId_name or stockId
-
     public String importStocks() throws JsonProcessingException {
         readImportFileStocks();
         List<String> storedStocks = storedStockIds();
@@ -139,6 +137,7 @@ public class KLineMarketClosedService {
     //load stock list
     private void readImportFileStocks() {
         importStockFileList.clear();
+        importedFileLine.clear();
         BufferedReader reader = null;
         String line;
         try {
@@ -153,9 +152,19 @@ public class KLineMarketClosedService {
                 importedFileLine.add(line);
                 String stock_id;
                 if (line.toLowerCase().startsWith("s") && !line.startsWith("#")) {
-                    String[] id_name = line.split("_");
-                    stock_id = id_name[0].toLowerCase();
-                    importStockFileList.add(stock_id);
+                    //split by 
+                    String[] commaSplit = line.split(",");
+                    if (commaSplit.length > 1) {
+                        for (String comma_split_str : commaSplit) {
+                            String[] id_name = comma_split_str.split("_");
+                            stock_id = id_name[0].toLowerCase();
+                            importStockFileList.add(stock_id);
+                        }
+                    } else {
+                        String[] id_name = line.split("_");
+                        stock_id = id_name[0].toLowerCase();
+                        importStockFileList.add(stock_id);
+                    }
                 }
             }
             logger.info("Successfully read stock name file !!");
@@ -204,6 +213,7 @@ public class KLineMarketClosedService {
     //2.getDaysPriceOnLineAndStoreInDb
 
     public String getHistoryPriceOnLineAndStoreInDb(Integer daysToGet) throws InterruptedException, JsonProcessingException {
+        logger.info("Enter getHistoryPriceOnLineAndStoreInDb method =========");
         ArrayList<StockNameVO> getHistoryPriceStocks = new ArrayList<>();
 
         //iterator to query 50day price history and calculate 10day price, and store in db
@@ -232,12 +242,14 @@ public class KLineMarketClosedService {
     }
 
     private List<ArrayList<String>> storeInDbAndReturnKlines(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+        logger.info("Enter storeInDbAndReturnKlines method =========");
         List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
         if (dayList == null) return null;
 
         BigDecimal beforeDay_FiveDayAvgPrice = null;
         BigDecimal beforeDay_TenDayAvgPrice = null;
         int size = dayList.size();
+        logger.info("dayList.size() =========" + dayList.size());
         for (int i = 0; i < size; i++) {
             ArrayList<String> dayPrice = dayList.get(i);
             StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
@@ -247,7 +259,6 @@ public class KLineMarketClosedService {
                 continue;
             }
 
-            logger.debug("dayPrice =========" + dayPrice);
             //calculate 5 day avg, need at least 5 day price list
             if (i >= 4) {
                 BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, dayList, 5);
@@ -264,9 +275,11 @@ public class KLineMarketClosedService {
                 stockDailyVO.setDayGainOfTen(dayDiff);
                 beforeDay_TenDayAvgPrice = tenDayAvgPrice;
             }
-            if (size == MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY) {
+            if (size <= MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY + 10) {
+                // just to run every stock logic
                 //remove other days except today to save
-                if (i == (size - 1)) {
+                if (checkIfTodayData(stockDailyVO)) {
+                    logger.info("EveryDay job: save stockDailyVO =========" + stockDailyVO);
                     stockDailyDao.save(stockDailyVO);
                     break;
                 }
@@ -277,6 +290,17 @@ public class KLineMarketClosedService {
         StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), Date.valueOf(dayList.get(dayList.size() - 1).get(0)));
         stockDao.save(lastUpdateDay);
         return dayList;
+    }
+
+    private static final String TODAYDATE = Utils.todayDate();
+
+    private boolean checkIfTodayData(StockDailyVO stockDailyVO) {
+        String date = Utils.format.format(stockDailyVO.getDay());
+        //if the date yyyy-MM-dd is equal, it means the market is started!
+        if (TODAYDATE.equals(date)) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -382,33 +406,56 @@ public class KLineMarketClosedService {
         stockNameVO.setStockName(stockChineseName);
     }
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private static SimpleDateFormat formatter = new SimpleDateFormat("YYYY/MM/dd");
 
-    //3.calculate avg
-    public void calculateAvg() {
-        // query all stockIds from daily_price table
-        List<String> stockIds = entityManager.createQuery("select distinct stock_id from daily_price;").getResultList();
-        ;
-        //query the newest one and check if avg exist, if yes, return.
-        for (String stockId : stockIds) {
-            String fiveDayPrice = (String) entityManager.createQuery("select five_day_avg from daily_price where stock_id=?1 and five_day_avg is null order by day limit 1 ;").setParameter(1, stockId).getSingleResult();
-            if (!StringUtils.hasLength(fiveDayPrice)) {
-                //need to calculate
-            }
-        }
-        //if not, query last 5 or 10 days price, calculate and in db.
-    }
-
-    public Object stockJsonData(String stockId) throws JsonProcessingException {
+    public Object multiK(String stockId) {
         logger.debug("enter stockJsonData stockId=============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
-        List resultList = entityManager.createNativeQuery("select day, closing_price from daily_price where stock_id=?1 ").setParameter(1, stockId).getResultList();
-
-        return objectMapper.writeValueAsString(resultList);
+        List<StockDailyVO> resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+        Collections.reverse(resultList);
+        ArrayList<Double[]> result = new ArrayList<>();
+        for (StockDailyVO stockNameVO : resultList) {
+            BigDecimal dayAvgFive = stockNameVO.getDayAvgFive();
+            BigDecimal dayAvgTen = stockNameVO.getDayAvgTen();
+            if (dayAvgFive == null || dayAvgTen == null) {
+                continue;
+            }
+            Double[] strings = new Double[2];
+            strings[0] = Double.valueOf(stockNameVO.getDay().getTime());
+            strings[1] = Double.valueOf(stockNameVO.getClosingPrice().toString());
+            result.add(strings);
+        }
+        return result;
     }
+
+    public Object stockJsonData(String stockId) throws JsonProcessingException, ParseException {
+        logger.debug("enter stockJsonData stockId=============" + stockId);
+        if (stockId.contains("_")) {
+            stockId = stockId.split("_")[0];
+        }
+        List<StockDailyVO> resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+        Collections.reverse(resultList);
+        ArrayList<String[]> result = new ArrayList<>();
+        for (StockDailyVO stockNameVO : resultList) {
+            BigDecimal dayAvgFive = stockNameVO.getDayAvgFive();
+            BigDecimal dayAvgTen = stockNameVO.getDayAvgTen();
+            if (dayAvgFive == null || dayAvgTen == null) {
+                continue;
+            }
+            String[] strings = new String[7];
+            strings[0] = formatter.format(stockNameVO.getDay());
+            strings[1] = stockNameVO.getOpeningPrice().toString();
+            strings[2] = stockNameVO.getClosingPrice().toString();
+            strings[3] = stockNameVO.getIntradayHigh().toString();
+            strings[4] = stockNameVO.getIntradayLow().toString();
+
+            result.add(strings);
+        }
+        return result;
+    }
+
 
     public Object listEtfs() throws JsonProcessingException {
         logger.debug("enter listEtfs ====");
@@ -422,7 +469,7 @@ public class KLineMarketClosedService {
     }
 
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        logger.debug("enter report ====");
+        logger.debug("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
         for (StockNameVO stockNameVO : stocks) {
@@ -434,11 +481,12 @@ public class KLineMarketClosedService {
             }
             Pageable pageable = PageRequest.of(0, 60, Sort.by(Sort.Direction.DESC, "day"));
 //            List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, Pageable.ofSize(60)).stream().toList();
-            List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, pageable).stream().sorted(Comparator.comparing(StockDailyVO::getDay)).toList();
+            List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, pageable).stream().sorted(Comparator.comparing(StockDailyVO::getDay)).collect(Collectors.toList());
             List<Integer> flipDayFive = analysisFlipDay(etfPriceList, "getDayGainOfFive");
             List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
             setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
             setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
+            logger.debug("handleStocksFlipDaysAndGainReport ====stockDao.save ==========" + stockNameVO);
             stockDao.save(stockNameVO);
             retStr.append(stockNameVO.getStockId() + "_" + stockNameVO.getStockName() + "</br>");
         }

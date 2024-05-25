@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Stocks curve 图表</title>
+    <style>
+.cell {
+    display: inline-block;
+    width: 200px;
+    height: 28px;
+    line-height: 30px;
+    text-align: center;
+    border: 1px solid black;
+    margin: 1px;
+}
+</style>
+</head>
+<body>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+
+<button id="getDivs" >getDivs</button>
+<table id="myTable" border="1"></table>
+
+<script>
+document.getElementById('getDivs').addEventListener('click', getDivs);
+
+document.addEventListener('DOMContentLoaded', function () {
+   function loadTableData() {
+      fetch('http://124.71.19.6:8888/etfs/3')
+         .then(response => response.text())
+         .then(data => {
+            const dataContainer = document.getElementById('myTable');
+            dataContainer.innerHTML = data;
+         })
+         .catch(error => {
+            console.error('Error fetching data:', error);
+         })
+   }
+
+loadTableData();
+});
+
+
+async function getDivs() {
+   const spans = document.querySelectorAll('div[id^="span_"]');
+spans.forEach(span => {
+    createChart(span.id);
+});}
+
+async function createChart(divId) {
+
+  const data = await fetch('http://124.71.19.6:8888/stock/'+divId.replace('span_', ''))
+    .then(response => response.json());
+
+    Highcharts.stockChart(divId, {
+        rangeSelector: {
+            selected: 1
+        },
+        title: {
+            text: divId // Using divId as chart title
+        },
+        series: [{
+            type: 'candlestick',
+            name: 'AAPL Stock Price',
+            data: data,
+            dataGrouping: {
+                units: [
+                    [
+                        'day', // unit name
+                        [1] // allowed multiples
+                    ], [
+                        'year',
+                        [1, 2, 3, 4, 6]
+                    ]
+                ]
+            }
+        }]
+    });
+}
+
+
+</script>
+</body>
+</html>

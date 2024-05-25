@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Table with Charts</title>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+</head>
+<body>
+
+<button id="generateTable">Generate Table</button>
+<button id="showChartIds">Show Chart IDs</button>
+<br><br>
+<div id="tableContainer"></div>
+
+<script>
+document.getElementById('generateTable').addEventListener('click', generateTable);
+document.getElementById('showChartIds').addEventListener('click', showChartIds);
+
+function generateTable() {
+    const numRows = 3;
+    const numCols = 2;
+    let tableHTML = '<table border="1">';
+    for (let i = 1; i <= numRows; i++) {
+        tableHTML += '<tr>';
+        for (let j = 1; j <= numCols; j++) {
+            const cellId = i + '_' + j;
+            tableHTML += `<td>${cellId}</td>`;
+            if (j === numCols) {
+                tableHTML += `<td><div id="${cellId}" style="width: 500px; height: 500px;"></div></td>`;
+            }
+        }
+        tableHTML += '</tr>';
+    }
+    tableHTML += '</table>';
+    document.getElementById('tableContainer').innerHTML = tableHTML;
+}
+
+async function showChartIds() {
+    const numRows = 3;
+    const numCols = 2;
+    for (let i = 1; i <= numRows; i++) {
+        for (let j = 1; j <= numCols; j++) {
+            if (j === numCols) {
+                const cellId = i + '_' + j;
+                const divId = document.getElementById(cellId).id;
+                document.getElementById(cellId).innerText = divId;
+                await createChart(cellId);
+            }
+        }
+    }
+}
+
+async function createChart(divId) {
+    const data = await fetch('https://demo-live-data.highcharts.com/aapl-ohlc.json')
+        .then(response => response.json());
+
+    Highcharts.stockChart(divId, {
+        rangeSelector: {
+            selected: 1
+        },
+        title: {
+            text: divId // Using divId as chart title
+        },
+        series: [{
+            type: 'candlestick',
+            name: 'AAPL Stock Price',
+            data: data,
+            dataGrouping: {
+                units: [
+                    [
+                        'day', // unit name
+                        [1] // allowed multiples
+                    ], [
+                        'year',
+                        [1, 2, 3, 4, 6]
+                    ]
+                ]
+            }
+        }]
+    });
+}
+</script>
+
+</body>
+</html>

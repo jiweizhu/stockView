@@ -95,6 +95,86 @@ public class ETFViewService {
         return html;
     }
 
+    public Object findAllEtfSortView_new(String num) {
+        List<Sort.Order> orders = new ArrayList<Sort.Order>();
+        orders.add(new Sort.Order(Sort.Direction.DESC, "upwardDaysFive"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "gainPercentFive"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "upwardDaysTen"));
+        orders.add(new Sort.Order(Sort.Direction.DESC, "gainPercentTen"));
+        List<StockNameVO> downwardDaysStock = stockDao.findDownwardDaysStock();
+        List<StockNameVO> fiveDayUpwardDays = stockDao.findupwardDaysStock();
+        boolean b = fiveDayUpwardDays.addAll(downwardDaysStock);
+        if (CollectionUtils.isEmpty(fiveDayUpwardDays)) {
+            return "No data found!";
+        }
+        StringBuilder html = new StringBuilder();
+
+        html.append("<tr><th>ETF Name</th>" + "<th>5线</th>" + "<th>8</th>" + "<th>10线</th>" + "</tr>\n");
+
+        List<String> lightColors = generateLightColors();
+        Integer loopCount = 0;
+        String color = lightColors.get(loopCount);
+        Integer temp = 0;
+
+        for (StockNameVO stockVo : fiveDayUpwardDays) {
+            String stockName = stockVo.getStockName();
+            if (stockName == null || !stockName.toLowerCase().contains("etf")) continue;
+            if (!stockVo.getUpwardDaysFive().equals(temp)) {
+                loopCount++;
+                temp = stockVo.getUpwardDaysFive();
+                if (loopCount >= lightColors.size()) {
+                    loopCount = 0;
+                }
+                color = lightColors.get(loopCount);
+            }
+
+            html.append("<tr style=\"background-color:").append(color).append("\">");
+            html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">")
+                    .append(stockVo.getStockId()).append("</br>").append(stockName).append("</a></td>");
+            view_3(html, stockVo);
+        }
+        return html;
+    }
+
+
+    private static void view_3(StringBuilder html, StockNameVO stockVo) {
+        Integer upwardDaysTen = stockVo.getUpwardDaysTen();
+        Integer upwardDaysFive = stockVo.getUpwardDaysFive();
+        if (upwardDaysFive > 1 && upwardDaysTen >= 0) {
+            html.append("<td style=\"background-color: #00FFB0;\">");
+        } else if (upwardDaysFive < 0 || upwardDaysTen < 0) {
+            html.append("<td style=\"background-color: #DEB887;\">");
+        } else {
+            html.append("<td>");
+        }
+        html.append(String.format("%02d", stockVo.getUpwardDaysFive()))
+//                    .append("|").append(formatter.format(stockVo.getFlipDayFive()))
+                .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>")
+                .append("<span >").append(stockVo.getGainPercentFive()).append("%")
+//                    .append("|").append(formatter.format(stockVo.getFlipEndDayFive()))
+                .append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>")
+                .append("(").append(formatter.format(stockVo.getLastUpdatedDay())).append(")")
+                .append("</span>")
+                .append("</td>");
+
+
+        html.append("<td style=\"background-color: #708090;\">").append("").append("</td>");
+        if (upwardDaysFive < 0 || upwardDaysTen < 0) {
+            html.append("<td style=\"background-color: #DEB887;\">");
+        } else {
+            html.append("<td>");
+        }
+        html.append(String.format("%02d", upwardDaysTen))
+//                    .append("|").append(formatter.format(stockVo.getFlipDayTen()))
+                .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>")
+                .append(stockVo.getGainPercentTen()).append("%")
+//                    .append("|").append(formatter.format(stockVo.getFlipEndDayTen()))
+                .append("|").append(stockVo.getFlipGainPercentTen()).append("%")
+                .append("</td>");
+        html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("span_"+stockVo.getStockId()).append("\"></div>");
+        html.append("</td></tr>\n");
+    }
+
     private static void view_one(StringBuilder html, StockNameVO stockVo) {
         String stockName = stockVo.getStockName();
         if (stockName != null && stockName.toLowerCase().contains("etf")) {
@@ -141,9 +221,7 @@ public class ETFViewService {
                 .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>")
                 .append(stockVo.getGainPercentTen()).append("%")
 //                    .append("|").append(formatter.format(stockVo.getFlipEndDayTen()))
-                .append("|").append(stockVo.getFlipGainPercentTen()).append("%")
-                .append("</td>");
-        html.append("<td><div id=\"").append("container").append("\"></div>");
+                .append("|").append(stockVo.getFlipGainPercentTen()).append("%");
         html.append("</td></tr>\n");
     }
 

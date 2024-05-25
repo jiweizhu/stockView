@@ -6,7 +6,7 @@
         <!--应用名称-->
         <property name="APP_NAME">NotificationApplication</property>
         <!--日志存放路径-->
-        <property name="LOG_PATH">./logs/${APP_NAME}</property>
+        <property name="LOG_PATH">./logs/</property>
         <!--日志输出格式-文件-->
         <property name="PATTERN_FILE">%d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level - %msg%n</property>
     </Properties>
@@ -18,7 +18,7 @@
             1. fileName: 日志存储路径
             2. filePattern: 历史日志封存路径。其中%d{yyyy-MM-dd}表示了日志的时间单位是天,log4j2自动识别zip等后缀，表示历史日志需要压缩
         -->
-        <RollingFile name="RollingFile" fileName="${LOG_PATH}/${APP_NAME}.log" filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}-%d{yyyy-MM-dd}_%i.log.zip">
+        <RollingFile name="RollingFile" fileName="${LOG_PATH}/${APP_NAME}.log" filePattern="${LOG_PATH}/$${date:yyyy-MM}/${APP_NAME}-%d{yyyy-MM-dd}_%i.log">
             <!--输出日志的格式, 不设置默认为:%m%n-->
             <PatternLayout pattern="${PATTERN_FILE}"/>
             <!--只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
