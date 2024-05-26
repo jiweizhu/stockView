@@ -50,6 +50,7 @@ public class Controller {
     @RequestMapping(value = {"/etfsCurveView"})
     @ResponseBody
     public ResponseEntity etfsCurveView() {
+        logger.info("Enter method etfsCurveView=========");
         Object body = kLineMarketClosedService.etfsCurveView();
         return ResponseEntity.ofNullable(body);
     }
@@ -65,6 +66,7 @@ public class Controller {
     @RequestMapping(value = {"/multiK/{stockId}"})
     @ResponseBody
     public ResponseEntity multiK(@PathVariable String stockId) {
+        logger.info("Enter method multiK====stockId====" + stockId);
         Object body = kLineMarketClosedService.multiK(stockId);
         return ResponseEntity.ofNullable(body);
     }

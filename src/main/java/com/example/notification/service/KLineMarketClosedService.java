@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -32,6 +33,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY;
@@ -71,6 +73,9 @@ public class KLineMarketClosedService {
 
     @Autowired
     private StockDao stockDao;
+
+    @Autowired
+    private ThreadPoolTaskExecutor executorService;
 
     @Autowired
     private StockDailyDao stockDailyDao;
@@ -212,32 +217,53 @@ public class KLineMarketClosedService {
     }
     //2.getDaysPriceOnLineAndStoreInDb
 
-    public String getHistoryPriceOnLineAndStoreInDb(Integer daysToGet) throws InterruptedException, JsonProcessingException {
+    public String getHistoryPriceOnLineAndStoreInDb(Integer days) {
         logger.info("Enter getHistoryPriceOnLineAndStoreInDb method =========");
         ArrayList<StockNameVO> getHistoryPriceStocks = new ArrayList<>();
-
+        final Integer daysToGet = days;
+        List<Callable<Void>> tasks = new ArrayList<>();
         //iterator to query 50day price history and calculate 10day price, and store in db
         List<StockNameVO> storedStocks = storedStocks();
         for (StockNameVO stockNameVO : storedStocks) {
-            //daysToGet.equals(0) means market closed job
-            if (stockNameVO.getGainPercentFive() != null && !daysToGet.equals(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY)) {
-                continue;
-            }
-
-            getHistoryPriceStocks.add(stockNameVO);
-            //slow down the speech, just intend to avoid website protection
-            Thread.sleep(100);
-            if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
-                WebQueryParam webQueryParam = new WebQueryParam();
-                if (daysToGet == null) {
-                    daysToGet = 50;
+            tasks.add(() -> {
+                // daysToGet.equals(0)
+                if (stockNameVO.getGainPercentFive() != null && !daysToGet.equals(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY)) {
+                    return null;
                 }
-                webQueryParam.setDaysToQuery(daysToGet);
-                webQueryParam.setIdentifier(stockNameVO.getStockId());
-                DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
-                storeInDbAndReturnKlines(dailyQueryResponse, stockNameVO);
-            }
+
+                synchronized (getHistoryPriceStocks) {
+                    getHistoryPriceStocks.add(stockNameVO);
+                }
+
+                // 降低速度，避免网站保护
+                Thread.sleep(100);
+
+                if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
+                    WebQueryParam webQueryParam = new WebQueryParam();
+                    webQueryParam.setDaysToQuery(daysToGet);
+                    webQueryParam.setIdentifier(stockNameVO.getStockId());
+                    DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+                    storeInDbAndReturnKlines(dailyQueryResponse, stockNameVO);
+                }
+
+                return null;
+            });
         }
+
+        try {
+            List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                try {
+                    future.get(); // 检查每个任务的执行情况
+                } catch (ExecutionException e) {
+                    logger.error("Error executing task", e.getCause());
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Task execution interrupted", e);
+        }
+
         return "getHistoryPriceStocks: " + getHistoryPriceStocks.toString();
     }
 
@@ -471,6 +497,7 @@ public class KLineMarketClosedService {
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.debug("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
+        List<Callable<Void>> tasks = new ArrayList<>();
         List<StockNameVO> stocks = storedStocks();
         for (StockNameVO stockNameVO : stocks) {
             //loop to calculate each etf
