@@ -11,6 +11,8 @@ import com.example.notification.vo.WebQueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
@@ -33,7 +36,9 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY;
@@ -44,7 +49,6 @@ public class KLineMarketClosedService {
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import.txt";
-    static String etfViewFile = "C:\\code\\tools\\notification\\src\\main\\resources\\etfs_view.txt";
 
     public static Boolean ifMarketOpen = Boolean.FALSE;
 
@@ -194,7 +198,7 @@ public class KLineMarketClosedService {
         try {
             boolean winSystem = Utils.isWinSystem();
             if (winSystem) {
-                etfViewFileInCloud = etfViewFile;
+                etfViewFileInCloud = importStockFile;
             }
             FileReader fileReader = new FileReader(etfViewFileInCloud);
             reader = new BufferedReader(fileReader);
@@ -271,7 +275,6 @@ public class KLineMarketClosedService {
         logger.info("Enter storeInDbAndReturnKlines method =========");
         List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
         if (dayList == null) return null;
-
         BigDecimal beforeDay_FiveDayAvgPrice = null;
         BigDecimal beforeDay_TenDayAvgPrice = null;
         int size = dayList.size();
@@ -636,6 +639,18 @@ public class KLineMarketClosedService {
             stringBuilder.append("</br>");
         }
         return stringBuilder;
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Transactional
+    public Object delete_HistoryData() {
+        entityManager.createNativeQuery("TRUNCATE TABLE daily_price").executeUpdate();
+
+        entityManager.createNativeQuery("update stock set gain_percent_five = null").executeUpdate();
+
+        return "ok";
     }
 }
 

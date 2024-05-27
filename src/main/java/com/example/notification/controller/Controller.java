@@ -47,6 +47,13 @@ public class Controller {
         return ResponseEntity.ofNullable(body);
     }
 
+    @RequestMapping(value = {"/delete_HistoryData"})
+    @ResponseBody
+    public ResponseEntity deleteHistoryData() throws JsonProcessingException {
+        Object body = kLineMarketClosedService.delete_HistoryData();
+        return ResponseEntity.ofNullable(body);
+    }
+
     @RequestMapping(value = {"/etfsCurveView"})
     @ResponseBody
     public ResponseEntity etfsCurveView() {

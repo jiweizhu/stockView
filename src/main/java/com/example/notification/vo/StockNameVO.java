@@ -86,9 +86,6 @@ public class StockNameVO {
 
     @Override
     public String toString() {
-        return "StockNameVO{" +
-                "stockId='" + stockId + '\'' +
-                ", stockName='" + stockName + '\'' +
-                '}';
+        return stockId + "_" + stockName + "</br>";
     }
 }
