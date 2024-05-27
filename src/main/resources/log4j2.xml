@@ -63,6 +63,9 @@
         <logger name="com.example.notification" level="debug" additivity="false">
             <appender-ref ref="Console"/>
         </logger>
+        <logger name="com.example.notification" level="info" additivity="false">
+            <appender-ref ref="InfoFile"/>
+        </logger>
         <!--建立一个默认的root的logger-->
         <root level="${outputLogLevel}">
             <appender-ref ref="Console"/>
