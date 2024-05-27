@@ -17,4 +17,7 @@ public interface StockDailyDao extends JpaRepository<StockDailyVO, StockDailyKey
 
     @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc ", nativeQuery = true)
     List<StockDailyVO> findByStockIdOrderByDay(String stock_id);
+
+    @Query(value = "SELECT day FROM daily_price where stock_id = ?1 ", nativeQuery = true)
+    List<String> findStockDaysByStockId(String stock_id);
 }

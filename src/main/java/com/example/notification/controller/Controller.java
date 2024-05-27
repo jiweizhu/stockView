@@ -43,6 +43,7 @@ public class Controller {
     @RequestMapping(value = {"/stock/list"})
     @ResponseBody
     public ResponseEntity listAllETFs() throws JsonProcessingException {
+        logger.info("Enter method listAllETFs=========");
         Object body = kLineMarketClosedService.listEtfs();
         return ResponseEntity.ofNullable(body);
     }

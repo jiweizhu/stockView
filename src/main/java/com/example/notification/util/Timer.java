@@ -25,7 +25,6 @@ public class Timer {
         try {
             logger.info("Start eightHourQuery=====");
             // also need to clear the upTenDayList, meaning that the notification email is sent today
-            KLineService.clearCollect();
             kLineService.getAvgPrice();
 
         } catch (Exception e) {

@@ -50,21 +50,10 @@ public class KLineMarketClosedService {
 
     static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import.txt";
 
-    public static Boolean ifMarketOpen = Boolean.FALSE;
-
     private static ArrayList<String> importStockFileList = new ArrayList<>();
     private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
 
-    private static Map<String, StockNameVO> exceedFiveDayMap = new HashMap<>();
-    private static Map<String, StockNameVO> exceedTenDayMap = new HashMap<>();
-    private static Map<String, StockNameVO> downFiveDayMap = new HashMap<>();
-    private static Map<String, StockNameVO> downTenDayMap = new HashMap<>();
     private static Map<String, List<ArrayList<String>>> daysPriceMap = new HashMap<>();
-
-    public static void clearCollect() {
-        exceedTenDayMap.clear();
-        downTenDayMap.clear();
-    }
 
     @Value("${notification.import.file}")
     private String importFileInCloud;
@@ -219,7 +208,6 @@ public class KLineMarketClosedService {
             }
         }
     }
-    //2.getDaysPriceOnLineAndStoreInDb
 
     public String getHistoryPriceOnLineAndStoreInDb(Integer days) {
         logger.info("Enter getHistoryPriceOnLineAndStoreInDb method =========");
@@ -243,13 +231,13 @@ public class KLineMarketClosedService {
                 Thread.sleep(100);
 
                 if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
+                    logger.info("Handle ===  " + stockNameVO + " ==history price====daysToGet=" + daysToGet);
                     WebQueryParam webQueryParam = new WebQueryParam();
                     webQueryParam.setDaysToQuery(daysToGet);
                     webQueryParam.setIdentifier(stockNameVO.getStockId());
                     DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
-                    storeInDbAndReturnKlines(dailyQueryResponse, stockNameVO);
+                    storeHistoryPrice(dailyQueryResponse, stockNameVO);
                 }
-
                 return null;
             });
         }
@@ -268,55 +256,52 @@ public class KLineMarketClosedService {
             logger.error("Task execution interrupted", e);
         }
 
-        return "getHistoryPriceStocks: " + getHistoryPriceStocks.toString();
+        return "getHistoryPriceStocks: " + getHistoryPriceStocks;
     }
 
-    private List<ArrayList<String>> storeInDbAndReturnKlines(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
-        logger.info("Enter storeInDbAndReturnKlines method =========");
+    private List<ArrayList<String>> storeHistoryPrice(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
+
+        //use hashmap to judge if the day is stored or not
+        List<String> days = stockDailyDao.findStockDaysByStockId(stockNameVO.getStockId());
+        Set<String> daysSet = days.stream().collect(Collectors.toSet());
+
         if (dayList == null) return null;
         BigDecimal beforeDay_FiveDayAvgPrice = null;
         BigDecimal beforeDay_TenDayAvgPrice = null;
         int size = dayList.size();
-        logger.info("dayList.size() =========" + dayList.size());
         for (int i = 0; i < size; i++) {
             ArrayList<String> dayPrice = dayList.get(i);
-            StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
-            //get 5 day avg, before 4 days, set to 0
-            String stockName = stockNameVO.getStockName();
-            if (stockName == null) {
+            if (daysSet.contains(stockNameVO.getStockId())) {
+                //history day already stored
                 continue;
             }
 
-            //calculate 5 day avg, need at least 5 day price list
-            if (i >= 4) {
-                BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, dayList, 5);
-                stockDailyVO.setDayAvgFive(fiveDayAvgPrice);
-                BigDecimal dayDiff = calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
-                stockDailyVO.setDayGainOfFive(dayDiff);
-                beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
-            }
-            //get 10 day avg
-            if (i >= 9) {
-                BigDecimal tenDayAvgPrice = calculateDayAvg(stockName, i, dayList, 10);
-                stockDailyVO.setDayAvgTen(tenDayAvgPrice);
-                BigDecimal dayDiff = calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
-                stockDailyVO.setDayGainOfTen(dayDiff);
-                beforeDay_TenDayAvgPrice = tenDayAvgPrice;
-            }
-            if (size <= MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY + 10) {
-                // just to run every stock logic
-                //remove other days except today to save
-                if (checkIfTodayData(stockDailyVO)) {
-                    logger.info("EveryDay job: save stockDailyVO =========" + stockDailyVO);
-                    stockDailyDao.save(stockDailyVO);
-                    break;
-                }
+            String stockName = stockNameVO.getStockName();
+            if (stockName == null || i < 9) {
+                //i < 9 just ignore to store avg price = null
                 continue;
             }
+            StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
+
+            //calculate 5 day avg, need at least 5 day price list
+            BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, dayList, 5);
+            stockDailyVO.setDayAvgFive(fiveDayAvgPrice);
+            BigDecimal dayDiffFive = calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
+            stockDailyVO.setDayGainOfFive(dayDiffFive);
+            beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
+
+            //get 10 day avg
+            BigDecimal tenDayAvgPrice = calculateDayAvg(stockName, i, dayList, 10);
+            stockDailyVO.setDayAvgTen(tenDayAvgPrice);
+            BigDecimal dayDiffTen = calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
+            stockDailyVO.setDayGainOfTen(dayDiffTen);
+            beforeDay_TenDayAvgPrice = tenDayAvgPrice;
+
             stockDailyDao.save(stockDailyVO);
         }
-        StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), Date.valueOf(dayList.get(dayList.size() - 1).get(0)));
+        Date date = Date.valueOf(days.get(days.size() - 1));
+        StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), date);
         stockDao.save(lastUpdateDay);
         return dayList;
     }
@@ -331,52 +316,6 @@ public class KLineMarketClosedService {
         }
         return false;
     }
-
-
-    private List<ArrayList<String>> storeInDbAndReturnKlines_backup(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
-        List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
-        if (dayList == null) return null;
-
-        BigDecimal indexNextDayPriceFive = null;
-        BigDecimal indexNextDayPriceTen = null;
-
-        //handle daily price, here handle today first, invert to handle
-        int size = dayList.size();
-        for (int indexDay = size - 1; indexDay > 0; indexDay--) {
-            if (size == (MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY) && (indexDay == size - 2)) {
-                //it is every day update price job
-                break;
-            }
-            ArrayList<String> dayPrice = dayList.get(indexDay);
-            StockDailyVO newDailyPriceVo = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
-            //get 5 day avg, before 4 days, set to 0
-            String stockName = stockNameVO.getStockName();
-            if (stockName == null) {
-                continue;
-            }
-
-            logger.debug("dayPrice =========" + dayPrice);
-            //calculate 5 day avg, need at least 5 day price list
-            if (indexDay >= 4) {
-                BigDecimal indexDayPriceFive = calculateDayAvg(stockName, indexDay, dayList, 5);
-                newDailyPriceVo.setDayAvgFive(indexDayPriceFive);
-                BigDecimal dayGainPercentage = calculateDayGainPercentage(indexDayPriceFive, indexNextDayPriceFive);
-                newDailyPriceVo.setDayGainOfFive(dayGainPercentage);
-                indexNextDayPriceFive = indexDayPriceFive;
-            }
-            //get 10 day avg
-            if (indexDay >= 9) {
-                BigDecimal indexDayPriceTen = calculateDayAvg(stockName, indexDay, dayList, 10);
-                newDailyPriceVo.setDayAvgTen(indexDayPriceTen);
-                BigDecimal dayGainPercentage = calculateDayGainPercentage(indexDayPriceTen, indexNextDayPriceTen);
-                newDailyPriceVo.setDayGainOfTen(dayGainPercentage);
-                indexNextDayPriceTen = indexDayPriceTen;
-            }
-            stockDailyDao.save(newDailyPriceVo);
-        }
-        return dayList;
-    }
-
 
     private static List<ArrayList<String>> getDayPriceList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
@@ -646,7 +585,8 @@ public class KLineMarketClosedService {
 
     @Transactional
     public Object delete_HistoryData() {
-        entityManager.createNativeQuery("TRUNCATE TABLE daily_price").executeUpdate();
+        entityManager.createNativeQuery("delete from daily_price " +
+                "where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
 
         entityManager.createNativeQuery("update stock set gain_percent_five = null").executeUpdate();
 

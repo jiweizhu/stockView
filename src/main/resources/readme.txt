@@ -13,8 +13,8 @@ issues:
 =================================
 
 need to do:
-3.IMPORTANT!----calculate the upAndDown program! to choose which ETF is the best to do upAndDown!----有色？酒？芯片太弱了！这里需有注意，就是网格要在底部安全区域做！否则不断加仓会疯！
-2.if not a opening day, skip to do realtime query! In order to void sending the same email as yesterday's.
+3.IMPORTANT!----calculate the upAndDown program! to choose which ETF is the best to do upAndDown!---done
+2.if not a opening day, skip to do realtime query! In order to void sending the same email as yesterday's.---done
 1.down 10days price---done;20230729
 
 Function:

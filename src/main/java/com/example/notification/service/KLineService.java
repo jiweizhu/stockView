@@ -41,11 +41,6 @@ public class KLineService {
     private static Map<String, DayAvgVO> dayAvgMap = new HashMap<>();
     private static Map<String, List<ArrayList<String>>> daysPriceMap = new HashMap<>();
 
-    public static void clearCollect() {
-        exceedTenDayMap.clear();
-        downTenDayMap.clear();
-    }
-
     @Value("${notification.monitor.file}")
     private String stockFile;
 
