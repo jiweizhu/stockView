@@ -19,7 +19,7 @@ public class ThreadPoolConfig {
         // 设置最大线程数
         threadPoolTaskExecutor.setMaxPoolSize(30);
         // 设置工作队列大小
-        threadPoolTaskExecutor.setQueueCapacity(100);
+        threadPoolTaskExecutor.setQueueCapacity(3000);
         //设置空闲线程死亡时间
         threadPoolTaskExecutor.setKeepAliveSeconds(300);
         // 设置拒绝策略.当工作队列已满,线程数为最大线程数的时候,接收新任务抛出RejectedExecutionException异常

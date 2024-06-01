@@ -15,8 +15,14 @@ import java.util.List;
 public interface StockDailyDao extends JpaRepository<StockDailyVO, StockDailyKey>, JpaSpecificationExecutor<StockDailyVO>, Serializable {
     Page<StockDailyVO> findByStockId(String firstname, Pageable pageable);
 
-    @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc ", nativeQuery = true)
+    @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc limit 100 ", nativeQuery = true)
     List<StockDailyVO> findByStockIdOrderByDay(String stock_id);
+
+    @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc limit 55 ", nativeQuery = true)
+    List<StockDailyVO> findByIndexStockIdOrderByDay(String stock_id);
+
+    @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc ", nativeQuery = true)
+    List<StockDailyVO> multiKFindByStockIdOrderByDay(String stock_id);
 
     @Query(value = "SELECT day FROM daily_price where stock_id = ?1 ", nativeQuery = true)
     List<String> findStockDaysByStockId(String stock_id);

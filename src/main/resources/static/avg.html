@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="utf-8">
     <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
@@ -10,16 +10,36 @@
   padding: 0;
 }
 .chart-container {
-    width: 550px;
-    height: 300px;
-    margin-bottom: 20px;
+    width: 350px;
+    height: 320px;
+    margin-bottom: 2px;
 }
-
+.index-container {
+    width: 400px;
+    height: 300px;
+    margin-bottom: 2px;
+    background-color: #FFFFCC;
+}
     </style>
 </head>
 <body>
 <button id="getDivs">getDivs</button>
 <button id="generateChart">generateChart</button>
+<table border="1" id="mainTable">
+<!--    <tr>-->
+<!--        <td ><div>sh510760_上证综指ETF</div><div id="span_sh510760_上证综指ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sh510300_沪深300ETF</div><div id="span_sh510300_沪深300ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sh510500_中证500ETF</div><div id="span_sh510500_中证500ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sh512100_中证1000ETF</div><div id="span_sh512100_中证1000ETF" class="index-container"></div></td>-->
+<!--    </tr>-->
+<!--    <tr>-->
+<!--        <td ><div>sz159949_创业板50ETF</div><div id="span_sz159949_创业板50ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sh588080_科创板50ETF</div><div id="span_sh588080_科创板50ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sh510190_上证50ETF</div><div id="span_sh510190_上证50ETF" class="index-container"></div></td>-->
+<!--        <td ><div>sz159915_创业板ETF</div><div id="span_sz159915_创业板ETF" class="index-container"></div></td>-->
+<!--    </tr>-->
+
+</table>
 <table border="1" id="myTable"></table>
 
 <script>
@@ -39,7 +59,23 @@ document.addEventListener('DOMContentLoaded', function () {
          })
    }
 
+   function loadIndexTableData() {
+      fetch('http://124.71.19.6:8888/etfs/main')
+         .then(response => response.text())
+         .then(data => {
+            const dataContainer = document.getElementById('mainTable');
+            dataContainer.innerHTML = data;
+         })
+         .catch(error => {
+            console.error('Error fetching data:', error);
+         })
+   }
+
 loadTableData();
+loadIndexTableData();
+setTimeout(function() {
+    getDivs();
+}, 3000);
 });
 
 
@@ -52,13 +88,12 @@ spans.forEach(span => {
 
 async function createChart(span) {
 
- var myChart = echarts.init(span, null, {
+var myChart = echarts.init(span, null, {
   renderer: 'canvas',
   useDirtyRect: false
 });
 
-const rawData = await fetch('http://124.71.19.6:8888/stock/'+span.id.replace('span_', ''))
-.then(response => response.json());
+const rawData = await fetch('http://124.71.19.6:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
 
 function calculateMA(dayCount, data) {
   var result = [];

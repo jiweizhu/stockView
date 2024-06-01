@@ -87,7 +87,9 @@ public class Controller {
         Object body = "";
         if (num.equals("3")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        } else {
+        } else if(num.equals("main") ){
+            body = etfViewService.findAllEtfSortView_new(num);
+        }else {
             body = etfViewService.findAllEtfSortView(num);
         }
         return ResponseEntity.ofNullable(body);

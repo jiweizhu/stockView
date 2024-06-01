@@ -132,6 +132,20 @@ public class KLineMarketClosedService {
 
     private static ArrayList<String> importedFileLine = new ArrayList<>();
 
+    public ArrayList<String> getMainKlineIds() {
+        if (CollectionUtils.isEmpty(importedFileLine)) {
+            readImportFileStocks();
+        }
+        String line = importedFileLine.get(0);
+        String[] split = line.split(",");
+        ArrayList<String> stockIds = new ArrayList<>();
+        for (String id_name : split) {
+            String stockId = id_name.split("_")[0];
+            stockIds.add(stockId);
+        }
+        return stockIds;
+    }
+
     //load stock list
     private void readImportFileStocks() {
         importStockFileList.clear();
@@ -210,7 +224,7 @@ public class KLineMarketClosedService {
     }
 
     public String getHistoryPriceOnLineAndStoreInDb(Integer days) {
-        logger.info("Enter getHistoryPriceOnLineAndStoreInDb method =========");
+        logger.info("Enter getHistoryPriceOnLineAndStoreInDb method ========days=" + days);
         ArrayList<StockNameVO> getHistoryPriceStocks = new ArrayList<>();
         final Integer daysToGet = days;
         List<Callable<Void>> tasks = new ArrayList<>();
@@ -220,6 +234,7 @@ public class KLineMarketClosedService {
             tasks.add(() -> {
                 // daysToGet.equals(0)
                 if (stockNameVO.getGainPercentFive() != null && !daysToGet.equals(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY)) {
+                    logger.info("stockNameVO.getGainPercentFive ========return=");
                     return null;
                 }
 
@@ -300,8 +315,10 @@ public class KLineMarketClosedService {
 
             stockDailyDao.save(stockDailyVO);
         }
-        Date date = Date.valueOf(days.get(days.size() - 1));
+        String today = days.get(days.size() - 1);
+        Date date = Date.valueOf(today);
         StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), date);
+        logger.info("storeHistoryPrice ====stockDao save ================= {} ,date=={}", stockNameVO, formatter.format(date));
         stockDao.save(lastUpdateDay);
         return dayList;
     }
@@ -381,7 +398,7 @@ public class KLineMarketClosedService {
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
-        List<StockDailyVO> resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+        List<StockDailyVO> resultList = stockDailyDao.multiKFindByStockIdOrderByDay(stockId);
         Collections.reverse(resultList);
         ArrayList<Double[]> result = new ArrayList<>();
         for (StockDailyVO stockNameVO : resultList) {
@@ -403,7 +420,15 @@ public class KLineMarketClosedService {
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
-        List<StockDailyVO> resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+
+        ArrayList<String> mainKlineIds = getMainKlineIds();
+        Set<String> stringSet = mainKlineIds.stream().collect(Collectors.toSet());
+        List<StockDailyVO> resultList;
+        if (stringSet.contains(stockId)) {
+            resultList = stockDailyDao.findByIndexStockIdOrderByDay(stockId);
+        } else {
+            resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+        }
         Collections.reverse(resultList);
         ArrayList<String[]> result = new ArrayList<>();
         for (StockDailyVO stockNameVO : resultList) {
@@ -439,7 +464,6 @@ public class KLineMarketClosedService {
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.debug("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
-        List<Callable<Void>> tasks = new ArrayList<>();
         List<StockNameVO> stocks = storedStocks();
         for (StockNameVO stockNameVO : stocks) {
             //loop to calculate each etf
@@ -455,7 +479,7 @@ public class KLineMarketClosedService {
             List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
             setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
             setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
-            logger.debug("handleStocksFlipDaysAndGainReport ====stockDao.save ==========" + stockNameVO);
+            logger.info("storeHistoryPrice ====stockDao save ================= {}", stockNameVO);
             stockDao.save(stockNameVO);
             retStr.append(stockNameVO.getStockId() + "_" + stockNameVO.getStockName() + "</br>");
         }
@@ -557,10 +581,8 @@ public class KLineMarketClosedService {
     }
 
     public Object etfsCurveView() {
-        logger.debug("enter listImport ====");
-        if (CollectionUtils.isEmpty(etfViewLine)) {
-            readETFFile();
-        }
+        etfViewLine.clear();
+        readETFFile();
         StringBuilder stringBuilder = new StringBuilder();
         for (String fileLine : etfViewLine) {
             stringBuilder.append("<tr>");
