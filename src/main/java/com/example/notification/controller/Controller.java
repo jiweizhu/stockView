@@ -87,9 +87,9 @@ public class Controller {
         Object body = "";
         if (num.equals("3")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        } else if(num.equals("main") ){
+        } else if (num.equals("main")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        }else {
+        } else {
             body = etfViewService.findAllEtfSortView(num);
         }
         return ResponseEntity.ofNullable(body);
@@ -140,13 +140,15 @@ public class Controller {
     @ResponseBody
     public String generateReportEveryDay() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, JsonProcessingException, InterruptedException {
         logger.info("Enter method generateReportEveryDay====");
+        Object body = kLineMarketClosedService.delete_HistoryData();
         etfViewService.generateReportEveryDay();
         return "ok";
     }
 
     @RequestMapping(value = {"/storeHistoryData"})
     @ResponseBody
-    public String storeHistoryData() throws InterruptedException, JsonProcessingException {
+    public String storeHistoryData() {
+        logger.info("Enter method storeHistoryData====");
         String historyPriceOnLineAndStoreInDb = kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(initHistoryPriceDay);
         return historyPriceOnLineAndStoreInDb;
     }

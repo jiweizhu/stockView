@@ -41,8 +41,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import static com.example.notification.constant.Constants.MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY;
-
 @Service
 public class KLineMarketClosedService {
     private static final Logger logger = LoggerFactory.getLogger(KLineMarketClosedService.class);
@@ -232,8 +230,7 @@ public class KLineMarketClosedService {
         List<StockNameVO> storedStocks = storedStocks();
         for (StockNameVO stockNameVO : storedStocks) {
             tasks.add(() -> {
-                // daysToGet.equals(0)
-                if (stockNameVO.getGainPercentFive() != null && !daysToGet.equals(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY)) {
+                if (stockNameVO.getGainPercentFive() != null) {
                     logger.info("stockNameVO.getGainPercentFive ========return=");
                     return null;
                 }
@@ -287,7 +284,8 @@ public class KLineMarketClosedService {
         int size = dayList.size();
         for (int i = 0; i < size; i++) {
             ArrayList<String> dayPrice = dayList.get(i);
-            if (daysSet.contains(stockNameVO.getStockId())) {
+            Date lastUpdatedDay = stockNameVO.getLastUpdatedDay();
+            if (lastUpdatedDay != null && daysSet.contains(lastUpdatedDay)) {
                 //history day already stored
                 continue;
             }
@@ -315,7 +313,7 @@ public class KLineMarketClosedService {
 
             stockDailyDao.save(stockDailyVO);
         }
-        String today = days.get(days.size() - 1);
+        String today = dayList.get(dayList.size() - 1).get(0);
         Date date = Date.valueOf(today);
         StockNameVO lastUpdateDay = new StockNameVO(stockNameVO.getStockId(), stockNameVO.getStockName(), date);
         logger.info("storeHistoryPrice ====stockDao save ================= {} ,date=={}", stockNameVO, formatter.format(date));
@@ -392,6 +390,7 @@ public class KLineMarketClosedService {
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("YYYY/MM/dd");
+    private static SimpleDateFormat formatter_yyyy_mm_day = new SimpleDateFormat("YYYY-MM-dd");
 
     public Object multiK(String stockId) {
         logger.debug("enter stockJsonData stockId=============" + stockId);
@@ -462,7 +461,7 @@ public class KLineMarketClosedService {
     }
 
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        logger.debug("Enter handleStocksFlipDaysAndGainReport ====");
+        logger.info("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
         for (StockNameVO stockNameVO : stocks) {
@@ -479,7 +478,9 @@ public class KLineMarketClosedService {
             List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
             setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
             setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
+            Date lastUpdatedDay = new Date(System.currentTimeMillis());
             logger.info("storeHistoryPrice ====stockDao save ================= {}", stockNameVO);
+            stockNameVO.setLastUpdatedDay(lastUpdatedDay);
             stockDao.save(stockNameVO);
             retStr.append(stockNameVO.getStockId() + "_" + stockNameVO.getStockName() + "</br>");
         }
@@ -607,10 +608,13 @@ public class KLineMarketClosedService {
 
     @Transactional
     public Object delete_HistoryData() {
-        entityManager.createNativeQuery("delete from daily_price " +
-                "where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
+        // also delete today's daily price as sometimes i need to know the real price while the market opening.
+        String dayStr = formatter_yyyy_mm_day.format((new Date(System.currentTimeMillis())));
+        entityManager.createNativeQuery("delete from daily_price where day = '" + dayStr + "'").executeUpdate();
 
-        entityManager.createNativeQuery("update stock set gain_percent_five = null").executeUpdate();
+        entityManager.createNativeQuery("delete from daily_price " + "where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
+
+        entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_day = null ;").executeUpdate();
 
         return "ok";
     }
