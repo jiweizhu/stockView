@@ -1,6 +1,8 @@
 package com.example.notification.util;
 
 import com.example.notification.service.ETFViewService;
+import com.example.notification.service.IntraDayService;
+import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,29 @@ public class Timer {
     @Autowired
     private ETFViewService etfViewService;
 
-//   every day in 8:00
+    @Autowired
+    private KLineMarketClosedService kLineMarketClosedService;
+
+
+    @Autowired
+    private IntraDayService intraDayService;
+
+    @Scheduled(cron = "5 */1 9,10,11,13,14 ? * MON-FRI")
+    public Object getPriceByminute() {
+        logger.info("========= cron exec getPriceByminute =======");
+        Object list = intraDayService.getPriceByminute();
+        return list;
+    }
+
+    @Scheduled(cron = "5 * 15 ? * MON-FRI")
+    public Object getPriceByminute1() {
+        logger.info("========= cron exec getPriceByminute =======");
+        Object list = intraDayService.getPriceByminute();
+        return list;
+    }
+
+
+    //   every day in 8:00
     @Scheduled(cron = "0 0 8 * * ?")
     public void eightHourQuery() {
         try {
@@ -32,16 +56,21 @@ public class Timer {
         }
     }
 
-    @Scheduled(cron = "0 10 15 * * ?")
-    public void generateReportEveryMarketDay() {
+    @Scheduled(cron = "0 10 15 * * MON-FRI")
+    public void generateReportWhenMarketClose() {
         try {
-            logger.info("Start generateReportEveryMarketDay=====");
+            logger.info("Start cron job generateReportEveryMarketDay=====");
+            kLineMarketClosedService.delete_HistoryData();
             etfViewService.generateReportEveryDay();
+
+            //2 delete intraday_price data before one week
+            String oneWeekAgeDay = Utils.getOneWeekAgeDay();
+            intraDayService.removeOneWeekAgoData(oneWeekAgeDay);
+
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
     }
-
 
 
     //  real time query, every 15min
@@ -54,7 +83,6 @@ public class Timer {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
     }
-
 
 
 }

@@ -20,6 +20,7 @@ public class RestRequest {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     static String dailyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
+    static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -44,6 +45,25 @@ public class RestRequest {
             logger.error("Website query error!! Stop to query real price. ", e);
         }
         logger.debug("dailyQueryResponseVO = " + dailyQueryResponseVO);
+        return dailyQueryResponseVO;
+    }
+
+    public DailyQueryResponseVO getIntraDayData(WebQueryParam webQueryParam) {
+        String queryUrl = IntraDay_URL + webQueryParam.getIdentifier();
+        logger.debug("getIntraDayData queryUrl = " + queryUrl);
+        String ret = restTemplate.getForObject(queryUrl, String.class);
+        logger.debug("ret = " + ret);
+        DailyQueryResponseVO dailyQueryResponseVO = null;
+        try {
+            dailyQueryResponseVO = objectMapper.readValue(ret, DailyQueryResponseVO.class);
+        } catch (JsonProcessingException e) {
+            //send an alarm email and stop to work
+            logger.error("Website query error!! Stop to query real price. ", e);
+        }
+        logger.debug("dailyQueryResponseVO = " + dailyQueryResponseVO);
+        if(dailyQueryResponseVO == null || dailyQueryResponseVO.getCode() != 0){
+            return null;
+        }
         return dailyQueryResponseVO;
     }
 

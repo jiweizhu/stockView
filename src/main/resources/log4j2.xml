@@ -27,7 +27,8 @@
 
         <!-- ============================打印INFO级别的日志到文件中======================= -->
         <!-- fileName:日志保存路径，filePattern:日志压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面进行压缩 -->
-        <RollingFile name="InfoFile" fileName="${basePath}/info.log" filePattern="${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="InfoFile" fileName="${basePath}/info.log"
+                     filePattern="${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${logFilePattern}"/>
             <Policies>
                 <!--    interval:设置为1,filePattern是%d{yyyy-MM-dd}到天的格式,则间隔一天生成一个文件,如果设置为12,filePattern是%d{yyyy-MM-dd-HH}到小时的格式,则间隔12小时生成一个文件
@@ -37,20 +38,21 @@
                 <SizeBasedTriggeringPolicy size="${fileSize}"/>
             </Policies>
             <!-- 日志默认同一文件夹下可以存放的数量,不设置此属性则默认为7个 -->
-            <DefaultRolloverStrategy max="10" />
+            <DefaultRolloverStrategy max="10"/>
             <Filters>
                 <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
         </RollingFile>
         <!-- ============================打印ERROR级别的日志到文件中=======配置和INFO的一样,就修改下保存文件名称和压缩文件名称==================== -->
-        <RollingFile name="ErrorFile" fileName="${basePath}/error.log" filePattern="${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="ErrorFile" fileName="${basePath}/error.log"
+                     filePattern="${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${logFilePattern}"/>
             <Policies>
                 <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
                 <SizeBasedTriggeringPolicy size="${fileSize}"/>
             </Policies>
-            <DefaultRolloverStrategy max="10" />
+            <DefaultRolloverStrategy max="10"/>
             <Filters>
                 <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -63,11 +65,14 @@
         <logger name="com.example.notification" level="debug" additivity="false">
             <appender-ref ref="Console"/>
         </logger>
+        <logger name="com" level="info" additivity="false">
+            <appender-ref ref="Console"/>
+        </logger>
         <logger name="com.example.notification" level="info" additivity="false">
             <appender-ref ref="InfoFile"/>
         </logger>
         <!--建立一个默认的root的logger-->
-        <root level="${outputLogLevel}">
+        <root level="info">
             <appender-ref ref="Console"/>
             <appender-ref ref="InfoFile"/>
             <appender-ref ref="ErrorFile"/>

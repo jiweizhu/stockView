@@ -1,86 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Dynamic Table with Charts</title>
-    <script src="https://code.highcharts.com/stock/highstock.js"></script>
-    <script src="https://code.highcharts.com/stock/modules/data.js"></script>
+    <title>EasyUI DataGrid with Tagbox Editor</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.edatagrid.js"></script>
 </head>
 <body>
+<table id="dg" class="easyui-datagrid" ctrlSelect="true"
+       idField="stockId" pageSize="50"
+       pagination="true" rownumbers="true" singleSelect="true" style="width:800px;height:400px"
+       title="My Users" toolbar="#toolbar" url="/holdingStock/datagridList">
+    <thead>
+    <tr>
+        <th align="center" editor="{type:'combobox',options:{required:true,
+                url: '/holdingStock/stockList',
+                valueField:'id',
+                textField:'text' }}" field="stockId"
+            width="100">Id
+        </th>
+        <th align="center" editor="{type:'validatebox',options:{required:false}}" field="stockName" width="90">Name</th>
+        <th align="center" editor="{type:'numberbox',options:{precision:3}}" field="oneDayGain">oneDayGain</th>
+        <th align="center" editor="{type:'numberbox',options:{precision:3}}" field="nowPrice">nowPrice</th>
+        <th align="center" editor="{type:'numberspinner',options:{precision:0}}" field="buyInLot">buyInLot</th>
+        <th editor="{type:'numberbox',options:{precision:3}}" field="lastClosePrice">lastClosePrice</th>
+        <th editor="{type:'numberbox',options:{precision:3}}" field="gainPercent">gainPercent</th>
+        <th editor="{type:'numberbox',options:{precision:3}}" field="costPrice">buyInPrice</th>
+        <th align="center" editor="{type:'combobox',options:{
+                url: '/holdingStock/etfList',
+                valueField:'id',
+                textField:'text' }}" field="belongEtf" width="110">belong_etf
+        </th>
+        <th align="center" editor="{type:'tagbox',options:{
+                url: '/holdingStock/etfList',
+                valueField: 'id',
+                textField: 'text',
+                limitToList: true,
+                hasDownArrow: true,
+                multiple: true,
+                prompt: 'Select ETFs'
+            }}" field="belong" width="110">belong
+        </th>
+        <th editor="{type:'datebox'}" field="buyDay">buyDay</th>
+        <th editor="text" field="lastUpdatedTime">lastUpdatedTime</th>
+    </tr>
+    </thead>
+</table>
 
-<button id="generateTable">Generate Table</button>
-<button id="showChartIds">Show Chart IDs</button>
-<br><br>
-<div id="tableContainer"></div>
-
-<script>
-document.getElementById('generateTable').addEventListener('click', generateTable);
-document.getElementById('showChartIds').addEventListener('click', showChartIds);
-
-function generateTable() {
-    const numRows = 3;
-    const numCols = 2;
-    let tableHTML = '<table border="1">';
-    for (let i = 1; i <= numRows; i++) {
-        tableHTML += '<tr>';
-        for (let j = 1; j <= numCols; j++) {
-            const cellId = i + '_' + j;
-            tableHTML += `<td>${cellId}</td>`;
-            if (j === numCols) {
-                tableHTML += `<td><div id="${cellId}" style="width: 500px; height: 500px;"></div></td>`;
-            }
-        }
-        tableHTML += '</tr>';
-    }
-    tableHTML += '</table>';
-    document.getElementById('tableContainer').innerHTML = tableHTML;
-}
-
-async function showChartIds() {
-    const numRows = 3;
-    const numCols = 2;
-    for (let i = 1; i <= numRows; i++) {
-        for (let j = 1; j <= numCols; j++) {
-            if (j === numCols) {
-                const cellId = i + '_' + j;
-                const divId = document.getElementById(cellId).id;
-                document.getElementById(cellId).innerText = divId;
-                await createChart(cellId);
-            }
-        }
-    }
-}
-
-async function createChart(divId) {
-    const data = await fetch('https://demo-live-data.highcharts.com/aapl-ohlc.json')
-        .then(response => response.json());
-
-    Highcharts.stockChart(divId, {
-        rangeSelector: {
-            selected: 1
-        },
-        title: {
-            text: divId // Using divId as chart title
-        },
-        series: [{
-            type: 'candlestick',
-            name: 'AAPL Stock Price',
-            data: data,
-            dataGrouping: {
-                units: [
-                    [
-                        'day', // unit name
-                        [1] // allowed multiples
-                    ], [
-                        'year',
-                        [1, 2, 3, 4, 6]
-                    ]
-                ]
-            }
-        }]
-    });
-}
-</script>
-
+<script type="text/javascript">
+        $(function(){
+            $('#dg').datagrid({
+                onClickRow: function(index){
+                    $('#dg').datagrid('beginEdit', index);
+                },
+                onEndEdit: function(index, row){
+                    var ed = $('#dg').datagrid('getEditor', {index:index,field:'belong'});
+                    row.belong = $(ed.target).tagbox('getValues').join(',');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -8,6 +8,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,9 @@ public class StockNameVO {
 
     @Column(name = "stockName")
     private String stockName;
+
+    @Column(name = "stock_ids")
+    private String stockIds;
 
     @Column(name = "upwardDaysFive")
     private Integer upwardDaysFive = 0;
@@ -58,8 +62,8 @@ public class StockNameVO {
     @Column(name = "flipGainPercentTen")
     private BigDecimal flipGainPercentTen;
 
-    @Column(name = "lastUpdatedDay")
-    private Date lastUpdatedDay;
+    @Column(name = "last_updated_time")
+    private Timestamp lastUpdatedTime;
 
     static Map<String, String[]> sortArrayMap = new HashMap<>();
 
@@ -68,12 +72,6 @@ public class StockNameVO {
 
     public StockNameVO(String stockId) {
         this.stockId = stockId;
-    }
-
-    public StockNameVO(String stockId, String stockName, Date day) {
-        this.stockId = stockId;
-        this.stockName = stockName;
-        this.lastUpdatedDay = day;
     }
 
     public static Map<String, String[]> getSortArrayMap() {

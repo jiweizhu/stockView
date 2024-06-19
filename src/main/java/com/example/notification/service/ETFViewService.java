@@ -164,14 +164,14 @@ public class ETFViewService {
         for (StockNameVO stockVo : fiveDayUpwardDays) {
             String stockName = stockVo.getStockName();
             if (stockName == null || !stockName.toLowerCase().contains("etf")) continue;
-            if (!stockVo.getUpwardDaysFive().equals(temp)) {
-                loopCount++;
-                temp = stockVo.getUpwardDaysFive();
-                if (loopCount >= lightColors.size()) {
-                    loopCount = 0;
-                }
-                color = lightColors.get(loopCount);
-            }
+//            if (!stockVo.getUpwardDaysFive().equals(temp)) {
+//                loopCount++;
+//                temp = stockVo.getUpwardDaysFive();
+//                if (loopCount >= lightColors.size()) {
+//                    loopCount = 0;
+//                }
+//                color = lightColors.get(loopCount);
+//            }
 
             html.append("<tr style=\"background-color:").append(color).append("\">");
             html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">").append(stockVo.getStockId()).append("</br>").append(stockName).append("</a></td>");
@@ -185,7 +185,8 @@ public class ETFViewService {
         Integer upwardDaysTen = stockVo.getUpwardDaysTen();
         Integer upwardDaysFive = stockVo.getUpwardDaysFive();
         if (upwardDaysFive > 1 && upwardDaysTen >= 0) {
-            html.append("<td style=\"background-color: #00FFB0;\">");
+//            html.append("<td style=\"background-color: #00FFB0;\">");
+            html.append("<td>");
         } else if (upwardDaysFive < 0 || upwardDaysTen < 0) {
             html.append("<td style=\"background-color: #DEB887;\">");
         } else {
@@ -195,7 +196,7 @@ public class ETFViewService {
 //                    .append("|").append(formatter.format(stockVo.getFlipDayFive()))
                 .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>").append("<span >").append(stockVo.getGainPercentFive()).append("%")
 //                    .append("|").append(formatter.format(stockVo.getFlipEndDayFive()))
-                .append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>").append("(").append(formatter.format(stockVo.getLastUpdatedDay())).append(")").append("</span>").append("</td>");
+                .append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>").append("(").append(formatter.format(stockVo.getLastUpdatedTime())).append(")").append("</span>").append("</td>");
 
 
         html.append("<td style=\"background-color: #708090;\">").append("").append("</td>");
@@ -219,7 +220,7 @@ public class ETFViewService {
             html.append("<td>").append(stockVo.getUpwardDaysFive()).append("|").append(formatter.format(stockVo.getFlipDayFive())).append("|").append(stockVo.getGainPercentFive()).append("%").append("</br>").append(stockVo.getFlipUpwardDaysFive()).append("|").append(formatter.format(stockVo.getFlipEndDayFive())).append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</td>");
             html.append("<td style=\"background-color: #708090;\"|").append("8").append("</td>");
             html.append("<td>").append(stockVo.getUpwardDaysTen()).append("|").append(formatter.format(stockVo.getFlipDayTen())).append("|").append(stockVo.getGainPercentTen()).append("%</br>");
-            html.append(stockVo.getFlipUpwardDaysTen()).append("|").append(formatter.format(stockVo.getFlipEndDayTen())).append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("(").append(stockVo.getLastUpdatedDay()).append(")").append("</td>");
+            html.append(stockVo.getFlipUpwardDaysTen()).append("|").append(formatter.format(stockVo.getFlipEndDayTen())).append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("(").append(stockVo.getLastUpdatedTime()).append(")").append("</td>");
             html.append("</tr>\n");
         }
     }
@@ -239,7 +240,7 @@ public class ETFViewService {
 //                    .append("|").append(formatter.format(stockVo.getFlipDayFive()))
                 .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>").append("<span >").append(stockVo.getGainPercentFive()).append("%")
 //                    .append("|").append(formatter.format(stockVo.getFlipEndDayFive()))
-                .append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("(").append(formatter.format(stockVo.getLastUpdatedDay())).append(")").append("</span>").append("</td>");
+                .append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("(").append(formatter.format(stockVo.getLastUpdatedTime())).append(")").append("</span>").append("</td>");
 
 
         html.append("<td style=\"background-color: #708090;\">").append("").append("</td>");
