@@ -14,7 +14,7 @@ today_gain DECIMAL(10,2),
 one_day_gain DECIMAL(10,2),
 last_close_price DECIMAL(10,3),
 
-belong_etf VARCHAR(12),
+-- belong_etf VARCHAR(12),
 buy_day DATE,
 last_updated_time time
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -65,7 +65,8 @@ flip_day_ten DATE,
 flip_end_day_ten DATE,
 last_updated_time time,
 
-stock_ids VARCHAR(200)
+stock_ids VARCHAR(200),
+belong_etf VARCHAR(12)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

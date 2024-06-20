@@ -101,17 +101,17 @@ public class HoldingService {
             target.setNowPrice(newestPriceVo.getPrice() + "(" + newestPriceVo.getMinute() + ")");
             target.setLastClosePrice(holdingStockVO.getLastClosePrice() + "|" + lastCloseDay);
             target.setOneDayGain(oneDayGain);
-            String etfId = holdingStockVO.getBelongEtf();
-            Optional<StockNameVO> byId = stockDao.findById(etfId);
-            String belongEtfName = getStockIdOrNameByMap(etfId);
-            if (!byId.isEmpty()) {
-                StockNameVO etfVo = byId.get();
-                Integer upwardDaysFive = etfVo.getUpwardDaysFive();
-                Integer flipUpwardDaysFive = etfVo.getFlipUpwardDaysFive();
+            StockNameVO stock = stockDao.findById(holdingStockVO.getStockId()).get();
+            if (stock.getBelongEtf() != null) {
+                Optional<StockNameVO> belongEtfOpt = stockDao.findById(stock.getBelongEtf());
+                StockNameVO belongEtfVo = belongEtfOpt.get();
+                String belongEtfName = getStockIdOrNameByMap(belongEtfVo.getStockId());
+                Integer upwardDaysFive = belongEtfVo.getUpwardDaysFive();
+                Integer flipUpwardDaysFive = belongEtfVo.getFlipUpwardDaysFive();
                 belongEtfName = belongEtfName + "(" + upwardDaysFive + "|" + flipUpwardDaysFive + ")";
                 belongEtfName = belongEtfName.toLowerCase().replace("etf", "");
+                target.setBelongEtf(belongEtfName);
             }
-            target.setBelongEtf(belongEtfName);
             retList.add(target);
         }
         Map<String, Object> retMap = new HashMap<>();

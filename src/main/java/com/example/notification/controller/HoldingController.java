@@ -1,17 +1,20 @@
 package com.example.notification.controller;
 
 import com.example.notification.repository.HoldingStockDao;
+import com.example.notification.repository.StockDao;
 import com.example.notification.requestVO.HoldingStockRequestVO;
 import com.example.notification.service.HoldingService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.vo.HoldingStockVO;
+import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,9 @@ public class HoldingController {
 
     @Autowired
     private HoldingStockDao holdingStockDao;
+
+    @Autowired
+    private StockDao stockDao;
 
     @Autowired
     private IntraDayService intraDayService;
@@ -61,7 +67,7 @@ public class HoldingController {
 
     @RequestMapping(value = {"/holdingStock/save"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
-    public String saveNewStock(@ModelAttribute HoldingStockRequestVO stockVO) throws JsonProcessingException {
+    public String saveNewStock(@ModelAttribute HoldingStockRequestVO stockVO) throws JsonProcessingException, ParseException {
         List<String> list = new ArrayList<>();
         list.add(stockVO.getStockId());
         String ret = kLineMarketClosedService.addNewInTable(list);
@@ -80,13 +86,20 @@ public class HoldingController {
 
     @RequestMapping(value = {"/holdingStock/update"}, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
-    public String update(@ModelAttribute HoldingStockRequestVO stockVO) {
-        Optional<HoldingStockVO> byId = holdingStockDao.findById(stockVO.getStockId());
+    public String update(@ModelAttribute HoldingStockRequestVO requestVO) {
+        Optional<HoldingStockVO> byId = holdingStockDao.findById(requestVO.getStockId());
         byId.ifPresent(vo -> {
-            BeanUtils.copyProperties(stockVO, vo);
+            BeanUtils.copyProperties(requestVO, vo);
             vo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
             holdingService.save(vo);
         });
+        // save belongEtf to stock table, not holding_stock table.
+        boolean hasLength = StringUtils.hasLength(requestVO.getBelongEtf());
+        if(hasLength){
+            StockNameVO stock = stockDao.findById(requestVO.getStockId()).get();
+            stock.setBelongEtf(requestVO.getBelongEtf());
+            stockDao.save(stock);
+        }
         return "ok";
     }
 
@@ -123,7 +136,7 @@ public class HoldingController {
 
     @RequestMapping(value = {"/getPriceByminute"})
     @ResponseBody
-    public Object getPriceByminute() {
+    public Object getPriceByminute() throws ParseException {
         Object list = intraDayService.getPriceByminute();
         return list;
     }

@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,9 @@ public class IntraDayService {
         return null;
     }
 
-    public Object getPriceByminute() {
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+    public Object getPriceByminute() throws ParseException {
         List<HoldingStockVO> holdingStockDaoAll = holdingStockDao.findAll();
         Date today = new Date(System.currentTimeMillis());
         for (HoldingStockVO stockVO : holdingStockDaoAll) {
@@ -65,14 +69,18 @@ public class IntraDayService {
             Map data = (Map) ((Map) intraDayData.getData().get(stockVO.getStockId())).get("data");
 
             List<String> minutePriceList = (List) data.get("data");
+            String date = (String) data.get("date");
+            java.util.Date parse = dateFormat.parse(date);
+            Date remoteRetureDate = new Date(parse.getTime());
+
             Set<IntradayPriceVO> voSet = intraDayPriceDao.findMinutesByIdAndToday(webQueryParam.getIdentifier(), today);
             Set<String> storedSet = new HashSet<>();
             voSet.forEach(vo -> {
-                storedSet.add(vo.getMinute());
+                storedSet.add(vo.getDay() + vo.getMinute());
             });
             for (String line : minutePriceList) {
                 String[] split = line.split("\\s+");
-                if (storedSet.contains(split[0])) {
+                if (storedSet.contains(remoteRetureDate + split[0])) {
                     continue;
                 }
                 IntradayPriceVO vo = new IntradayPriceVO();

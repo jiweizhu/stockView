@@ -26,6 +26,9 @@ public class StockNameVO {
     @Column(name = "stock_ids")
     private String stockIds;
 
+    @Column(name = "belong_etf")
+    private String belongEtf;
+
     @Column(name = "upwardDaysFive")
     private Integer upwardDaysFive = 0;
 
