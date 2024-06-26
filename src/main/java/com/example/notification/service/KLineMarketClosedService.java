@@ -581,7 +581,7 @@ public class KLineMarketClosedService {
                 if (eftIndex > 0) {
                     str = str.substring(0, eftIndex + 3);
                 }
-                stringBuilder.append("<span class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</span>");
+                stringBuilder.append("<td class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</td>");
             }
             stringBuilder.append("</tr>");
             stringBuilder.append("</br>");
