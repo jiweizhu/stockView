@@ -21,4 +21,7 @@ public interface IntraDayPriceDao extends JpaRepository<IntradayPriceVO, Intrada
     @Query(value = "DELETE FROM intraday_price where DAY < ?1 ", nativeQuery = true)
     void removeOneWeekAgoData(String day);
 
+    @Query(value = "DELETE FROM intraday_price where DAY = ?1 ", nativeQuery = true)
+    void clearTodayIntraPrice(String day);
+
 }

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
+
 @Component
 public class Timer {
 
@@ -28,15 +30,21 @@ public class Timer {
     @Autowired
     private IntraDayService intraDayService;
 
+    @Scheduled(cron = "0 30 9 ? * MON-FRI")
+    public void clearIntradayPriceBeforeOpeningMarket() {
+        logger.info("========= cron exec clearIntradayPriceBeforeOpeningMarket =======");
+        intraDayService.clearTodayIntraPrice();
+    }
+
     @Scheduled(cron = "5 */1 9,10,11,13,14 ? * MON-FRI")
-    public Object getPriceByminute() {
+    public Object getPriceByminute() throws ParseException {
         logger.info("========= cron exec getPriceByminute =======");
         Object list = intraDayService.getPriceByminute();
         return list;
     }
 
     @Scheduled(cron = "5 * 15 ? * MON-FRI")
-    public Object getPriceByminute1() {
+    public Object getPriceByminute1() throws ParseException {
         logger.info("========= cron exec getPriceByminute =======");
         Object list = intraDayService.getPriceByminute();
         return list;

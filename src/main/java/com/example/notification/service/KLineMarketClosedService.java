@@ -45,7 +45,7 @@ public class KLineMarketClosedService {
     private static final Logger logger = LoggerFactory.getLogger(KLineMarketClosedService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String importStockFile = "C:\\code\\tools\\notification\\src\\main\\resources\\import.txt";
+    static String importStockFile = "C:\\kiwi\\notification\\src\\main\\resources\\import.txt";
 
     private static ArrayList<String> importStockFileList = new ArrayList<>();
     private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
@@ -603,6 +603,10 @@ public class KLineMarketClosedService {
         entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_day = null ;").executeUpdate();
 
         return "ok";
+    }
+
+    public Object addNewStock(String stockId) {
+        return null;
     }
 }
 

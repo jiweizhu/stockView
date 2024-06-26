@@ -39,9 +39,6 @@ public class HoldingStockVO {
     @Column(name = "last_close_price")
     private BigDecimal lastClosePrice;
 
-    @Column(name = "belong_etf")
-    private String belongEtf;
-
     @Column(name = "buy_day")
     private Date buyInDay;
 

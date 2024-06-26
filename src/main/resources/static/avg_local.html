@@ -39,7 +39,7 @@
     text-orientation: upright;
 <!--    border: 1px solid #000;-->
     padding: 10px;
-    font-size: 25px;
+    font-size: 20px;
 }
     </style>
 </head>
@@ -63,13 +63,14 @@
 </table>
 <table border="1" id="myTable"></table>
 
+<script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
 <script>
 
 document.getElementById('getDivs').addEventListener('click', getDivs);
 
 document.addEventListener('DOMContentLoaded', function () {
    function loadTableData() {
-      fetch('http://124.71.19.6:8888/etfs/3')
+      fetch('http://localhost:8888/etfs/3')
          .then(response => response.text())
          .then(data => {
             const dataContainer = document.getElementById('myTable');
@@ -81,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
    }
 
    function loadIndexTableData() {
-      fetch('http://124.71.19.6:8888/etfs/main')
+      fetch('http://localhost:8888/etfs/main')
          .then(response => response.text())
          .then(data => {
             const dataContainer = document.getElementById('mainTable');
@@ -104,6 +105,7 @@ async function getDivs() {
    const spans = document.querySelectorAll('div[id^="span_"]');
 spans.forEach(span => {
    createChart(span);
+   createMultiChart();
 });}
 
 
@@ -114,7 +116,7 @@ var myChart = echarts.init(span, null, {
   useDirtyRect: false
 });
 
-const rawData = await fetch('http://124.71.19.6:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
+const rawData = await fetch('http://localhost:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
 
 function calculateMA(dayCount, data) {
   var result = [];
@@ -226,6 +228,90 @@ option = {
 
     window.addEventListener('resize',() => myChart.resize());
 
+}
+
+
+</script>
+<script>
+
+async function createMultiChart() {
+var dom = document.getElementById('multi_sz159516');
+var myChart = echarts.init(dom, null, {
+  renderer: 'canvas',
+  useDirtyRect: false
+});
+var app = {};
+
+var option;
+
+option = {
+  title: {
+<!--    text: 'Stacked Line'-->
+  },
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine']
+  },
+  grid: {
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {}
+    }
+  },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [
+    {
+      name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      data: [120, 132, 101, 134, 90, 230, 210]
+    },
+    {
+      name: 'Union Ads',
+      type: 'line',
+      stack: 'Total',
+      data: [220, 182, 191, 234, 290, 330, 310]
+    },
+    {
+      name: 'Video Ads',
+      type: 'line',
+      stack: 'Total',
+      data: [150, 232, 201, 154, 190, 330, 410]
+    },
+    {
+      name: 'Direct',
+      type: 'line',
+      stack: 'Total',
+      data: [320, 332, 301, 334, 390, 330, 320]
+    },
+    {
+      name: 'Search Engine',
+      type: 'line',
+      stack: 'Total',
+      data: [820, 932, 901, 934, 1290, 1330, 1320]
+    }
+  ]
+};
+
+if (option && typeof option === 'object') {
+  myChart.setOption(option);
+}
+
+window.addEventListener('resize', myChart.resize);
 }
 
 

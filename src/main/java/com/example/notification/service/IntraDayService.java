@@ -4,6 +4,7 @@ import com.example.notification.http.RestRequest;
 import com.example.notification.repository.HoldingStockDao;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDao;
+import com.example.notification.util.Utils;
 import com.example.notification.vo.DailyQueryResponseVO;
 import com.example.notification.vo.HoldingStockVO;
 import com.example.notification.vo.IntradayPriceVO;
@@ -96,6 +97,11 @@ public class IntraDayService {
 
     public void removeOneWeekAgoData(String oneWeekAgeDay) {
         intraDayPriceDao.removeOneWeekAgoData(oneWeekAgeDay);
+    }
+
+    public void clearTodayIntraPrice() {
+        String todayDate = Utils.getTodayDate();
+        intraDayPriceDao.clearTodayIntraPrice(todayDate);
     }
 }
 

@@ -59,11 +59,19 @@ public class Utils {
         return today;
     }
 
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
     public static String getYesterDay() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         String formattedDate = yesterday.format(formatter);
+        return formattedDate;
+    }
+
+    public static String getTodayDate() {
+        LocalDate today = LocalDate.now();
+        String formattedDate = today.format(formatter);
         return formattedDate;
     }
 

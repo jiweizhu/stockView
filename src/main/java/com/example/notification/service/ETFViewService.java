@@ -174,14 +174,14 @@ public class ETFViewService {
 //            }
 
             html.append("<tr style=\"background-color:").append(color).append("\">");
-            html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">").append(stockVo.getStockId()).append("</br>").append(stockName).append("</a></td>");
-            view_3(html, stockVo);
+
+            avg_graph(html, stockVo);
         }
         return html.toString();
     }
 
 
-    private static void view_3(StringBuilder html, StockNameVO stockVo) {
+    private static void avg_graph(StringBuilder html, StockNameVO stockVo) {
         Integer upwardDaysTen = stockVo.getUpwardDaysTen();
         Integer upwardDaysFive = stockVo.getUpwardDaysFive();
         if (upwardDaysFive > 1 && upwardDaysTen >= 0) {
@@ -210,7 +210,12 @@ public class ETFViewService {
                 .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>").append(stockVo.getGainPercentTen()).append("%")
 //                    .append("|").append(formatter.format(stockVo.getFlipEndDayTen()))
                 .append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("</td>");
+        String stockId = stockVo.getStockId();
+        html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">")
+                .append("").append(stockId).append("</a></br><span class=\"vertical-stockName\" >")
+                .append(stockVo.getStockName().replace("ETF", "")).append("</span></td>");
         html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("span_" + stockVo.getStockId()).append("\"></div>");
+        html.append("<td><div class=\"multiLine-container\" style=\"background-color:#FFFFFF\" id=\"").append("multi_" + stockVo.getStockId()).append("\"></div>");
         html.append("</td></tr>\n");
     }
 

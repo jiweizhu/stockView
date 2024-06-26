@@ -8,7 +8,7 @@
   margin: 0;
   padding: 0;
 }
-#chart-container {
+#multiLine-container {
   position: relative;
   height: 100vh;
   overflow: hidden;
@@ -16,10 +16,10 @@
     </style>
 </head>
 <body>
-<div id="chart-container"></div>
+<div id="multiLine-container"></div>
 <script src="https://registry.npmmirror.com/echarts/5/files/dist/echarts.min.js"></script>
 <script>
-    var dom = document.getElementById('chart-container');
+    var dom = document.getElementById('multiLine-container');
 var myChart = echarts.init(dom, null, {
   renderer: 'canvas',
   useDirtyRect: false
