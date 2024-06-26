@@ -113,7 +113,7 @@ public class HoldingController {
     @RequestMapping(value = {"/holdingStock/delete"})
     @ResponseBody
     public Object delete(@ModelAttribute HoldingStockRequestVO stockVO) {
-        holdingService.delete(stockVO.getStockId());
+        holdingService.delete(stockVO.getId());
         return "ok";
     }
 
