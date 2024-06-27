@@ -152,11 +152,10 @@ public class HoldingService {
 
     public Object stockList() {
         logger.debug("enter HoldingService stockList ====");
-        Set<String> holdingStockVOS = holdingStockDao.findAllStockIds();
         List<StockNameVO> resultList = stockDao.findAll();
         List<StockRespVO> retList = new ArrayList<>();
         for (StockNameVO stockVo : resultList) {
-            if (holdingStockVOS.contains(stockVo.getStockId()) || stockVo.getStockName().toLowerCase().contains("etf"))
+            if (stockVo.getStockName().toLowerCase().contains("etf"))
                 continue;
             retList.add(new StockRespVO(stockVo.getStockId(), stockVo.getStockName()));
         }
