@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HoldingService {
@@ -55,10 +56,11 @@ public class HoldingService {
             return ret;
         }
         List<StockNameVO> voList = stockDao.findAll();
-        voList.stream().filter(vo -> !STOCK_ID_NAME_MAP.containsKey(vo.getStockId()) || !STOCK_ID_NAME_MAP.containsKey(vo.getStockName())).forEach(vo -> {
-            STOCK_ID_NAME_MAP.put(vo.getStockId(), vo.getStockName());
-            STOCK_ID_NAME_MAP.put(vo.getStockName(), vo.getStockId());
-        });
+        voList.stream().filter(vo -> !STOCK_ID_NAME_MAP.containsKey(vo.getStockId()) || !STOCK_ID_NAME_MAP.containsKey(vo.getStockName()))
+                .forEach(vo -> {
+                    STOCK_ID_NAME_MAP.put(vo.getStockId(), vo.getStockName());
+                    STOCK_ID_NAME_MAP.put(vo.getStockName(), vo.getStockId());
+                });
         return STOCK_ID_NAME_MAP.get(id_or_name);
     }
 
@@ -102,11 +104,11 @@ public class HoldingService {
             target.setOneDayGain(oneDayGain);
             StockNameVO stock = stockDao.findById(holdingStockVO.getStockId()).get();
             if (StringUtils.hasLength(stock.getBelongEtf())) {
-                Optional<StockNameVO> byId = stockDao.findById(stock.getBelongEtf());
-                if (byId.isEmpty()) {
+                Optional<StockNameVO> belongEtfOpt = stockDao.findById(stock.getBelongEtf());
+                if (belongEtfOpt.isEmpty()) {
                     continue;
                 }
-                StockNameVO belongEtfVo = byId.get();
+                StockNameVO belongEtfVo = belongEtfOpt.get();
                 String belongEtfName = getStockIdOrNameByMap(belongEtfVo.getStockId());
                 Integer upwardDaysFive = belongEtfVo.getUpwardDaysFive();
                 Integer flipUpwardDaysFive = belongEtfVo.getFlipUpwardDaysFive();
@@ -132,15 +134,19 @@ public class HoldingService {
             if (StringUtils.hasLength(stockIds)) {
                 StringBuilder sb = new StringBuilder();
                 String[] split = stockIds.split(",");
-                Arrays.stream(split).forEach(stockId -> {
-                    String stockName = getStockIdOrNameByMap(stockId);
-                    sb.append(stockName).append(",");
-                });
+                Arrays.stream(split).forEach(
+                        stockId -> {
+                            String stockName = getStockIdOrNameByMap(stockId);
+                            sb.append(stockName).append(",");
+                        }
+                );
                 stockIds = sb.toString();
             }
             retList.add(new EtfsRespVO(stockVo.getStockId(), stockVo.getStockName(), stockIds));
         }
-        return retList;
+        Comparator<EtfsRespVO> comparator = Comparator.comparing(EtfsRespVO::getStockIds, Comparator.nullsLast(Comparator.naturalOrder()));
+        List<EtfsRespVO> resp = retList.stream().sorted(comparator).collect(Collectors.toList());
+        return resp;
     }
 
     public void save(HoldingStockVO stockVO) {

@@ -385,6 +385,7 @@ public class ETFViewService {
         StockNameVO etf = stockDao.findById(etfId).get();
         String etfStockIds = etf.getStockIds();
         List<String> stockList = new ArrayList<>();
+        stockList.add(etf.getStockId());
         if (StringUtils.hasLength(etfStockIds)) {
             String[] stockIds = etfStockIds.split(",");
             for (String stockId : stockIds) {
