@@ -10,6 +10,12 @@
     <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
     <script src="js/jquery.edatagrid.js" type="text/javascript"></script>
+    <style>
+
+        .datagrid-cell {
+    white-space: normal;
+}
+    </style>
 </head>
 
 <body>
@@ -61,7 +67,8 @@ $('#ff').form({
                 limitToList: true,
                 hasDownArrow: true,
                 prompt: 'Select stock...'
-            }}" field="stockIds" width="500">stocks
+            }}" field="stockIds" width="500" class="stockIds-align"
+        >stocks
         </th>
     </tr>
     </thead>
