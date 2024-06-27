@@ -1,5 +1,6 @@
 package com.example.notification.service;
 
+import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
@@ -28,10 +30,17 @@ public class ETFViewService {
     private StockDao stockDao;
 
     @Autowired
+    private StockDailyDao stockDailyDao;
+
+    @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
     @Autowired
     private KLineService kLineService;
+
+    @Autowired
+    private HoldingService holdingService;
+
 
     public void generateReportEveryDay() throws JsonProcessingException, InterruptedException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         //check if today market day open
@@ -370,5 +379,37 @@ public class ETFViewService {
         }
         result.put("data", list);
         return result;
+    }
+
+    public List<String> getStocksBelongEtf(String etfId) {
+        StockNameVO etf = stockDao.findById(etfId).get();
+        String etfStockIds = etf.getStockIds();
+        List<String> stockList = new ArrayList<>();
+        if (StringUtils.hasLength(etfStockIds)) {
+            String[] stockIds = etfStockIds.split(",");
+            for (String stockId : stockIds) {
+                String stockName = holdingService.getStockIdOrNameByMap(stockId);
+                stockList.add(stockId +"_"+ stockName);
+            }
+            return stockList;
+        }
+        return Collections.emptyList();
+//            re
+//            String[] stockIds = etfStockIds.split(",");
+//            List<BelongStocksVO> stocks = new ArrayList<>();
+//            for (String stockId : stockIds) {
+//                List<StockDailyVO> byStockIdOrderByDay = stockDailyDao.findByStockIdOrderByDay(stockId);
+//                List<BigDecimal> valus = new ArrayList<>();
+//                for (StockDailyVO stockDailyVO : byStockIdOrderByDay) {
+//                    valus.add(stockDailyVO.getClosingPrice());
+//                }
+//                BelongStocksVO belong = new BelongStocksVO();
+//                belong.setName(holdingService.getStockIdOrNameByMap(stockId));
+//                belong.setData(valus);
+//                stocks.add(belong);
+//            }
+//            retMap.put("series", stocks);
+//        }
+//        return retMap;
     }
 }

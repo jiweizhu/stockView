@@ -2,6 +2,7 @@ package com.example.notification.controller;
 
 import com.example.notification.repository.StockDao;
 import com.example.notification.requestVO.ETFRequestVO;
+import com.example.notification.service.ETFViewService;
 import com.example.notification.service.HoldingService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
@@ -20,6 +21,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -32,6 +34,9 @@ public class ETFController {
 
     @Autowired
     private StockDao stockDao;
+
+    @Autowired
+    private ETFViewService etfViewService;
 
     @Autowired
     private IntraDayService intraDayService;
@@ -56,6 +61,13 @@ public class ETFController {
                 }
             }
         });
+    }
+
+
+    @RequestMapping(value = {"/etf/belongStocks/{etfId}"})
+    @ResponseBody
+    public List<String> getStocksBelongEtf(@PathVariable String etfId) {
+        return etfViewService.getStocksBelongEtf(etfId);
     }
 
 
