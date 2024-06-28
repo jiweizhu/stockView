@@ -129,7 +129,7 @@ public class HoldingService {
         List<StockNameVO> resultList = stockDao.findAll();
         List<EtfsRespVO> retList = new ArrayList<>();
         for (StockNameVO stockVo : resultList) {
-            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            if (stockVo.getStockName() == null || !stockVo.getStockName().toLowerCase().contains("etf")) continue;
             String stockIds = stockVo.getStockIds();
             if (StringUtils.hasLength(stockIds)) {
                 StringBuilder sb = new StringBuilder();
