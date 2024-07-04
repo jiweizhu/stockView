@@ -30,7 +30,7 @@ public class Timer {
     @Autowired
     private IntraDayService intraDayService;
 
-    @Scheduled(cron = "0 30 9 ? * MON-FRI")
+    @Scheduled(cron = "0 31 9 ? * MON-FRI")
     public void clearIntradayPriceBeforeOpeningMarket() {
         logger.info("========= cron exec clearIntradayPriceBeforeOpeningMarket =======");
         intraDayService.clearTodayIntraPrice();

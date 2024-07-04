@@ -600,7 +600,7 @@ public class KLineMarketClosedService {
 
         entityManager.createNativeQuery("delete from daily_price " + "where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
 
-        entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_day = null ;").executeUpdate();
+        entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null ;").executeUpdate();
 
         return "ok";
     }
