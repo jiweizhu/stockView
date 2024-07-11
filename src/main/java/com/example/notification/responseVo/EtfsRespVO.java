@@ -7,6 +7,7 @@ public class EtfsRespVO {
     private String etfId;
     private String etfName;
     private String stockIds;
+    private String dayGain;
 
     public EtfsRespVO(String etfId, String etfName, String stockIds) {
         this.etfId = etfId;

@@ -129,8 +129,9 @@ public class HoldingService {
         List<StockNameVO> resultList = stockDao.findAll();
         List<EtfsRespVO> retList = new ArrayList<>();
         for (StockNameVO stockVo : resultList) {
-            if (stockVo.getStockName() == null || !stockVo.getStockName().toLowerCase().contains("etf")) continue;
+            if (!stockVo.getStockName().toLowerCase().contains("etf")) continue;
             String stockIds = stockVo.getStockIds();
+            int stockCount = 0;
             if (StringUtils.hasLength(stockIds)) {
                 StringBuilder sb = new StringBuilder();
                 String[] split = stockIds.split(",");
@@ -140,9 +141,16 @@ public class HoldingService {
                             sb.append(stockName).append(",");
                         }
                 );
+                stockCount = split.length;
                 stockIds = sb.toString();
             }
-            retList.add(new EtfsRespVO(stockVo.getStockId(), stockVo.getStockName(), stockIds));
+            EtfsRespVO respVO = new EtfsRespVO(stockVo.getStockId(), stockVo.getStockName() + "|" + stockCount, stockIds);
+            List<StockDailyVO> lastTwoDayPriceByStockId = stockDailyDao.findLastTwoDayPriceByStockId(stockVo.getStockId());
+            StockDailyVO lastPriceVo = lastTwoDayPriceByStockId.get(0);
+            StockDailyVO yesterdayPriceVo = lastTwoDayPriceByStockId.get(1);
+            BigDecimal gainPercentage = Utils.calculateDayGainPercentage(lastPriceVo.getClosingPrice(), yesterdayPriceVo.getClosingPrice());
+            respVO.setDayGain(gainPercentage.toString());
+            retList.add(respVO);
         }
         Comparator<EtfsRespVO> comparator = Comparator.comparing(EtfsRespVO::getStockIds, Comparator.nullsLast(Comparator.naturalOrder()));
         List<EtfsRespVO> resp = retList.stream().sorted(comparator).collect(Collectors.toList());
@@ -158,11 +166,12 @@ public class HoldingService {
 
     public Object stockList() {
         logger.debug("enter HoldingService stockList ====");
+        Set<String> holdingStockVOS = holdingStockDao.findAllStockIds();
         List<StockNameVO> resultList = stockDao.findAll();
         List<StockRespVO> retList = new ArrayList<>();
         for (StockNameVO stockVo : resultList) {
-            if (stockVo.getStockName().toLowerCase().contains("etf"))
-                continue;
+//            if (holdingStockVOS.contains(stockVo.getStockId()) || stockVo.getStockName().toLowerCase().contains("etf"))
+//                continue;
             retList.add(new StockRespVO(stockVo.getStockId(), stockVo.getStockName()));
         }
         return retList;

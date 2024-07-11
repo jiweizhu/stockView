@@ -3,7 +3,6 @@ package com.example.notification.requestVO;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 
 @Data
 public class HoldingStockRequestVO {
@@ -16,6 +15,6 @@ public class HoldingStockRequestVO {
 
     private String belongEtf;
 
-    private Date buyInDay;
+    private String buyDay;
 
 }

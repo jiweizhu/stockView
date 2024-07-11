@@ -85,7 +85,7 @@ public class Controller {
     public ResponseEntity findAllEtfSort(@PathVariable String num) {
         logger.info("Enter method findAllEtfSort====" + num);
         Object body = "";
-        if (num.equals("3")) {
+        if (num.equals("3") || num.equals("4")) {
             body = etfViewService.findAllEtfSortView_new(num);
         } else if (num.equals("main")) {
             body = etfViewService.findAllEtfSortView_new(num);

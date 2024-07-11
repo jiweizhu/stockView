@@ -10,7 +10,18 @@
     <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
     <script src="js/jquery.edatagrid.js" type="text/javascript"></script>
+    <script src="js/datagrid-detailview.js" type="text/javascript"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
     <style>
+        .chart-container {
+         width: 350px;
+         height: 320px;
+         margin-bottom: 2px;
+ }
 
         .datagrid-cell {
     white-space: normal;
@@ -31,6 +42,7 @@
         </table>
     </form>
 </div>
+<button id="toggleButton">Toggle Row</button>
 <script>
 $('#ff').form({
     success:function(data){
@@ -45,21 +57,32 @@ $('#ff').form({
         if(data.code != 200){
             $.messager.alert('Info', 'Please check input Id! ', 'info');
         }else{
-            $.messager.alert('Info', 'Success!', 'info');
+            $.messager.alert('Info', 'Success!', 'info', function() {
+                           location.reload();
+                        });
         }
-
     }
 });
 
+function strSorter(a, b) {
+    return a == b ? 0 : (a > b ? 1 : -1);
+}
+
+function numSorter(a,b){
+    a = parseFloat(a);
+    b = parseFloat(b);
+    return a==b?0:(a>b?1:-1);
+}
 </script>
 <table class="easyui-datagrid" ctrlSelect="true"
        id="dg" idField="stockId" pageSize="50"
-       pagination="true" rownumbers="true" singleSelect="true" style="width:500px;height:250px"
+       pagination="false" rownumbers="true" singleSelect="true" style="width:500px;height:250px"
        title="My Users" toolbar="#toolbar">
     <thead>
     <tr>
-        <th align="center" field="etfId" width="100">Id</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" field="etfName" width="120">Name</th>
+        <th align="center" field="etfId" width="100" data-options="sortable:true,sorter:strSorter">Id</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="etfName" width="120" >Name</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayGain" width="120" >DayGain</th>
         <th align="center" editor="{type:'tagbox',options:{
                 url: '/holdingStock/stockList',
                 valueField: 'stockId',
@@ -67,8 +90,7 @@ $('#ff').form({
                 limitToList: true,
                 hasDownArrow: true,
                 prompt: 'Select stock...'
-            }}" field="stockIds" width="500" class="stockIds-align"
-        >stocks
+            }}" field="stockIds" data-options="sortable:true,sorter:strSorter" width="500">stocks
         </th>
     </tr>
     </thead>
@@ -96,8 +118,25 @@ $(function(){
     $('#dg').edatagrid({
         url: '/holdingStock/etfList',
         updateUrl: '/etf/update',
-        remoteSort: false
-    });
+        remoteSort: false,
+        onSave: function(index, row) {
+                    $('#dg').edatagrid('reload');
+                },
+        view: detailview,
+        autoUpdateDetail: true,
+        sortName: 'dayGain',
+        sortOrder: 'asc',
+        detailFormatter: function(rowIndex, rowData){
+        return '<table><tr>' +
+                '<td>' +
+                '<div class="chart-container" id= "span_'+rowData.etfId+'">' +
+                '<p>Attribute: ' + rowData.etfId + '</p>' +
+                '<p>Status: ' + rowData.etfName + '</p>' +
+                '</div>' +
+                '</td>' +
+                '</tr></table>';
+                }
+});
 });
 
 $.extend($.fn.datagrid.defaults.editors, {
@@ -127,10 +166,98 @@ $.extend($.fn.datagrid.defaults.editors, {
 	}
 })
 
-
-
-
-
 </script>
 </body>
 </html>
+<script>
+    async function getDivs() {
+      const spans = document.querySelectorAll('div[id^="span_"]');
+   spans.forEach(span => {
+      createIntradayChart(span);
+   });
+   }
+
+
+   async function createIntradayChart(span) {
+  // Load the dataset
+    const data = await fetch('http://124.71.19.6:8888/etf/getIntradayPrice/'+span.id.replace('span_', '')).then(response => response.json());
+
+    // create the chart
+    Highcharts.stockChart(span.id, {
+
+        title: {
+            text: 'AAPL stock price by minute'
+        },
+        xAxis: {
+            gapGridLineWidth: 0
+        },
+
+        rangeSelector: {
+            buttons: [{
+                type: 'hour',
+                count: 1,
+                text: '1h'
+            }, {
+                type: 'day',
+                count: 1,
+                text: '1D'
+            }, {
+                type: 'all',
+                count: 1,
+                text: 'All'
+            }],
+            selected: 1,
+            inputEnabled: false
+        },
+
+        series: [{
+            name: 'AAPL',
+            type: 'area',
+            data: data,
+            gapSize: 5,
+            tooltip: {
+                valueDecimals: 2
+            },
+            fillColor: {
+                linearGradient: {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                },
+                stops: [
+                    [0, Highcharts.getOptions().colors[0]],
+                    [
+                        1,
+                        Highcharts.color(
+                            Highcharts.getOptions().colors[0]
+                        ).setOpacity(0).get('rgba')
+                    ]
+                ]
+            },
+            threshold: null
+        }]
+    });
+   }
+
+<!--     setTimeout(function() {-->
+          var opened = false;
+
+     document.getElementById('toggleButton').addEventListener('click', function() {
+        var count = $('#dg').datagrid('getRows').length;
+        if(opened){
+            for(var i=0; i<count; i++){
+                $('#dg').datagrid('expandRow', i);
+            }
+            opened = false;
+            getDivs();
+        }else{
+            for(var i=0; i<count; i++){
+                $('#dg').datagrid('collapseRow', i);
+            }
+            opened = true;
+        }
+     });
+<!--    }, 2500);-->
+
+</script>

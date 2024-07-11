@@ -137,6 +137,7 @@ public class HoldingController {
     @RequestMapping(value = {"/getPriceByminute"})
     @ResponseBody
     public Object getPriceByminute() throws ParseException {
+        logger.info("======= Enter HoldingController getPriceByminute =========");
         Object list = intraDayService.getPriceByminute();
         return list;
     }

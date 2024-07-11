@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
+    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
     <link href="https://www.jeasyui.com/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="https://www.jeasyui.com/easyui/themes/icon.css" rel="stylesheet" type="text/css">
     <link href="themes/demo.css" rel="stylesheet" type="text/css">
@@ -13,7 +14,6 @@
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
-    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
     <style>
         * {
           margin: 0;
@@ -30,11 +30,11 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
-<!--        .multiLine-container {-->
-<!--            width: 750px;-->
-<!--            height: 320px;-->
-<!--            margin-bottom: 2px;-->
-<!--        }-->
+        .multiLine-container {
+            width: 550px;
+            height: 320px;
+            margin-bottom: 2px;
+        }
 
         .vertical-stockId {
             writing-mode: vertical-rl;
@@ -65,7 +65,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch('http://localhost:8888/etfs/4')
+          fetch('http://124.71.19.6:8888/etfs/4')
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');
@@ -78,7 +78,7 @@
 
 
     function loadIndexTableData() {
-      fetch('http://localhost:8888/etfs/main')
+      fetch('http://124.71.19.6:8888/etfs/main')
          .then(response => response.text())
          .then(data => {
             const dataContainer = document.getElementById('mainTable');
@@ -104,10 +104,6 @@
        createETFChart(span);
     });
 
-    <!--this is for highchart 拆线图-->
-    <!--initializeIntraCharts();-->
-
-
     }
 
 
@@ -118,7 +114,7 @@
       useDirtyRect: false
     });
 
-    const rawData = await fetch('http://localhost:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
+    const rawData = await fetch('http://124.71.19.6:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
 
     function calculateMA(dayCount, data) {
       var result = [];
@@ -269,7 +265,7 @@
         // 获取每个 name 的数据
         const promises = names.map(name => new Promise(resolve => {
             (async () => {
-                const data = await fetch(`http://localhost:8888/multiK/${name}`)
+                const data = await fetch(`http://124.71.19.6:8888/multiK/${name}`)
                     .then(response => response.json());
                 resolve({ name, data });
             })();
@@ -281,7 +277,7 @@
     }
 
     async function fetchData(spanId) {
-        const response = await fetch(`http://localhost:8888/etf/belongStocks/${spanId.replace('multi_', '')}`);
+        const response = await fetch(`http://124.71.19.6:8888/etf/belongStocks/${spanId.replace('multi_', '')}`);
         const data = await response.json();
         return data;
     }
@@ -293,77 +289,6 @@
             updateChart(names, span.id);
         }
     }
-
-    // 初始化图表
-    initializeMultiCharts();
-
-
-
-</script>
-
-<script>
-
-
-    async function createChart(span) {
-        const chartData = await fetchData(span.id);
-
-        Highcharts.chart(span.id, {
-            title: {
-                text: 'Dynamic Chart Title',
-                align: 'left'
-            },
-            subtitle: {
-                text: 'Dynamic Chart Subtitle',
-                align: 'left'
-            },
-            yAxis: {
-                title: {
-                    text: 'Price'
-                }
-            },
-            xAxis: {
-                accessibility: {
-                    rangeDescription: 'Range: 2010 to 2020'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            series: chartData.series,
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        }
-                    }
-                }]
-            }
-        });
-    }
-
-    async function initializeIntraCharts() {
-    const spans = document.querySelectorAll('div[id^="multi_"]');
-        for (const span of spans) {
-            await createChart(span);
-        }
-    }
-
-
 </script>
 </body>
 </html>

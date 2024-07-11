@@ -21,22 +21,22 @@ public class HoldingStockVO {
     @Column(name = "stockName")
     private String stockName;
 
-    @Column(name = "costPrice")
+    @Column(name = "costPrice", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal costPrice;
 
-    @Column(name = "nowPrice")
+    @Column(name = "nowPrice", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal nowPrice;
 
     @Column(name = "buy_in_lot")
     private Integer buyInLot;
 
-    @Column(name = "gain_percent")
+    @Column(name = "gain_percent", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal gainPercent;
 
-    @Column(name = "one_day_gain")
+    @Column(name = "one_day_gain", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal oneDayGain;
 
-    @Column(name = "last_close_price")
+    @Column(name = "last_close_price", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal lastClosePrice;
 
     @Column(name = "buy_day")

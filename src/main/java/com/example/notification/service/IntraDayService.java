@@ -3,17 +3,16 @@ package com.example.notification.service;
 import com.example.notification.http.RestRequest;
 import com.example.notification.repository.HoldingStockDao;
 import com.example.notification.repository.IntraDayPriceDao;
+import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
 import com.example.notification.util.Utils;
-import com.example.notification.vo.DailyQueryResponseVO;
-import com.example.notification.vo.HoldingStockVO;
-import com.example.notification.vo.IntradayPriceVO;
-import com.example.notification.vo.WebQueryParam;
+import com.example.notification.vo.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,10 +20,10 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @Service
 public class IntraDayService {
@@ -36,6 +35,9 @@ public class IntraDayService {
     private StockDao stockDao;
 
     @Autowired
+    private StockDailyDao stockDailyDao;
+
+    @Autowired
     private RestRequest restRequest;
 
     @Autowired
@@ -44,6 +46,8 @@ public class IntraDayService {
     @Autowired
     private HoldingStockDao holdingStockDao;
 
+    @Autowired
+    private ThreadPoolTaskExecutor executorService;
 
     public void save(HoldingStockVO stockVO) {
         stockVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
@@ -59,40 +63,84 @@ public class IntraDayService {
 
     public Object getPriceByminute() throws ParseException {
         List<HoldingStockVO> holdingStockDaoAll = holdingStockDao.findAll();
-        Date today = new Date(System.currentTimeMillis());
-        for (HoldingStockVO stockVO : holdingStockDaoAll) {
-            WebQueryParam webQueryParam = new WebQueryParam();
-            webQueryParam.setIdentifier(stockVO.getStockId());
-            DailyQueryResponseVO intraDayData = restRequest.getIntraDayData(webQueryParam);
-            if (null == intraDayData) {
-                continue;
-            }
-            Map data = (Map) ((Map) intraDayData.getData().get(stockVO.getStockId())).get("data");
 
-            List<String> minutePriceList = (List) data.get("data");
-            String date = (String) data.get("date");
-            java.util.Date parse = dateFormat.parse(date);
-            Date remoteRetureDate = new Date(parse.getTime());
-
-            Set<IntradayPriceVO> voSet = intraDayPriceDao.findMinutesByIdAndToday(webQueryParam.getIdentifier(), today);
-            Set<String> storedSet = new HashSet<>();
-            voSet.forEach(vo -> {
-                storedSet.add(vo.getDay() + vo.getMinute());
-            });
-            for (String line : minutePriceList) {
-                String[] split = line.split("\\s+");
-                if (storedSet.contains(remoteRetureDate + split[0])) {
-                    continue;
+        //etfs need to get minute data as well
+        List<StockNameVO> stockDaoAll = stockDao.findAll();
+        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf")).forEach(
+                etfVo -> {
+                    HoldingStockVO holdingStockVO = new HoldingStockVO();
+                    holdingStockVO.setStockId(etfVo.getStockId());
+                    holdingStockDaoAll.add(holdingStockVO);
                 }
-                IntradayPriceVO vo = new IntradayPriceVO();
-                vo.setDay(today);
-                vo.setMinute(split[0]);
-                vo.setPrice(new BigDecimal(split[1]));
-                vo.setStockId(webQueryParam.getIdentifier());
-                intraDayPriceDao.save(vo);
+        );
+
+        Date today = new Date(System.currentTimeMillis());
+        String formattedToday = dateFormat.format(today);
+        List<Callable<Void>> tasks = getCallables(holdingStockDaoAll, formattedToday, today);
+        try {
+            List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    logger.error("Error executing task", e.getCause());
+                }
             }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Task execution interrupted", e);
         }
         return null;
+    }
+
+    private List<Callable<Void>> getCallables(List<HoldingStockVO> holdingStockDaoAll, String formattedToday, Date today) {
+        List<Callable<Void>> tasks = new ArrayList<>();
+        for (HoldingStockVO stockVO : holdingStockDaoAll) {
+            tasks.add(() -> {
+                WebQueryParam webQueryParam = new WebQueryParam();
+                webQueryParam.setIdentifier(stockVO.getStockId());
+                DailyQueryResponseVO intraDayData = restRequest.getIntraDayData(webQueryParam);
+                if (null == intraDayData) {
+                    return null;
+                }
+                Map data = (Map) ((Map) intraDayData.getData().get(stockVO.getStockId())).get("data");
+
+                List<String> minutePriceList = (List) data.get("data");
+                String date = (String) data.get("date");
+
+                if (!formattedToday.equals(date)) {
+                    return null;
+                }
+
+                Set<IntradayPriceVO> voSet = intraDayPriceDao.findMinutesByIdAndToday(webQueryParam.getIdentifier(), today);
+                Set<String> storedSet = new HashSet<>();
+                voSet.forEach(vo -> {
+                    storedSet.add(vo.getMinute());
+                });
+                for (String line : minutePriceList) {
+                    String[] split = line.split("\\s+");
+                    if (storedSet.contains(split[0])) {
+                        continue;
+                    }
+                    IntradayPriceVO vo = new IntradayPriceVO();
+                    vo.setDay(today);
+                    vo.setMinute(split[0]);
+                    vo.setPrice(new BigDecimal(split[1]));
+                    vo.setStockId(webQueryParam.getIdentifier());
+                    intraDayPriceDao.save(vo);
+                }
+                //save latest price in stockDaily table.
+                String latestPriceLine = minutePriceList.get(minutePriceList.size() - 1);
+                String[] split = latestPriceLine.split("\\s+");
+                StockDailyVO stockDailyVO = new StockDailyVO();
+                stockDailyVO.setStockId(stockVO.getStockId());
+                stockDailyVO.setDay(today);
+                stockDailyVO.setClosingPrice(BigDecimal.valueOf(Double.valueOf(split[1])));
+                stockDailyDao.save(stockDailyVO);
+                return null;
+            });
+        }
+        return tasks;
     }
 
     public void removeOneWeekAgoData(String oneWeekAgeDay) {

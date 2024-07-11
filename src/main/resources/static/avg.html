@@ -94,7 +94,7 @@
     setTimeout(function() {
         getDivs();
         initializeMultiCharts();
-    }, 3000);
+    }, 2000);
     });
 
 
@@ -103,10 +103,6 @@
     spans.forEach(span => {
        createETFChart(span);
     });
-
-    <!--this is for highchart 拆线图-->
-    <!--initializeCharts();-->
-
 
     }
 
@@ -293,78 +289,6 @@
             updateChart(names, span.id);
         }
     }
-
-    // 初始化图表
-    initializeMultiCharts();
-
-
-
-</script>
->
-
-<script>
-
-
-    async function createChart(span) {
-        const chartData = await fetchData(span.id);
-
-        Highcharts.chart(span.id, {
-            title: {
-                text: 'Dynamic Chart Title',
-                align: 'left'
-            },
-            subtitle: {
-                text: 'Dynamic Chart Subtitle',
-                align: 'left'
-            },
-            yAxis: {
-                title: {
-                    text: 'Price'
-                }
-            },
-            xAxis: {
-                accessibility: {
-                    rangeDescription: 'Range: 2010 to 2020'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            series: chartData.series,
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        }
-                    }
-                }]
-            }
-        });
-    }
-
-    async function initializeCharts() {
-    const spans = document.querySelectorAll('div[id^="multi_"]');
-        for (const span of spans) {
-            await createChart(span);
-        }
-    }
-
-
 </script>
 </body>
 </html>

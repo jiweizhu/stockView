@@ -27,7 +27,7 @@ public class IntradayPriceVO {
     @Column(name = "stockName")
     private String stockName;
 
-    @Column(name = "price")
+    @Column(name = "price", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal price;
 
 

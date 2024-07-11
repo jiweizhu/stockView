@@ -32,13 +32,13 @@ public class StockNameVO {
     @Column(name = "upwardDaysFive")
     private Integer upwardDaysFive = 0;
 
-    @Column(name = "gainPercentFive")
+    @Column(name = "gainPercentFive", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal gainPercentFive;
 
     @Column(name = "flipUpwardDaysFive")
     private Integer flipUpwardDaysFive = 0;
 
-    @Column(name = "flipGainPercentFive")
+    @Column(name = "flipGainPercentFive", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal flipGainPercentFive;
 
     @Column(name = "flipDayFive")
@@ -62,7 +62,7 @@ public class StockNameVO {
     @Column(name = "flipEndDayTen")
     private Date flipEndDayTen;
 
-    @Column(name = "flipGainPercentTen")
+    @Column(name = "flipGainPercentTen", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal flipGainPercentTen;
 
     @Column(name = "last_updated_time")

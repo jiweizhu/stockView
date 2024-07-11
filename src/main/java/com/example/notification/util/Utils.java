@@ -46,7 +46,7 @@ public class Utils {
     }
 
     public static BigDecimal calculateDayGainPercentage(BigDecimal numerator, BigDecimal denominator) {
-        if (denominator == null) {
+        if (denominator == null || numerator == null || denominator.equals(new BigDecimal(0))) {
             return new BigDecimal(0);
         }
         BigDecimal subtract = numerator.subtract(denominator).multiply(BigDecimal.valueOf(100));

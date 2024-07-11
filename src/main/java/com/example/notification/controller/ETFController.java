@@ -6,12 +6,14 @@ import com.example.notification.service.ETFViewService;
 import com.example.notification.service.HoldingService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
+import com.example.notification.vo.IntradayPriceVO;
 import com.example.notification.vo.StockNameVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +22,9 @@ import java.beans.PropertyEditorSupport;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @RestController
 public class ETFController {
@@ -68,6 +69,38 @@ public class ETFController {
     @ResponseBody
     public List<String> getStocksBelongEtf(@PathVariable String etfId) {
         return etfViewService.getStocksBelongEtf(etfId);
+    }
+
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
+
+    @RequestMapping(value = {"/etf/getIntradayPrice/{etfId}"})
+    @ResponseBody
+    public ResponseEntity getIntradayPrice(@PathVariable String etfId) {
+        logger.info("Enter ETFController getIntradayPrice======" + etfId);
+        Set<IntradayPriceVO> intradayPrice = etfViewService.getIntradayPrice(etfId);
+        if (intradayPrice == null) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        ArrayList<Double[]> result = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        DateTimeFormatter minuteSec = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        ZoneId zoneId = ZoneId.systemDefault();
+        for (IntradayPriceVO vo : intradayPrice) {
+            LocalDate localDate = vo.getDay().toLocalDate();
+            String formattedDate = localDate.format(formatter);
+            String timeStr = formattedDate + vo.getMinute();
+            LocalDateTime localDateTime = LocalDateTime.parse(timeStr, minuteSec);
+            ZonedDateTime zonedDateTime = localDateTime.atZone(zoneId);
+
+            Instant instant = zonedDateTime.toInstant();
+            long timestamp = instant.toEpochMilli();
+            Double[] strings = new Double[2];
+            strings[0] = Double.valueOf(Long.toString(timestamp));
+            strings[1] = Double.valueOf(vo.getPrice().toString());
+            result.add(strings);
+        }
+        return ResponseEntity.ofNullable(result);
     }
 
 

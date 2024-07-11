@@ -24,28 +24,28 @@ public class StockDailyVO {
     @Column(name = "day")
     private Date day;
 
-    @Column(name = "openingPrice")
+    @Column(name = "openingPrice", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal openingPrice;
 
-    @Column(name = "closingPrice")
+    @Column(name = "closingPrice", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal closingPrice;
 
-    @Column(name = "intradayHigh")
+    @Column(name = "intradayHigh", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal intradayHigh;
 
-    @Column(name = "intradayLow")
+    @Column(name = "intradayLow", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal intradayLow;
 
-    @Column(name = "dayAvgFive")
+    @Column(name = "dayAvgFive", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal dayAvgFive;
 
-    @Column(name = "dayAvgTen")
+    @Column(name = "dayAvgTen", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal dayAvgTen;
 
-    @Column(name = "day_gain_of_five")
+    @Column(name = "day_gain_of_five", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal dayGainOfFive;
 
-    @Column(name = "day_gain_of_ten")
+    @Column(name = "day_gain_of_ten", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal dayGainOfTen;
 
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
