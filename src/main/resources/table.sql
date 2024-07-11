@@ -1,3 +1,6 @@
+SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS 'Size (MB)' FROM information_schema.tables GROUP BY table_schema;
+
+Create schema stock;
 CREATE TABLE  imported_stock(
 stock_id VARCHAR(12) primary key,
 stock_name VARCHAR(20)
@@ -19,7 +22,6 @@ buy_day DATE,
 last_updated_time time
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE intraday_price(
 stock_id VARCHAR(12),
 stock_name VARCHAR(20),
@@ -30,9 +32,16 @@ price DECIMAL(10,3),
 PRIMARY KEY (stock_id, day, minute)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE week_price (
+stock_id VARCHAR(12) NOT NULL,
+day DATE NOT NULL,
+opening_price DECIMAL(10,3),
+closing_price DECIMAL(10,3),
+week_high DECIMAL(10,3),
+week_low DECIMAL(10,3),
+PRIMARY KEY(stock_id, day)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
-Create schema stock;
 CREATE TABLE daily_price (
 stock_id VARCHAR(12) NOT NULL,
 day DATE NOT NULL,
