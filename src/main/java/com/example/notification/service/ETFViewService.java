@@ -214,7 +214,7 @@ public class ETFViewService {
         if (upwardDaysFive > 1 && upwardDaysTen >= 0) {
 //            html.append("<td style=\"background-color: #00FFB0;\">");
             html.append("<td>");
-        } else if (upwardDaysFive < 0 || upwardDaysTen < 0) {
+        } else if (upwardDaysFive < 0) {
             html.append("<td style=\"background-color: #DEB887;\">");
         } else {
             html.append("<td>");
@@ -240,7 +240,7 @@ public class ETFViewService {
                 .append("</td>");
 
         html.append("<td style=\"background-color: #708090;\">").append("").append("</td>");
-        if (upwardDaysFive < 0 || upwardDaysTen < 0) {
+        if (upwardDaysTen < 0) {
             html.append("<td style=\"background-color: #DEB887;\">");
         } else {
             html.append("<td>");
@@ -252,9 +252,9 @@ public class ETFViewService {
                 .append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("</br>").append("</td>");
         String stockId = stockVo.getStockId();
         String stockIds = stockVo.getStockIds();
-        int belongStockNum = (StringUtils.hasLength(stockIds))? stockIds.split(",").length:0;
+        int belongStockNum = (StringUtils.hasLength(stockIds)) ? stockIds.split(",").length : 0;
         html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">").append("").append(stockId).append("</a></br><span class=\"vertical-stockName\" >")
-                .append(stockVo.getStockName().replace("ETF", "E"))
+                .append(stockVo.getStockName().replace("ETF", "|"))
                 .append(belongStockNum)
                 .append("</span></td>");
         html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("week_" + stockVo.getStockId()).append("\"></div></td>");
