@@ -24,7 +24,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY;
 
@@ -129,7 +128,7 @@ public class ETFViewService {
 
         //group main index Kline
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
-        Set<String> stringSet = mainKlineIds.stream().collect(Collectors.toSet());
+        Set<String> stringSet = new HashSet<>(mainKlineIds);
         for (StockNameVO fiveDayUpwardDay : fiveDayUpwardDays) {
             if (!stringSet.contains(fiveDayUpwardDay.getStockId())) {
                 commonEtfs.add(fiveDayUpwardDay);
@@ -254,7 +253,7 @@ public class ETFViewService {
         String stockIds = stockVo.getStockIds();
         int belongStockNum = (StringUtils.hasLength(stockIds)) ? stockIds.split(",").length : 0;
         html.append("<td>").append("<a href=\"https://gushitong.baidu.com/fund/ab-" + stockVo.getStockId().substring(2) + "\">").append("").append(stockId).append("</a></br><span class=\"vertical-stockName\" >")
-                .append(stockVo.getStockName().replace("ETF", "|"))
+                .append(stockVo.getStockName().replace("ETF", "#"))
                 .append(belongStockNum)
                 .append("</span></td>");
         html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("week_" + stockVo.getStockId()).append("\"></div></td>");
@@ -461,6 +460,9 @@ public class ETFViewService {
     }
 
     public List<String> getStocksBelongEtf(String etfId) {
+        if (etfId.contains("_")) {
+            etfId = etfId.split("_")[0];
+        }
         StockNameVO etf = stockDao.findById(etfId).get();
         String etfStockIds = etf.getStockIds();
         List<String> stockList = new ArrayList<>();
@@ -474,23 +476,21 @@ public class ETFViewService {
             return stockList;
         }
         return Collections.emptyList();
-//            re
-//            String[] stockIds = etfStockIds.split(",");
-//            List<BelongStocksVO> stocks = new ArrayList<>();
-//            for (String stockId : stockIds) {
-//                List<StockDailyVO> byStockIdOrderByDay = stockDailyDao.findByStockIdOrderByDay(stockId);
-//                List<BigDecimal> valus = new ArrayList<>();
-//                for (StockDailyVO stockDailyVO : byStockIdOrderByDay) {
-//                    valus.add(stockDailyVO.getClosingPrice());
-//                }
-//                BelongStocksVO belong = new BelongStocksVO();
-//                belong.setName(holdingService.getStockIdOrNameByMap(stockId));
-//                belong.setData(valus);
-//                stocks.add(belong);
-//            }
-//            retMap.put("series", stocks);
-//        }
-//        return retMap;
+    }
+
+    public String[] belongStockIds(String etfId) {
+        if (etfId.contains("_")) {
+            etfId = etfId.split("_")[0];
+        }
+        StockNameVO etf = stockDao.findById(etfId).get();
+        String etfStockIds = etf.getStockIds();
+        List<String> stockList = new ArrayList<>();
+        if (StringUtils.hasLength(etfStockIds)) {
+            stockList.add(etfId);
+            String[] stockIds = etfStockIds.split(",");
+            return stockIds;
+        }
+        return null;
     }
 
     public Set<IntradayPriceVO> getIntradayPrice(String etfId) {

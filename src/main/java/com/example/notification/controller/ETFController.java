@@ -71,6 +71,11 @@ public class ETFController {
         return etfViewService.getStocksBelongEtf(etfId);
     }
 
+    @RequestMapping(value = {"/etf/belongStockIds/{etfId}"})
+    @ResponseBody
+    public Object belongStockIds(@PathVariable String etfId) {
+        return etfViewService.belongStockIds(etfId);
+    }
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
 

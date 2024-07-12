@@ -13,9 +13,17 @@
     border: 1px solid black;
     margin: 1px;
 }
+
+#container {
+    width: 1350px;
+    height: 850px;
+    position: relative;
+    border: 1px solid black;
+    background-color:lightblue;
+}
 </style>
 </head>
-<body>
+<body style="background-color: #FFFFCC;">
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
@@ -28,9 +36,9 @@
 <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
 <script src="js/jquery.edatagrid.js" type="text/javascript"></script>
 
-<div id="container"></div>
-<button onclick="fetchData()">List ETFs</button>
-<button onclick="modifyScriptContent()">Modify Script</button>
+<div id="container" style="background-color: #FFFFCC;"></div>
+<!--<button onclick="fetchData()">List ETFs</button>-->
+<!--<button onclick="modifyScriptContent()">Modify Script</button>-->
 <table id="myTable" ></table>
 
 <script>
@@ -71,7 +79,7 @@ async function updateChart() {
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                 'http://124.71.19.6:8888/multiK/'+ name
+                 'http://localhost:8888/multiK/'+ name
             )
                 .then(response => response.json());
             resolve({ name, data });
@@ -87,7 +95,7 @@ async function updateChart() {
 updateChart();
 
 function fetchData() {
-    fetch('http://124.71.19.6:8888/etfsCurveView')
+    fetch('http://localhost:8888/etfsCurveView')
     .then(response => response.text())
         .then(data => { const dataContainer = document.getElementById('myTable');
     dataContainer.innerHTML = data; })
@@ -121,8 +129,44 @@ function modifyScriptContent(clickedText) {
     } else {
         names.push(clickedText);
     }
+    console.log('Data for modifyScriptContent:', names);
     updateChart();
 }
+
+function fetchEtfStockIdsData(etfId) {
+    return fetch(`http://localhost:8888/etf/belongStockIds/${etfId.textContent}`)
+        .then(response => response.text())
+        .catch(error => {
+            console.error('Error fetching data:', error);
+        });
+}
+
+function showEtf(clickedElement) {
+    var cell = clickedElement;
+
+    var currentColor = cell.style.backgroundColor;
+
+    if (currentColor === 'yellow') {
+        cell.style.backgroundColor = 'transparent';
+    } else {
+        cell.style.backgroundColor = 'yellow';
+    }
+    const stockIds = clickedElement.attributes.stockids.value.split(',');
+    for (const id of stockIds) {
+        if (names.includes(id)) {
+            names = names.filter(name => name !== id);
+        } else {
+            names.push(id);
+        }
+    }
+    names = names.filter(id => id !== '');
+    console.log('Data for chart:', names);
+    updateChart();
+}
+
+
+
+fetchData();
 </script>
 </body>
 </html>

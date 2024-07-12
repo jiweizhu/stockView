@@ -1,7 +1,6 @@
 package com.example.notification.service;
 
 import com.example.notification.http.RestRequest;
-import com.example.notification.repository.HoldingStockDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
 import com.example.notification.repository.WeeklyPriceDao;
@@ -23,6 +22,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -58,7 +58,7 @@ public class KLineMarketClosedService {
     private String etfViewFileInCloud;
 
     @Autowired
-    private HoldingStockDao holdingStockDao;
+    private HoldingService holdingService;
 
     @Autowired
     private RestRequest restRequest;
@@ -647,23 +647,35 @@ public class KLineMarketClosedService {
     public Object etfsCurveView() {
         etfViewLine.clear();
         readETFFile();
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String fileLine : etfViewLine) {
-            stringBuilder.append("<tr>");
-            String[] split = fileLine.split(",");
-            for (int index = 0; index < split.length; index++) {
-//                stringBuilder.append("<td><a href=\"javascript:addOrRemove(").append(split[index]).append(")\">").append(split[index]).append("</a>").append(",").append("</td>");
-                String str = split[index];
-                int eftIndex = str.indexOf("ETF");
-                if (eftIndex > 0) {
-                    str = str.substring(0, eftIndex + 3);
-                }
-                stringBuilder.append("<td class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</td>");
+        StringBuilder sb = new StringBuilder();
+        List<StockNameVO> etfs = getAllEtfs();
+        ArrayList<String> mainKlineIds = getMainKlineIds();
+        for (StockNameVO etfVo : etfs) {
+            String stockIds = etfVo.getStockIds();
+            if (!StringUtils.hasLength(stockIds)) {
+                continue;
             }
-            stringBuilder.append("</tr>");
-            stringBuilder.append("</br>");
+            String[] stockIdSplit = stockIds.split(",");
+            StringBuilder stockAppend =  new StringBuilder();
+            StringBuilder divStockIds =  new StringBuilder();
+            for (int index = 0; index < stockIdSplit.length; index++) {
+                String str = stockIdSplit[index];
+                str = str + "_" + holdingService.getStockIdOrNameByMap(str);
+                if (!StringUtils.hasLength(str)) {
+                    continue;
+                }
+                divStockIds.append(str).append(",");
+                stockAppend.append("<td class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</td>");
+            }
+            sb.append("<tr>");
+            sb.append("<td class=\"cell\" onclick=\"showEtf(this)\" stockIds=\"").append(divStockIds).append("\">");
+            sb.append(etfVo.getStockId()).append("_").append(etfVo.getStockName());
+            sb.append("</td>");
+            sb.append(stockAppend);
+            sb.append("</tr>");
+            sb.append("</br>");
         }
-        return stringBuilder;
+        return sb;
     }
 
     @PersistenceContext
