@@ -99,7 +99,7 @@ public class IntraDayService {
             tasks.add(() -> {
                 WebQueryParam webQueryParam = new WebQueryParam();
                 webQueryParam.setIdentifier(stockVO.getStockId());
-                DailyQueryResponseVO intraDayData = restRequest.getIntraDayData(webQueryParam);
+                QueryFromTencentResponseVO intraDayData = restRequest.getIntraDayData(webQueryParam);
                 if (null == intraDayData) {
                     return null;
                 }

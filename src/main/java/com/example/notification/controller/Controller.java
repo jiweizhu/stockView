@@ -71,6 +71,14 @@ public class Controller {
         return ResponseEntity.ofNullable(body);
     }
 
+    @RequestMapping(value = {"/stock/weekly/{stockId}"})
+    @ResponseBody
+    public ResponseEntity stockWeeklyDataById(@PathVariable String stockId) throws JsonProcessingException, ParseException {
+        Object body = kLineMarketClosedService.stockWeeklyJsonData(stockId);
+        return ResponseEntity.ofNullable(body);
+    }
+
+
     @RequestMapping(value = {"/multiK/{stockId}"})
     @ResponseBody
     public ResponseEntity multiK(@PathVariable String stockId) {
@@ -141,9 +149,20 @@ public class Controller {
     public String generateReportEveryDay() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, JsonProcessingException, InterruptedException {
         logger.info("Enter method generateReportEveryDay====");
         Object body = kLineMarketClosedService.delete_HistoryData();
+        kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
         etfViewService.generateReportEveryDay();
         return "ok";
     }
+
+
+    @RequestMapping(value = {"/getWeekHistoryPriceAndStoreInDb"})
+    @ResponseBody
+    public String getWeekHistoryPriceAndStoreInDb() {
+        logger.info("Enter method getWeekHistoryPriceAndStoreInDb====");
+        kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(initHistoryPriceDay);
+        return "ok";
+    }
+
 
     @RequestMapping(value = {"/storeHistoryData"})
     @ResponseBody

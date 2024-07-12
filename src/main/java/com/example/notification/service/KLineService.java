@@ -82,7 +82,7 @@ public class KLineService {
         readStockFile();
         WebQueryParam webQueryParam = new WebQueryParam();
         webQueryParam.setDaysToQuery(1);
-        DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+        QueryFromTencentResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
         List<ArrayList<String>> dailyPriceList = getRealPriceList(dailyQueryResponse, webQueryParam.getIdentifier());
         String date = dailyPriceList.get(dailyPriceList.size() - 1).get(0);
         if (Utils.todayDate().equals(date)) {
@@ -103,7 +103,7 @@ public class KLineService {
                 webQueryParam.setIdentifier(stockNameVO.getStockId());
                 StockNameVO nameVO = new StockNameVO();
                 nameVO.setStockId(stockNameVO.getStockId());
-                DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+                QueryFromTencentResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
                 calculateDayAvgPrice(dailyQueryResponse, nameVO);
             }
         }
@@ -114,7 +114,7 @@ public class KLineService {
     }
 
 
-    public void calculateDayAvgPrice(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+    public void calculateDayAvgPrice(QueryFromTencentResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         List<ArrayList<String>> dailyPriceList = getLastThirtyDaysList(dailyQueryResponse, stockNameVO);
         if (dailyPriceList == null) return;
         int size = dailyPriceList.size();
@@ -169,7 +169,7 @@ public class KLineService {
         putCache(dayAvgVO);
     }
 
-    private static List<ArrayList<String>> getLastThirtyDaysList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+    private static List<ArrayList<String>> getLastThirtyDaysList(QueryFromTencentResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
 //        List<ArrayList<String>> daysPrice = daysPriceMap.get(stockNameVO.getStockId());
 //        if (daysPrice != null) {
 //            return daysPrice;
@@ -207,7 +207,7 @@ public class KLineService {
             //at least 2 days to query, because need to check if avg price is between real price and yesterday's price
             webQueryParam.setDaysToQuery(2);
 
-            DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+            QueryFromTencentResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
 
             List<ArrayList<String>> twoDayList = getRealPriceList(dailyQueryResponse, stockId);
             if (twoDayList == null || !checkIfTodayData(twoDayList)) {
@@ -257,7 +257,7 @@ public class KLineService {
         }
     }
 
-    private List<ArrayList<String>> getRealPriceList(DailyQueryResponseVO dailyQueryResponse, String stockId) throws JsonProcessingException {
+    private List<ArrayList<String>> getRealPriceList(QueryFromTencentResponseVO dailyQueryResponse, String stockId) throws JsonProcessingException {
         if (dailyQueryResponse == null) {
             logger.info("==============getRealPriceList ===== dailyQueryResponse is null.====={}", stockId);
             return null;

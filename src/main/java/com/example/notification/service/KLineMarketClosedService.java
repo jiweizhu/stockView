@@ -4,6 +4,7 @@ import com.example.notification.http.RestRequest;
 import com.example.notification.repository.HoldingStockDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
+import com.example.notification.repository.WeeklyPriceDao;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,8 +51,6 @@ public class KLineMarketClosedService {
     private static ArrayList<String> importStockFileList = new ArrayList<>();
     private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
 
-    private static Map<String, List<ArrayList<String>>> daysPriceMap = new HashMap<>();
-
     @Value("${notification.import.file}")
     private String importFileInCloud;
 
@@ -73,6 +72,10 @@ public class KLineMarketClosedService {
     @Autowired
     private StockDailyDao stockDailyDao;
 
+    @Autowired
+    private WeeklyPriceDao weeklyPriceDao;
+
+
     // 1.importStocks,
     // format: stockId_name or stockId
     public String importStocks() throws JsonProcessingException {
@@ -90,7 +93,7 @@ public class KLineMarketClosedService {
         for (String stockid : newImportStock) {
             stockid = stockid.toLowerCase();
             StockNameVO stockIdVo = new StockNameVO(stockid);
-            DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(new WebQueryParam(1, stockid));
+            QueryFromTencentResponseVO dailyQueryResponse = restRequest.queryKLine(new WebQueryParam(1, stockid));
             if (dailyQueryResponse == null) {
                 wrongInputStockId.add(stockid);
                 ret.append(stockid);
@@ -112,13 +115,11 @@ public class KLineMarketClosedService {
     }
 
     public List<String> storedStockIds() {
-        List<String> storedStockIds = stockDao.findStockIds();
-        return storedStockIds;
+        return stockDao.findStockIds();
     }
 
     public List<StockNameVO> storedStocks() {
-        List<StockNameVO> storedStocks = stockDao.findAll();
-        return storedStocks;
+        return stockDao.findAll();
     }
 
     public List<StockNameVO> getAllEtfs() {
@@ -227,6 +228,39 @@ public class KLineMarketClosedService {
         }
     }
 
+    public void getWeekHistoryPriceAndStoreInDb(Integer days) {
+        logger.info("Enter getWeekHistoryPriceAndStoreInDb method ========days=" + days);
+        final Integer daysToGet = days;
+        List<Callable<Void>> tasks = new ArrayList<>();
+        //iterator to query 50day price history and calculate 10day price, and store in db
+        List<StockNameVO> etfs = getAllEtfs();
+        for (StockNameVO etfVO : etfs) {
+            tasks.add(() -> {
+                // 降低速度，避免网站保护
+                Thread.sleep(10);
+                WebQueryParam webQueryParam = new WebQueryParam();
+                webQueryParam.setDaysToQuery(daysToGet);
+                webQueryParam.setIdentifier(etfVO.getStockId());
+                storeHistoryWeeklyPrice(webQueryParam, etfVO);
+                return null;
+            });
+        }
+
+        try {
+            List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                try {
+                    future.get(); // 检查每个任务的执行情况
+                } catch (ExecutionException e) {
+                    logger.error("Error executing task", e.getCause());
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Task execution interrupted", e);
+        }
+    }
+
     public String getHistoryPriceOnLineAndStoreInDb(Integer days) {
         logger.info("Enter getHistoryPriceOnLineAndStoreInDb method ========days=" + days);
         ArrayList<StockNameVO> getHistoryPriceStocks = new ArrayList<>();
@@ -246,14 +280,14 @@ public class KLineMarketClosedService {
                 }
 
                 // 降低速度，避免网站保护
-                Thread.sleep(100);
+                Thread.sleep(10);
 
-                if (stockNameVO.getStockId().contains("sh") || stockNameVO.getStockId().contains("sz")) {
+                if (stockNameVO.getStockId().startsWith("sh") || stockNameVO.getStockId().startsWith("sz")) {
                     WebQueryParam webQueryParam = new WebQueryParam();
                     webQueryParam.setDaysToQuery(daysToGet);
                     webQueryParam.setIdentifier(stockNameVO.getStockId());
-                    DailyQueryResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
-                    storeHistoryPrice(dailyQueryResponse, stockNameVO);
+                    QueryFromTencentResponseVO dailyQueryResponse = restRequest.queryKLine(webQueryParam);
+                    storeHistoryDailyPrice(dailyQueryResponse, stockNameVO);
                 }
                 return null;
             });
@@ -276,7 +310,51 @@ public class KLineMarketClosedService {
         return "getHistoryPriceStocks: " + getHistoryPriceStocks;
     }
 
-    private List<ArrayList<String>> storeHistoryPrice(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
+    private List<ArrayList<String>> storeHistoryWeeklyPrice(WebQueryParam webQueryParam, StockNameVO stockNameVO) throws JsonProcessingException {
+        webQueryParam.setIdentifier(stockNameVO.getStockId());
+        webQueryParam.setToQueryDailyPrice(false);
+        QueryFromTencentResponseVO weeklyResponse = restRequest.queryKLine(webQueryParam);
+        List<ArrayList<String>> dayList = getWeeklyPriceList(weeklyResponse, stockNameVO);
+
+        //use hashmap to judge if the day is stored or not
+        List<String> days = weeklyPriceDao.findWeekDaysByStockId(stockNameVO.getStockId());
+        Set<String> daysSet = days.stream().collect(Collectors.toSet());
+
+        if (dayList == null) return null;
+        int size = dayList.size();
+        logger.info("==storeHistoryWeeklyPrice==={} ==got {} week, == lastest week is {}", stockNameVO, size, dayList.get(size - 1).get(0));
+        for (int i = 0; i < size; i++) {
+            ArrayList<String> dayPrice = dayList.get(i);
+            String stockName = stockNameVO.getStockName();
+            if (stockName == null) {
+                continue;
+            }
+            if (daysSet.contains(dayPrice.get(0))) {
+                //history day already stored
+                continue;
+            }
+            WeekPriceVO weekPriceVO = new WeekPriceVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
+            weeklyPriceDao.save(weekPriceVO);
+        }
+        return null;
+    }
+
+    private static List<ArrayList<String>> getWeeklyPriceList(QueryFromTencentResponseVO responseVO, StockNameVO stockNameVO) throws JsonProcessingException {
+        Map<String, Object> dataMap = (Map) responseVO.getData().get(stockNameVO.getStockId().toLowerCase());
+        Object dayListObj = dataMap.get("week");
+        if (Objects.isNull(dayListObj)) {
+            dayListObj = dataMap.get("qfqweek");
+        }
+        List<ArrayList<String>> dayList = objectMapper.readValue(objectMapper.writeValueAsString(dayListObj), List.class);
+        if (dayList.isEmpty()) {
+            logger.error("==============ERROR ===== Input Stock Name must be wrong: " + stockNameVO.getStockId());
+            logger.error("==============ERROR ====Response is =====" + responseVO);
+            return null;
+        }
+        return dayList;
+    }
+
+    private List<ArrayList<String>> storeHistoryDailyPrice(QueryFromTencentResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
         List<ArrayList<String>> dayList = getDayPriceList(dailyQueryResponse, stockNameVO);
 
         //use hashmap to judge if the day is stored or not
@@ -327,20 +405,19 @@ public class KLineMarketClosedService {
         return dayList;
     }
 
-    private static List<ArrayList<String>> getDayPriceList(DailyQueryResponseVO dailyQueryResponse, StockNameVO stockNameVO) throws JsonProcessingException {
-        Map<String, Object> dataMap = (Map) dailyQueryResponse.getData().get(stockNameVO.getStockId().toLowerCase());
+    private static List<ArrayList<String>> getDayPriceList(QueryFromTencentResponseVO responseVO, StockNameVO stockNameVO) throws JsonProcessingException {
+        Map<String, Object> dataMap = (Map) responseVO.getData().get(stockNameVO.getStockId().toLowerCase());
         Object dayListObj = dataMap.get("day");
         if (Objects.isNull(dayListObj)) {
             dayListObj = dataMap.get("qfqday");
         }
         List<ArrayList<String>> dayList = objectMapper.readValue(objectMapper.writeValueAsString(dayListObj), List.class);
-        if (dayList.size() == 0) {
+        if (dayList.isEmpty()) {
             logger.error("==============ERROR ===== Input Stock Name must be wrong: " + stockNameVO.getStockId());
-            logger.error("==============ERROR ====try this url ==https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=" + stockNameVO.getStockId() + ",day,,,10,qfq");
+            logger.error("==============ERROR ====Response is =====" + responseVO);
             return null;
         }
         extractStockName(stockNameVO, dataMap);
-        daysPriceMap.put(stockNameVO.getStockId(), dayList);
         return dayList;
     }
 
@@ -379,7 +456,7 @@ public class KLineMarketClosedService {
     private static SimpleDateFormat formatter_yyyy_mm_day = new SimpleDateFormat("YYYY-MM-dd");
 
     public Object multiK(String stockId) {
-        logger.debug("enter stockJsonData stockId=============" + stockId);
+        logger.debug("enter multiK stockId=============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
@@ -436,7 +513,7 @@ public class KLineMarketClosedService {
 
 
     public Object listEtfs() throws JsonProcessingException {
-        logger.debug("enter listEtfs ====");
+        logger.info("enter listEtfs ====");
         List<StockNameVO> resultList = stockDao.findAll();
         StringBuilder ret = new StringBuilder("");
         for (StockNameVO stockVo : resultList) {
@@ -607,6 +684,26 @@ public class KLineMarketClosedService {
 
     public Object addNewStock(String stockId) {
         return null;
+    }
+
+    public Object stockWeeklyJsonData(String stockId) {
+        logger.info("enter stockWeeklyJsonData stockId=============" + stockId);
+        if (stockId.contains("_")) {
+            stockId = stockId.split("_")[0];
+        }
+        List<WeekPriceVO> resultList = weeklyPriceDao.findAllByStockId(stockId);
+        ArrayList<String[]> result = new ArrayList<>();
+        for (WeekPriceVO weekPriceVO : resultList) {
+            String[] strings = new String[7];
+            strings[0] = formatter.format(weekPriceVO.getDay());
+            strings[1] = weekPriceVO.getOpeningPrice().toString();
+            strings[2] = weekPriceVO.getClosingPrice().toString();
+            strings[3] = weekPriceVO.getWeekHigh().toString();
+            strings[4] = weekPriceVO.getWeekLow().toString();
+
+            result.add(strings);
+        }
+        return result;
     }
 }
 

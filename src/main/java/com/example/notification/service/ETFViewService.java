@@ -257,6 +257,7 @@ public class ETFViewService {
                 .append(stockVo.getStockName().replace("ETF", "E"))
                 .append(belongStockNum)
                 .append("</span></td>");
+        html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("week_" + stockVo.getStockId()).append("\"></div></td>");
         html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("span_" + stockVo.getStockId()).append("\"></div></td>");
         html.append("<td> <div class=\"multiLine-container\" style=\"background-color:#FFFFFF\" id=\"").append("multi_" + stockVo.getStockId()).append("\"> </div></td>");
 //        html.append("<td> <div class=\"stock-container\" style=\"background-color:#FFFFFF\" id=\"").append("list_" + stockVo.getStockId()).append("\"> " +

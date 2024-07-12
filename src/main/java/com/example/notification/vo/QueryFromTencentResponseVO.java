@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DailyQueryResponseVO {
+public class QueryFromTencentResponseVO {
 
     private int code;
 

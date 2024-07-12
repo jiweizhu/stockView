@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
+    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
     <link href="https://www.jeasyui.com/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="https://www.jeasyui.com/easyui/themes/icon.css" rel="stylesheet" type="text/css">
     <link href="themes/demo.css" rel="stylesheet" type="text/css">
@@ -13,7 +14,6 @@
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
     <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
-    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
     <style>
         * {
           margin: 0;
@@ -30,11 +30,11 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
-<!--        .multiLine-container {-->
-<!--            width: 750px;-->
-<!--            height: 320px;-->
-<!--            margin-bottom: 2px;-->
-<!--        }-->
+        .multiLine-container {
+            width: 550px;
+            height: 320px;
+            margin-bottom: 2px;
+        }
 
         .vertical-stockId {
             writing-mode: vertical-rl;
@@ -65,7 +65,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch('http://localhost:8888/etfs/3')
+          fetch('http://124.71.19.6:8888/etfs/4')
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');
@@ -78,7 +78,7 @@
 
 
     function loadIndexTableData() {
-      fetch('http://localhost:8888/etfs/main')
+      fetch('http://124.71.19.6:8888/etfs/main')
          .then(response => response.text())
          .then(data => {
             const dataContainer = document.getElementById('mainTable');
@@ -104,10 +104,10 @@
        createETFChart(span);
     });
 
-    <!--this is for highchart 拆线图-->
-    <!--initializeIntraCharts();-->
-
-
+    const weeks = document.querySelectorAll('div[id^="week_"]');
+            weeks.forEach(span => {
+               createWeekChart(span);
+        });
     }
 
 
@@ -118,7 +118,7 @@
       useDirtyRect: false
     });
 
-    const rawData = await fetch('http://localhost:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
+    const rawData = await fetch('http://124.71.19.6:8888/stock/'+span.id.replace('span_', '')).then(response => response.json());
 
     function calculateMA(dayCount, data) {
       var result = [];
@@ -269,7 +269,7 @@
         // 获取每个 name 的数据
         const promises = names.map(name => new Promise(resolve => {
             (async () => {
-                const data = await fetch(`http://localhost:8888/multiK/${name}`)
+                const data = await fetch(`http://124.71.19.6:8888/multiK/${name}`)
                     .then(response => response.json());
                 resolve({ name, data });
             })();
@@ -281,7 +281,7 @@
     }
 
     async function fetchData(spanId) {
-        const response = await fetch(`http://localhost:8888/etf/belongStocks/${spanId.replace('multi_', '')}`);
+        const response = await fetch(`http://124.71.19.6:8888/etf/belongStocks/${spanId.replace('multi_', '')}`);
         const data = await response.json();
         return data;
     }
@@ -293,11 +293,6 @@
             updateChart(names, span.id);
         }
     }
-
-    // 初始化图表
-    initializeMultiCharts();
-
-
 
 </script>
 
@@ -364,6 +359,128 @@
     }
 
 
+</script>
+<script>
+    async function createWeekChart(span) {
+
+        var myChart = echarts.init(span, null, {
+          renderer: 'canvas',
+          useDirtyRect: false
+        });
+
+        const rawData = await fetch('http://124.71.19.6:8888/stock/weekly/'+span.id.replace('week_', '')).then(response => response.json());
+
+        function calculateMA(dayCount, data) {
+          var result = [];
+          for (var i = 0, len = data.length; i < len; i++) {
+            if (i < dayCount) {
+              result.push('-');
+              continue;
+            }
+            var sum = 0;
+            for (var j = 0; j < dayCount; j++) {
+              sum += +data[i - j][1];
+            }
+            result.push(sum / dayCount);
+          }
+          return result;
+        }
+        const dates = rawData.map(item => item[0]);
+        const data =rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+        option = {
+          legend: {
+            data: ['日K', 'MA5', 'MA10'],
+            inactiveColor: '#777'
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              animation: false,
+              type: 'cross',
+              lineStyle: {
+                color: '#376df4',
+                width: 2,
+                opacity: 1
+              }
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: dates,
+            axisLine: { lineStyle: { color: '#8392A5' } }
+          },
+          yAxis: {
+            scale: true,
+            axisLine: { lineStyle: { color: '#8392A5' } },
+            splitLine: { show: false }
+          },
+          grid: {
+            bottom: 80
+          },
+          dataZoom: [
+            {
+              textStyle: {
+                color: '#8392A5'
+              },
+              handleIcon:
+                'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+              dataBackground: {
+                areaStyle: {
+                  color: '#8392A5'
+                },
+                lineStyle: {
+                  opacity: 0.8,
+                  color: '#8392A5'
+                }
+              },
+              brushSelect: true
+            },
+            {
+              type: 'inside'
+            }
+          ],
+          series: [
+            {
+              type: 'candlestick',
+              name: 'Day',
+              data: data,
+              itemStyle: {
+                color: '#FD1050',
+                color0: '#0CF49B',
+                borderColor: '#FD1050',
+                borderColor0: '#0CF49B'
+              }
+            },
+            {
+              name: 'MA5',
+              type: 'line',
+              data: calculateMA(5, data),
+              smooth: true,
+              showSymbol: false,
+              lineStyle: {
+                width: 1
+              }
+            },
+            {
+              name: 'MA10',
+              type: 'line',
+              data: calculateMA(10, data),
+              smooth: true,
+              showSymbol: false,
+              lineStyle: {
+                width: 1
+              }
+            }
+          ]
+        };
+
+            if (option && typeof option === 'object') {
+              myChart.setOption(option);
+            }
+
+            window.addEventListener('resize',() => myChart.resize());
+
+        }
 </script>
 </body>
 </html>
