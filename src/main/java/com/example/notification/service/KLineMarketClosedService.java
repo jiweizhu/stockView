@@ -123,13 +123,12 @@ public class KLineMarketClosedService {
     }
 
     public List<StockNameVO> getAllEtfs() {
-        if (CollectionUtils.isEmpty(storedETFs)) {
-            List<StockNameVO> stockDaoAll = stockDao.findAll();
-            for (StockNameVO id_name : stockDaoAll) {
-                if (!id_name.getStockId().toLowerCase().startsWith("s")) continue;
-                if (id_name.getStockName().toLowerCase().contains("etf")) {
-                    storedETFs.add(id_name);
-                }
+        storedETFs.clear();
+        List<StockNameVO> stockDaoAll = stockDao.findAll();
+        for (StockNameVO id_name : stockDaoAll) {
+            if (!id_name.getStockId().toLowerCase().startsWith("s")) continue;
+            if (id_name.getStockName().toLowerCase().contains("etf")) {
+                storedETFs.add(id_name);
             }
         }
         return storedETFs;
@@ -645,8 +644,6 @@ public class KLineMarketClosedService {
     }
 
     public Object etfsCurveView() {
-        etfViewLine.clear();
-        readETFFile();
         StringBuilder sb = new StringBuilder();
         List<StockNameVO> etfs = getAllEtfs();
         ArrayList<String> mainKlineIds = getMainKlineIds();
@@ -656,8 +653,9 @@ public class KLineMarketClosedService {
                 continue;
             }
             String[] stockIdSplit = stockIds.split(",");
-            StringBuilder stockAppend =  new StringBuilder();
-            StringBuilder divStockIds =  new StringBuilder();
+            StringBuilder htmlAppend = new StringBuilder();
+            StringBuilder divStockIds = new StringBuilder();
+            divStockIds.append(etfVo.getStockId()).append(",");
             for (int index = 0; index < stockIdSplit.length; index++) {
                 String str = stockIdSplit[index];
                 str = str + "_" + holdingService.getStockIdOrNameByMap(str);
@@ -665,13 +663,13 @@ public class KLineMarketClosedService {
                     continue;
                 }
                 divStockIds.append(str).append(",");
-                stockAppend.append("<td class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</td>");
+                htmlAppend.append("<td class=\"cell\" onclick=\"changeColor(this)\">").append(str).append("</td>");
             }
             sb.append("<tr>");
-            sb.append("<td class=\"cell\" onclick=\"showEtf(this)\" stockIds=\"").append(divStockIds).append("\">");
+            sb.append("<td class=\"cell\" style=\"background-color: lightGreen;\" onclick=\"showEtf(this)\" stockIds=\"").append(divStockIds).append("\">");
             sb.append(etfVo.getStockId()).append("_").append(etfVo.getStockName());
             sb.append("</td>");
-            sb.append(stockAppend);
+            sb.append(htmlAppend);
             sb.append("</tr>");
             sb.append("</br>");
         }
