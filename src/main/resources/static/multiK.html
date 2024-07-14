@@ -6,7 +6,7 @@
 <style>
 .cell {
     display: inline-block;
-    width: 200px;
+    width: 150px;
     height: 28px;
     line-height: 30px;
     text-align: center;
@@ -146,10 +146,10 @@ function showEtf(clickedElement) {
 
     var currentColor = cell.style.backgroundColor;
 
-    if (currentColor === 'yellow') {
-        cell.style.backgroundColor = 'transparent';
+    if (currentColor === 'yellow' || currentColor === 'lightblue') {
+        cell.style.backgroundColor = 'lightgreen';
     } else {
-        cell.style.backgroundColor = 'yellow';
+        cell.style.backgroundColor = 'lightblue';
     }
     const stockIds = clickedElement.attributes.stockids.value.split(',');
     for (const id of stockIds) {
@@ -163,8 +163,6 @@ function showEtf(clickedElement) {
     console.log('Data for chart:', names);
     updateChart();
 }
-
-
 
 fetchData();
 </script>

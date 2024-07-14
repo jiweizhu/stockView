@@ -685,7 +685,7 @@ public class KLineMarketClosedService {
         String dayStr = formatter_yyyy_mm_day.format((new Date(System.currentTimeMillis())));
         entityManager.createNativeQuery("delete from daily_price where day = '" + dayStr + "'").executeUpdate();
 
-        entityManager.createNativeQuery("delete from daily_price " + "where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
+        entityManager.createNativeQuery("delete from daily_price where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
 
         entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null ;").executeUpdate();
 

@@ -90,8 +90,9 @@ function numSorter(a,b){
                 limitToList: true,
                 hasDownArrow: true,
                 prompt: 'Select stock...'
-            }}" field="stockIds" data-options="sortable:true,sorter:strSorter" width="500">stocks
+            }}" field="stockIds" data-options="sortable:true,sorter:strSorter" width="300">stocks
         </th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="customerRange" width="280" >customerRange</th>
     </tr>
     </thead>
 </table>

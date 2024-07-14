@@ -6,6 +6,5 @@ import lombok.Data;
 public class ETFRequestVO {
     private String etfId;
     private String stockIds;
-
-
+    private String customerRange;
 }

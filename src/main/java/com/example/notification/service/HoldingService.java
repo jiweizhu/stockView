@@ -69,7 +69,7 @@ public class HoldingService {
     DateTimeFormatter FORMATTER_MMDD = DateTimeFormatter.ofPattern("MM-dd");
 
     public Object datagridList() {
-        logger.debug("enter HoldingService list ====");
+        logger.debug("enter HoldingService list ============");
         List<HoldingStockVO> resultList = holdingStockDao.findAll();
         List<HoldingStockViewRespVO> retList = new ArrayList<>();
         for (HoldingStockVO holdingStockVO : resultList) {
@@ -149,6 +149,7 @@ public class HoldingService {
             StockDailyVO lastPriceVo = lastTwoDayPriceByStockId.get(0);
             StockDailyVO yesterdayPriceVo = lastTwoDayPriceByStockId.get(1);
             BigDecimal gainPercentage = Utils.calculateDayGainPercentage(lastPriceVo.getClosingPrice(), yesterdayPriceVo.getClosingPrice());
+            respVO.setCustomerRange(stockVo.getCustomerRange());
             respVO.setDayGain(gainPercentage.toString());
             retList.add(respVO);
         }
@@ -160,7 +161,6 @@ public class HoldingService {
     public void save(HoldingStockVO stockVO) {
         stockVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
         holdingStockDao.save(stockVO);
-
     }
 
 
@@ -170,8 +170,6 @@ public class HoldingService {
         List<StockNameVO> resultList = stockDao.findAll();
         List<StockRespVO> retList = new ArrayList<>();
         for (StockNameVO stockVo : resultList) {
-//            if (holdingStockVOS.contains(stockVo.getStockId()) || stockVo.getStockName().toLowerCase().contains("etf"))
-//                continue;
             retList.add(new StockRespVO(stockVo.getStockId(), stockVo.getStockName()));
         }
         return retList;

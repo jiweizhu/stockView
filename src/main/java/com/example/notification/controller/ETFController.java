@@ -77,8 +77,6 @@ public class ETFController {
         return etfViewService.belongStockIds(etfId);
     }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
-
     @RequestMapping(value = {"/etf/getIntradayPrice/{etfId}"})
     @ResponseBody
     public ResponseEntity getIntradayPrice(@PathVariable String etfId) {

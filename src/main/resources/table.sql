@@ -32,6 +32,16 @@ price DECIMAL(10,3),
 PRIMARY KEY (stock_id, day, minute)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE range_gain(
+stock_id VARCHAR(12),
+start_day DATE,
+end_day DATE,
+market_days_num INT,
+gain_percent_five DECIMAL(10,3),
+gain_percent DECIMAL(10,3)
+
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE week_price (
 stock_id VARCHAR(12) NOT NULL,
 day DATE NOT NULL,
@@ -75,7 +85,12 @@ flip_end_day_ten DATE,
 last_updated_time time,
 
 stock_ids VARCHAR(200),
-belong_etf VARCHAR(12)
+belong_etf VARCHAR(12),
+
+customer_range VARCHAR(50), -- 20240601_20240615_20240620
+customer_range_gain_pre DECIMAL(10,2),
+customer_range_gain_post DECIMAL(10,2)
+
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

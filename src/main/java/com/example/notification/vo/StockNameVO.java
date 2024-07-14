@@ -68,6 +68,15 @@ public class StockNameVO {
     @Column(name = "last_updated_time")
     private Timestamp lastUpdatedTime;
 
+    @Column(name = "customer_range")
+    private String customerRange;
+
+    @Column(name = "customer_range_gain_pre", columnDefinition = "DECIMAL(10,2)")
+    private BigDecimal customerRangeGainPre;
+
+    @Column(name = "customer_range_gain_post", columnDefinition = "DECIMAL(10,2)")
+    private BigDecimal customerRangeGainPost;
+
     static Map<String, String[]> sortArrayMap = new HashMap<>();
 
     public StockNameVO() {
