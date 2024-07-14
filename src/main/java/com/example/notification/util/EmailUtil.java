@@ -21,7 +21,7 @@ public class EmailUtil {
 
     final static String from = "kiwi66@qq.com";
     final static String username = "kiwi66@qq.com";
-    final static String password = "sczomovkggdlcbcd";
+    final static String password = "";
     final static String host = "smtp.qq.com";
     final static String port = "465";
     final static String to = "370610613@qq.com";
