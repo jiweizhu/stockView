@@ -245,9 +245,10 @@ public class ETFViewService {
         String eftStockGainFiveList = getEftStockGainList(stockVo, flipDayFive, flipEndDayFive);
         String eftStockGainTenList = getEftStockGainList(stockVo, flipDayTen, flipEndDayTen);
 
-        html.append(String.format("%02d", stockVo.getUpwardDaysFive())).append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>")
+        html.append("5Day|").append(String.format("%02d", stockVo.getUpwardDaysFive())).append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>")
             .append(stockVo.getGainPercentFive()).append("%").append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>")
             .append("-----------------<br/>")
+            .append("10Day|")
             .append(String.format("%02d", upwardDaysTen))
 //                    .append("|").append(formatter.format(stockVo.getFlipDayTen()))
             .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>").append(stockVo.getGainPercentTen()).append("%")
