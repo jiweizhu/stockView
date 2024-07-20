@@ -57,7 +57,7 @@
             font-size: 20px;
         }
         th, td {
-          text-align: center;
+          text-align: left;
           padding: 10px;
         }
     </style>
@@ -67,6 +67,7 @@
 <button id="generateChart">generateChart</button>
 <table border="1" id="mainTable">
 </table>
+<a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
 <table border="1" id="myTable"></table>
 <script>
 
@@ -98,14 +99,18 @@
          })
     }
 
-    loadTableData();
-    loadIndexTableData();
-    setTimeout(function() {
-        getDivs();
-        initializeMultiCharts();
-    }, 2000);
-    });
+ loadTableData();
+ loadIndexTableData();
+ setTimeout(function() {
+     getDivs();
+     initializeMultiCharts();
+     $('.hide-column').hide();
+ }, 1000);
+ });
 
+function toggleColumn() {
+  $('.hide-column').toggle();
+}
 
     async function getDivs() {
        const spans = document.querySelectorAll('div[id^="span_"]');

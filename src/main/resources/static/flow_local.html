@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Basic DataGrid - jQuery EasyUI Demo</title>
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="themes/icon.css">
+    <link rel="stylesheet" type="text/css" href="../demo.css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+</head>
+<body>
+<h2>Add and Remove Layout</h2>
+<p>Click the buttons below to add or remove region panel of layout.</p>
+<div style="margin:20px 0;">
+    <span>Select Region Panel:</span>
+    <select id="region">
+        <option value="north">North</option>
+        <option value="south">South</option>
+        <option value="east">East</option>
+        <option value="west">West</option>
+    </select>
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="addPanel()">Add</a>
+    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="removePanel()">Remove</a>
+</div>
+<div id="cc" class="easyui-layout" style="width:2000px;height:1350px;">
+    <div data-options="region:'north'" style="height:50px"></div>
+    <div data-options="region:'south',split:true" style="height:50px;"></div>
+    <div data-options="region:'east',split:true" title="East" style="width:100px;"></div>
+    <div data-options="region:'west',split:true" title="West" style="width:630px;">
+        <table class="easyui-datagrid" title="5日向上" style="width:630px;height:1000px"
+               data-options="singleSelect:true,collapsible:true,url:'http://124.71.19.6:8888/etfs/five/noflip',method:'get'">
+            <thead>
+            <tr>
+                <th data-options="field:'stockId',width:70">stockId</th>
+                <th data-options="field:'stockName',width:120">stock Name</th>
+                <th data-options="field:'upwardDaysFive',width:100,align:'center'">5日向上天数</th>
+                <th data-options="field:'gainPercentFive',width:100,align:'center'">5日向上百分比</th>
+                <th data-options="field:'flipUpwardDaysFive',width:100,align:'center'">5日调整天数</th>
+                <th data-options="field:'flipGainPercentFive',width:100,align:'center'">5日调整百分比</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <div data-options="region:'center',title:'Center'" style="width:630px;">
+        <table class="easyui-datagrid" title="10日向上" style="width:600px;height:1000px"
+               data-options="singleSelect:true,collapsible:true,url:'http://124.71.19.6:8888/etfs/ten',method:'get'">
+            <thead>
+            <tr>
+                <th data-options="field:'stockId',width:70">stockId</th>
+                <th data-options="field:'stockName',width:130">stock Name</th>
+                <th data-options="field:'upwardDaysTen',width:100,align:'center'">10日向上天数</th>
+                <th data-options="field:'gainPercentTen',width:100,align:'center'">10日向上百分比</th>
+                <th data-options="field:'flipUpwardDaysTen',width:100,align:'center'">10日调整天数</th>
+                <th data-options="field:'flipGainPercentTen',width:100,align:'center'">10日调整百分比</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<script type="text/javascript">
+    function addPanel(){
+        var region = $('#region').val();
+        var options = {
+            region: region
+        };
+        if (region=='north' || region=='south'){
+            options.height = 50;
+        } else {
+            options.width = 100;
+            options.split = true;
+            options.title = $('#region option:selected').text();
+        }
+        $('#cc').layout('add', options);
+    }
+    function removePanel(){
+        $('#cc').layout('remove', $('#region').val());
+    }
+
+</script>
+
+<script>
+    const colors = {}; // 存储字符串对应的颜色
+
+    // 生成随机颜色
+    function generateRandomColor() {
+        return '#' + Math.floor(Math.random()*16777215).toString(16);
+    }
+
+    // 为字符串分配颜色
+    function assignColorToString(string) {
+        if (!colors[string]) {
+            colors[string] = generateRandomColor();
+        }
+        return colors[string];
+    }
+
+    // 获取所有的可着色元素
+    const elements = document.querySelectorAll('.datagrid-row');
+
+    // 为每个元素分配颜色
+    elements.forEach(element => {
+        const string = element.textContent.trim(); // 获取元素文本内容
+        const color = assignColorToString(string); // 分配颜色
+        element.style.backgroundColor = color; // 设置背景颜色
+    });
+</script>
+
+</body>
+
+</html>

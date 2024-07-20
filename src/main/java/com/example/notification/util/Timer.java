@@ -71,6 +71,10 @@ public class Timer {
             kLineMarketClosedService.delete_HistoryData();
             etfViewService.generateReportEveryDay();
 
+            Object body = kLineMarketClosedService.delete_HistoryData();
+            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
+            etfViewService.generateReportEveryDay();
+
             //2 delete intraday_price data before one week
             String oneWeekAgeDay = Utils.getOneWeekAgeDay();
             intraDayService.removeOneWeekAgoData(oneWeekAgeDay);

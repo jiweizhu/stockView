@@ -103,6 +103,15 @@ public class Controller {
         return ResponseEntity.ofNullable(body);
     }
 
+    @RequestMapping(value = {"/etfs/flow"})
+    @ResponseBody
+    public ResponseEntity findAllEtfFlow() {
+        logger.info("Enter method findAllEtfFlow====");
+        Object body = "";
+        body = etfViewService.findAllEtfFlowView();
+        return ResponseEntity.ofNullable(body);
+    }
+
 
     @RequestMapping(value = {"/etfs/table1"})
     @ResponseBody

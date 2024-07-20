@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <!-- 引入jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+<!-- 引入EasyUI的CSS文件 -->
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+ 
+<!-- 引入EasyUI的JS文件 -->
+<script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+</head>
+<body>
+    <table id="dg" class="easyui-datagrid" style="width:800px;height:400px">
+    </table>
+    <button onclick="addColumn()">添加列</button>
+
+    <script type="text/javascript">
+        $(function(){
+            $('#dg').datagrid({
+                 columns:[[
+                    {field:'stock',title:'stock',width:100},
+                    {field:'0507_0613',title:'0507_0613',width:100},
+                    {field:'0613_0714',title:'0613_0714',width:100,align:'right'}
+                     ]],
+                data: [
+                    { stock: '天宇通信', '0507_0613': '6.03%', '0613_0714': '-13.20%' },
+                    { stock: '传音控股', '0507_0613': '-7.12%', '0613_0714': '-13.01%' },
+                    // ... (添加其他初始数据)
+                    { stock: '新易盛', '0507_0613': '18.66%', '0613_0714': '14.89%' }
+                ]
+            });
+        });
+
+        function addColumn() {
+            var columns = $('#dg').datagrid('options').columns[0];
+            var newField = prompt("Input date range: like: '0714-0815': ");
+
+            if (newField) {
+                // 添加新列
+                columns.push({ field: newField, title: newField, width: 100 });
+                $('#dg').datagrid({ columns: [columns] });
+
+                // 模拟发送 AJAX 请求到后台
+                $.ajax({
+                    url: 'your-backend-url', // 替换为你的后台URL
+                    method: 'POST',
+                    data: { dateRange: newField },
+                    success: function(response) {
+                        // 假设后台返回的数据结构为 { stock: '天宇通信', newField: '新值' }
+                        var rows = $('#dg').datagrid('getRows');
+                        for (var i = 0; i < rows.length; i++) {
+                            rows[i][newField] = response[i][newField];
+                        }
+                        $('#dg').datagrid('loadData', rows);
+                    },
+                    error: function(error) {
+                        console.error('请求失败', error);
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

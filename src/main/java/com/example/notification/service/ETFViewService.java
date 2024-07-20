@@ -216,90 +216,116 @@ public class ETFViewService {
         if (upwardDaysFive > 1 && upwardDaysTen >= 0) {
 //            html.append("<td style=\"background-color: #00FFB0;\">");
             html.append("<td>");
-        } else if (upwardDaysFive < 0) {
+        } else if (upwardDaysFive < 0 || upwardDaysTen < 0) {
             html.append("<td style=\"background-color: #DEB887;\">");
         } else {
             html.append("<td>");
         }
         Timestamp lastUpdatedTime = stockVo.getLastUpdatedTime();
-        Date flipDayFive = stockVo.getFlipDayFive();
-        Date flipEndDayFive = stockVo.getFlipEndDayFive();
 
-        Date flipDayTen = stockVo.getFlipDayTen();
-        Date flipEndDayTen = stockVo.getFlipEndDayTen();
+        Date customized_date_1 = stockVo.getFlipEndDayTen();
+        Date customized_date_2 = stockVo.getFlipDayTen();
+        Date customized_date_3 = null;
         String customerRange = stockVo.getCustomerRange();
         if (StringUtils.hasLength(customerRange)) {
-            String[] split = customerRange.split(",");
-            LocalDate flipEnd = LocalDate.parse(split[0], yyyyMMdd_Formatter);
-            LocalDate flipStart = LocalDate.parse(split[1], yyyyMMdd_Formatter);
-            flipEndDayTen = Date.valueOf(flipEnd);
-            flipDayTen = Date.valueOf(flipStart);
+            String[] ranges = customerRange.split(";");
+            for (String range : ranges) {
+                String[] split = range.split(",");
+                LocalDate customized_1 = LocalDate.parse(split[0], yyyyMMdd_Formatter);
+                LocalDate customized_2 = LocalDate.parse(split[1], yyyyMMdd_Formatter);
+                customized_date_1 = Date.valueOf(customized_1);
+                customized_date_2 = Date.valueOf(customized_2);
+                if (split.length == 3 && StringUtils.hasLength(split[2])) {
+                    LocalDate customized_3 = LocalDate.parse(split[2], yyyyMMdd_Formatter);
+                    customized_date_3 = Date.valueOf(customized_3);
+                }
+            }
         }
 
         String updatedDay = lastUpdatedTime == null ? "null" : MMdd_Formatter.format(lastUpdatedTime);
-        String flipDayFiveDay = flipDayFive == null ? "null" : MMdd_Formatter.format(flipDayFive);
-        String flipEndDayFiveDay = flipEndDayFive == null ? "null" : MMdd_Formatter.format(flipEndDayFive);
-        String flipDayTenDay = flipDayTen == null ? "null" : MMdd_Formatter.format(flipDayTen);
-        String flipEndDayTenDay = flipEndDayTen == null ? "null" : MMdd_Formatter.format(flipEndDayTen);
+        String cust_day_3 = customized_date_3 == null ? "null" : MMdd_Formatter.format(customized_date_3);
+        String cust_day_2 = customized_date_2 == null ? "null" : MMdd_Formatter.format(customized_date_2);
+        String cust_day_1 = customized_date_1 == null ? "null" : MMdd_Formatter.format(customized_date_1);
 
-        String eftStockGainFiveList = getEftStockGainList(stockVo, flipDayFive, flipEndDayFive);
-        String eftStockGainTenList = getEftStockGainList(stockVo, flipDayTen, flipEndDayTen);
+//        String eftStockGainFiveList = getEftStockGainList(stockVo, flipDayFive, flipEndDayFive);
+        String eftStockGainTenList = getEftStockGainList(stockVo, customized_date_1, customized_date_2, customized_date_3);
 
-        html.append("5Day|").append(String.format("%02d", stockVo.getUpwardDaysFive())).append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>")
-            .append(stockVo.getGainPercentFive()).append("%").append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>")
-            .append("-----------------<br/>")
-            .append("10Day|")
-            .append(String.format("%02d", upwardDaysTen))
+        html.append(String.format("%-6s", stockVo.getUpwardDaysFive())).append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysFive())).append("</br>")
+                .append(stockVo.getGainPercentFive()).append("%").append("|").append(stockVo.getFlipGainPercentFive()).append("%").append("</br>")
+                .append("-----------------<br/>")
+
+                .append(String.format("%02d", upwardDaysTen))
 //                    .append("|").append(formatter.format(stockVo.getFlipDayTen()))
-            .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>").append(stockVo.getGainPercentTen()).append("%")
+                .append("|").append(String.format("%02d", stockVo.getFlipUpwardDaysTen())).append("</br>")
+                .append(stockVo.getGainPercentTen()).append("%")
 //                    .append("|").append(formatter.format(stockVo.getFlipEndDayTen()))
-            .append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("</br>")
-            .append("</td>");
-
-
-        if (upwardDaysTen < 0) {
-            html.append("<td style=\"background-color: #DEB887;\">");
-        } else {
-            html.append("<td>");
-        }
-        //customized day gain
-        html.append(flipEndDayTenDay).append("|").append(flipDayTenDay).append("|").append(updatedDay).append("</br>")
-                .append(eftStockGainTenList).append("</br>")
+                .append("|").append(stockVo.getFlipGainPercentTen()).append("%").append("</br>")
                 .append("</td>");
+
+
         String stockId = stockVo.getStockId();
         String stockIds = stockVo.getStockIds();
         int belongStockNum = (StringUtils.hasLength(stockIds)) ? stockIds.split(",").length : 0;
-        html.append("<td>").append(stockId).append("</br><span class=\"vertical-stockName\" >")
-                .append(stockVo.getStockName().replace("ETF", "#"))
-                .append(belongStockNum)
-                .append("</span></td>");
-        html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("week_").append(stockId).append("\"></div></td>");
-        html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("span_").append(stockId).append("\"></div></td>");
+//        html.append("<td>").append(stockId).append("</br><span class=\"vertical-stockName\" >")
+//                .append(stockVo.getStockName().replace("ETF", "#"))
+//                .append(belongStockNum)
+//                .append("</span></td>");
+        html.append("<td class=\"hide-column\"><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"").append("week_").append(stockId).append("\"></div></td>");
+//        if (upwardDaysTen < 0) {
+//            html.append("<td style=\"background-color: #DEB887;\">");
+//        } else {
+//            html.append("<td>");
+//        }
+        //customized day gain
+        html.append("<td><div class=\"chart-container\" style=\"background-color:#FFFFFF\" id=\"")
+                .append("span_").append(stockId).append("\"></div></td>");
+        html.append("<td>");
+        html.append("<b style=\"font-size:15px\">").append(stockVo.getStockName().replace("ETF", "#")).append("</b>")
+                .append(belongStockNum).append("</br>")
+                .append(stockId)
+                .append("</br>");
+        if (StringUtils.hasLength(customerRange)) {
+            html.append("<b>#########</b><br/>");
+        } else {
+            html.append("<b>---------</b><br/>");
+        }
+        if(!"null".equals(cust_day_3)){
+            updatedDay = cust_day_3;
+        }
+        html.append(cust_day_1).append("|").append(cust_day_2).append("|").append(updatedDay).append("</br>")
+                .append(eftStockGainTenList).append("</br>")
+                .append("</td>");
         html.append("<td><div class=\"multiLine-container\" style=\"background-color:#FFFFFF\" id=\"").append("multi_").append(stockId).append("\"></div></td>");
         html.append("</tr>\n");
     }
 
-    private String getEftStockGainList(StockNameVO stockVo, Date flipDay, Date flipEndDayDay) {
+    private String getEftStockGainList(StockNameVO stockVo, Date customized_date_1, Date customized_date_2, Date customized_date_3) {
         String stockIds = stockVo.getStockIds();
         StringBuilder htmlStr = new StringBuilder();
         htmlStr.append("-----------------<br/>");
         if (!StringUtils.hasLength(stockIds)) {
             return htmlStr.toString();
         }
-        String[] split = stockIds.split(",");
+        List<String> idList = new ArrayList<>(Arrays.stream(stockIds.split(",")).toList());
+        idList.add(stockVo.getStockId());
         List<StockNameVO> list = new ArrayList<>();
-        for (String stockId : split) {
+        for (String stockId : idList) {
             String stockIdOrNameByMap = holdingService.getStockIdOrNameByMap(stockId);
             if (!StringUtils.hasLength(stockId) || !StringUtils.hasLength(stockIdOrNameByMap)) {
                 continue;
             }
             StockDailyVO tempDailyVo = new StockDailyVO();
             tempDailyVo.setClosingPrice(new BigDecimal(0));
-            StockDailyVO flipEndVo = stockDailyDao.findDayPriceByStockIdAndDay(stockId, flipEndDayDay);
+            StockDailyVO flipEndVo = stockDailyDao.findDayPriceByStockIdAndDay(stockId, customized_date_1);
             flipEndVo = flipEndVo == null ? tempDailyVo : flipEndVo;
-            StockDailyVO flipVo = stockDailyDao.findDayPriceByStockIdAndDay(stockId, flipDay);
+            StockDailyVO flipVo = stockDailyDao.findDayPriceByStockIdAndDay(stockId, customized_date_2);
             flipVo = flipVo == null ? tempDailyVo : flipVo;
-            StockDailyVO todayVo = stockDailyDao.findLastOneDayPriceByStockId(stockId);
+            StockDailyVO todayVo = null;
+            if (customized_date_3 == null) {
+                todayVo = stockDailyDao.findLastOneDayPriceByStockId(stockId);
+            } else {
+                todayVo = stockDailyDao.findDayPriceByStockIdAndDay(stockId, customized_date_3);
+            }
             todayVo = todayVo == null ? tempDailyVo : todayVo;
 
             BigDecimal todayClosePrice = todayVo.getClosingPrice();
@@ -313,10 +339,22 @@ public class ETFViewService {
             stockNameVO.setFlipGainPercentFive(flipEndGainPercent);
             list.add(stockNameVO);
         }
-        List<StockNameVO> collect = list.stream().sorted(Comparator.comparing(StockNameVO::getFlipGainPercentFive).reversed()).toList();
-        for (StockNameVO stockNameVO : collect) {
-            htmlStr.append(stockNameVO.getStockName()).append("|")
-                    .append(stockNameVO.getFlipGainPercentFive()).append("%|").append(stockNameVO.getGainPercentFive()).append("%</br>");
+        List<StockNameVO> descList = list.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentFive).reversed()).toList();
+        for (int i = 0; i < descList.size(); i++) {
+            descList.get(i).setStockId(descList.get(i).getGainPercentFive() + "%_" + i);
+        }
+        List<StockNameVO> resultCollect = descList.stream().sorted(Comparator.comparing(StockNameVO::getFlipGainPercentFive).reversed()).toList();
+        for (int i = 0; i < resultCollect.size(); i++) {
+            StockNameVO stockNameVO = resultCollect.get(i);
+            if (stockNameVO.getStockName().toLowerCase().contains("etf")) {
+                htmlStr.append("<b style=\"background-color: #DEB887;\">").append(stockNameVO.getStockName()).append(i).append("</b>|")
+                        .append(stockNameVO.getFlipGainPercentFive()).append("%").append("|")
+                        .append(stockNameVO.getStockId()).append("</br>");
+            } else {
+                htmlStr.append(stockNameVO.getStockName()).append(i).append("|")
+                        .append(stockNameVO.getFlipGainPercentFive()).append("%").append("|")
+                        .append(stockNameVO.getStockId()).append("</br>");
+            }
         }
         return htmlStr.toString();
     }
@@ -513,5 +551,10 @@ public class ETFViewService {
         if (lastestPriceById == null) return null;
         Set<IntradayPriceVO> minuteVOs = intraDayPriceDao.findMinutesByIdAndToday(etfId, lastestPriceById.getDay());
         return minuteVOs;
+    }
+
+    public Object findAllEtfFlowView() {
+
+        return null;
     }
 }
