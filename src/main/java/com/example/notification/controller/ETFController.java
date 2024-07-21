@@ -64,6 +64,24 @@ public class ETFController {
         });
     }
 
+    @RequestMapping(value = {"/etf/flow/{way}"})
+    @ResponseBody
+    public ResponseEntity findAllEtfFlow(@PathVariable String way) {
+        logger.info("Enter method findAllEtfFlow====" + way);
+        Object body = "";
+        body = etfViewService.findAllEtfFlowView(way);
+        return ResponseEntity.ofNullable(body);
+    }
+
+
+    @RequestMapping(value = {"/etf/flow/main/{way}"})
+    @ResponseBody
+    public ResponseEntity findMainEtfFlow(@PathVariable String way) {
+        logger.info("Enter method findMainEtfFlow====" + way);
+        Object body = "";
+        body = etfViewService.findMainEtfFlow(way);
+        return ResponseEntity.ofNullable(body);
+    }
 
     @RequestMapping(value = {"/etf/belongStocks/{etfId}"})
     @ResponseBody

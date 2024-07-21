@@ -50,7 +50,7 @@ public class Controller {
 
     @RequestMapping(value = {"/delete_HistoryData"})
     @ResponseBody
-    public ResponseEntity deleteHistoryData() throws JsonProcessingException {
+    public ResponseEntity deleteHistoryData() {
         Object body = kLineMarketClosedService.delete_HistoryData();
         return ResponseEntity.ofNullable(body);
     }
@@ -73,7 +73,7 @@ public class Controller {
 
     @RequestMapping(value = {"/stock/weekly/{stockId}"})
     @ResponseBody
-    public ResponseEntity stockWeeklyDataById(@PathVariable String stockId) throws JsonProcessingException, ParseException {
+    public ResponseEntity stockWeeklyDataById(@PathVariable String stockId)  {
         Object body = kLineMarketClosedService.stockWeeklyJsonData(stockId);
         return ResponseEntity.ofNullable(body);
     }
@@ -103,15 +103,6 @@ public class Controller {
         return ResponseEntity.ofNullable(body);
     }
 
-    @RequestMapping(value = {"/etfs/flow"})
-    @ResponseBody
-    public ResponseEntity findAllEtfFlow() {
-        logger.info("Enter method findAllEtfFlow====");
-        Object body = "";
-        body = etfViewService.findAllEtfFlowView();
-        return ResponseEntity.ofNullable(body);
-    }
-
 
     @RequestMapping(value = {"/etfs/table1"})
     @ResponseBody
@@ -123,7 +114,7 @@ public class Controller {
 
     @RequestMapping(value = {"/etfs/table2"})
     @ResponseBody
-    public ResponseEntity findAllEtfsForTable_2() throws JsonProcessingException {
+    public ResponseEntity findAllEtfsForTable_2() {
         logger.info("Enter method findAllEtfsForTable_2====");
         Object body = etfViewService.findAllEtfsForTable(2);
         return ResponseEntity.ofNullable(body);
@@ -132,14 +123,14 @@ public class Controller {
 
     @RequestMapping(value = {"/etfs/five/noflip"})
     @ResponseBody
-    public ResponseEntity fiveDayAdjusted() throws InterruptedException, JsonProcessingException {
+    public ResponseEntity fiveDayAdjusted() {
         Object body = etfViewService.fiveDayAdjustedView();
         return ResponseEntity.ofNullable(body);
     }
 
     @RequestMapping(value = {"/etfs/ten"})
     @ResponseBody
-    public ResponseEntity tenDayAdjusted() throws InterruptedException, JsonProcessingException {
+    public ResponseEntity tenDayAdjusted() {
         Object body = etfViewService.tenDayAdjustedView();
         return ResponseEntity.ofNullable(body);
     }
@@ -147,7 +138,7 @@ public class Controller {
 
     @RequestMapping(value = {"/import"})
     @ResponseBody
-    public String importETF() throws InterruptedException, JsonProcessingException {
+    public String importETF() throws JsonProcessingException {
         logger.info("Enter method importETF====");
         String result = kLineMarketClosedService.importStocks();
         return result;

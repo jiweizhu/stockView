@@ -15,6 +15,9 @@ public class Utils {
 
     public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static final String TODAYDATE = Utils.todayDate();
+    private static final String MAIN_INDICATOR =
+            "sh510760_上证综指ETF,sh510300_沪深300ETF,sh510500_中证500ETF,sh512100_中证1000ETF,sz159949_创业板50ETF,"
+          + "sh588080_科创板50ETF,sh510190_上证50ETF,sz159915_创业板ETF,sh512910_中证100ETF,sz399306_深证ETF,sz159901_深证100ETF";
 
     public static String getOneWeekAgeDay() {
         LocalDate today = LocalDate.now();

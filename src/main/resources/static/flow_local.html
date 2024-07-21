@@ -5,89 +5,151 @@
     <title>Basic DataGrid - jQuery EasyUI Demo</title>
     <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
     <link rel="stylesheet" type="text/css" href="themes/icon.css">
-    <link rel="stylesheet" type="text/css" href="../demo.css">
+    <link rel="stylesheet" type="text/css" href="themes/demo.css">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/jquery.easyui.min.js"></script>
+    <style>
+        body {
+          background-color: #FFFFCC;
+        }
+        .panel-body{
+         background-color: #FFFFCC;
+        }
+    </style>
 </head>
 <body>
-<h2>Add and Remove Layout</h2>
-<p>Click the buttons below to add or remove region panel of layout.</p>
-<div style="margin:20px 0;">
-    <span>Select Region Panel:</span>
-    <select id="region">
-        <option value="north">North</option>
-        <option value="south">South</option>
-        <option value="east">East</option>
-        <option value="west">West</option>
-    </select>
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="addPanel()">Add</a>
-    <a href="javascript:void(0)" class="easyui-linkbutton" onclick="removePanel()">Remove</a>
-</div>
-<div id="cc" class="easyui-layout" style="width:2000px;height:1350px;">
-    <div data-options="region:'north'" style="height:50px"></div>
+<div style="margin:20px 0;"></div>
+<div class="easyui-layout" style="width:2300px;height:500px;background-color: #FFFFCC;">
+    <div data-options="region:'north'" style="width:10px;height:10px">
+    </div>
     <div data-options="region:'south',split:true" style="height:50px;"></div>
-    <div data-options="region:'east',split:true" title="East" style="width:100px;"></div>
-    <div data-options="region:'west',split:true" title="West" style="width:630px;">
-        <table class="easyui-datagrid" title="5日向上" style="width:630px;height:1000px"
-               data-options="singleSelect:true,collapsible:true,url:'http://124.71.19.6:8888/etfs/five/noflip',method:'get'">
+    <div data-options="region:'east',split:true" title="East" style="width:100px;height:500px"></div>
+    <div data-options="region:'west',split:true" title="West" style="width:800px;">
+        <table id="dg-north-main" class="easyui-datagrid" title="Main ETFs FLOW DOWN DOWN DOWN" style="width:800px;height:500px"
+               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:'http://localhost:8888/etf/flow/main/down',method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'stockId',width:70">stockId</th>
-                <th data-options="field:'stockName',width:120">stock Name</th>
-                <th data-options="field:'upwardDaysFive',width:100,align:'center'">5日向上天数</th>
-                <th data-options="field:'gainPercentFive',width:100,align:'center'">5日向上百分比</th>
-                <th data-options="field:'flipUpwardDaysFive',width:100,align:'center'">5日调整天数</th>
-                <th data-options="field:'flipGainPercentFive',width:100,align:'center'">5日调整百分比</th>
+                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">1 DayDown</th>
+                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">2 DayDown</th>
+                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">3 DayDown</th>
+                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">4 DayDown</th>
+                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">5 DayDown</th>
             </tr>
             </thead>
         </table>
     </div>
-    <div data-options="region:'center',title:'Center'" style="width:630px;">
-        <table class="easyui-datagrid" title="10日向上" style="width:600px;height:1000px"
-               data-options="singleSelect:true,collapsible:true,url:'http://124.71.19.6:8888/etfs/ten',method:'get'">
+    <div data-options="region:'center',title:'Main Title',iconCls:'icon-ok'">
+        <table id="dg-center-main" class="easyui-datagrid" title="Main ETFs FLOW UP UP UP" style="width:1400px;height:500px"
+               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:'http://localhost:8888/etf/flow/main/up',method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'stockId',width:70">stockId</th>
-                <th data-options="field:'stockName',width:130">stock Name</th>
-                <th data-options="field:'upwardDaysTen',width:100,align:'center'">10日向上天数</th>
-                <th data-options="field:'gainPercentTen',width:100,align:'center'">10日向上百分比</th>
-                <th data-options="field:'flipUpwardDaysTen',width:100,align:'center'">10日调整天数</th>
-                <th data-options="field:'flipGainPercentTen',width:100,align:'center'">10日调整百分比</th>
+                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">1 DayUp</th>
+                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">2 DayUp</th>
+                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">3 DayUp</th>
+                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">4 DayUp</th>
+                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">5 DayUp</th>
+                <th data-options="field:'sixDayUp',width:130,sortable:true,sorter:customSorter">6 DayUp</th>
+                <th data-options="field:'sevenDayUp',width:130,sortable:true,sorter:customSorter">7 DayUp</th>
+                <th data-options="field:'eightDayUp',width:130,sortable:true,sorter:customSorter">8 DayUp</th>
             </tr>
             </thead>
         </table>
     </div>
 </div>
+
+
+<div style="margin:20px 0;"></div>
+<div class="easyui-layout" style="width:2300px;height:2000px;background-color: #FFFFCC;">
+    <div data-options="region:'north'" style="width:10px;height:10px">
+    </div>
+    <div data-options="region:'south',split:true" style="height:50px;"></div>
+    <div data-options="region:'east',split:true" title="East" style="width:100px;height:2000px"></div>
+    <div data-options="region:'west',split:true" title="West" style="width:800px;">
+        <table id="dg-east" class="easyui-datagrid" title="ETFs FLOW DOWN DOWN DOWN" style="width:800px;height:1700px"
+               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:'http://localhost:8888/etf/flow/down',method:'get'">
+            <thead>
+            <tr>
+                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">oneDayDown</th>
+                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">twoDayDown</th>
+                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">threeDayDown</th>
+                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">fourDayDown</th>
+                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">fiveDayDown</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <div data-options="region:'center',title:'Main Title',iconCls:'icon-ok'">
+        <table id="dg-center" class="easyui-datagrid" title="ETFs FLOW UP UP UP" style="width:1400px;height:1700px"
+               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:'http://localhost:8888/etf/flow/up',method:'get'">
+            <thead>
+            <tr>
+                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">oneDayUp</th>
+                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">twoDayUp</th>
+                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">threeDayUp</th>
+                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">fourDayUp</th>
+                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">fiveDayUp</th>
+                <th data-options="field:'sixDayUp',width:130,sortable:true,sorter:customSorter">sixDayUp</th>
+                <th data-options="field:'sevenDayUp',width:130,sortable:true,sorter:customSorter">sevenDayUp</th>
+                <th data-options="field:'eightDayUp',width:130,sortable:true,sorter:customSorter">eightDayUp</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
 <script type="text/javascript">
-    function addPanel(){
-        var region = $('#region').val();
-        var options = {
-            region: region
-        };
-        if (region=='north' || region=='south'){
-            options.height = 50;
-        } else {
-            options.width = 100;
-            options.split = true;
-            options.title = $('#region option:selected').text();
+function customSorter(a, b) {
+    // If a is null or empty and b is not, a should be placed after b
+    if (!a || a === '') return 1;
+    if (!b || b === '') return -1;
+
+    var aParts = a.split('|');
+    var bParts = b.split('|');
+
+    var aSecondColumn = parseInt(aParts[1], 10);
+    var bSecondColumn = parseInt(bParts[1], 10);
+
+    // Handle NaN values resulting from parseInt on invalid strings
+    if (isNaN(aSecondColumn)) aSecondColumn = Number.MAX_SAFE_INTEGER;
+    if (isNaN(bSecondColumn)) bSecondColumn = Number.MAX_SAFE_INTEGER;
+
+    if (aSecondColumn < bSecondColumn) {
+        return -1;
+    }
+    if (aSecondColumn > bSecondColumn) {
+        return 1;
+    }
+    return 0;
+}
+
+
+        function addPanel(){
+            var region = $('#region').val();
+            var options = {
+                region: region
+            };
+            if (region=='north' || region=='south'){
+                options.height = 50;
+            } else {
+                options.width = 100;
+                options.split = true;
+                options.title = $('#region option:selected').text();
+            }
+            $('#cc').layout('add', options);
         }
-        $('#cc').layout('add', options);
-    }
-    function removePanel(){
-        $('#cc').layout('remove', $('#region').val());
-    }
+        function removePanel(){
+            $('#cc').layout('remove', $('#region').val());
+        }
 
 </script>
 
 <script>
-    const colors = {}; // 存储字符串对应的颜色
+    const colors = {};
 
-    // 生成随机颜色
     function generateRandomColor() {
         return '#' + Math.floor(Math.random()*16777215).toString(16);
     }
 
-    // 为字符串分配颜色
     function assignColorToString(string) {
         if (!colors[string]) {
             colors[string] = generateRandomColor();
@@ -95,14 +157,12 @@
         return colors[string];
     }
 
-    // 获取所有的可着色元素
     const elements = document.querySelectorAll('.datagrid-row');
 
-    // 为每个元素分配颜色
     elements.forEach(element => {
-        const string = element.textContent.trim(); // 获取元素文本内容
-        const color = assignColorToString(string); // 分配颜色
-        element.style.backgroundColor = color; // 设置背景颜色
+        const string = element.textContent.trim();
+        const color = assignColorToString(string);
+        element.style.backgroundColor = color;
     });
 </script>
 

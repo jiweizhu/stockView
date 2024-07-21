@@ -30,6 +30,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.notification.constant.Constants.ROWS;
+import static com.example.notification.constant.Constants.TOTAL;
+
 @Service
 public class HoldingService {
     private static final Logger logger = LoggerFactory.getLogger(HoldingService.class);
@@ -119,8 +122,8 @@ public class HoldingService {
             retList.add(target);
         }
         Map<String, Object> retMap = new HashMap<>();
-        retMap.put("total", retList.size());
-        retMap.put("rows", retList);
+        retMap.put(TOTAL, retList.size());
+        retMap.put(ROWS, retList);
         return retMap;
     }
 
