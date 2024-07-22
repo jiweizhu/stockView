@@ -570,9 +570,9 @@ public class ETFViewService {
         List<StockNameVO> stockDaoAll = stockDao.findAll(Sort.by(orders));
         List<EtfFlowVO> dayList;
         if (way.equals("up")) {
-            dayList = daysUp(stockDaoAll);
+            dayList = daysUp(stockDaoAll, false);
         } else {
-            dayList = daysDown(stockDaoAll);
+            dayList = daysDown(stockDaoAll, false);
         }
         Map<String, Object> result = new HashMap<>();
         if (CollectionUtils.isEmpty(stockDaoAll)) {
@@ -590,9 +590,9 @@ public class ETFViewService {
         List<StockNameVO> stockDaoAll = stockDao.findAllById(stringSet);
         List<EtfFlowVO> dayList;
         if (way.equals("up")) {
-            dayList = daysUp(stockDaoAll);
+            dayList = daysUp(stockDaoAll, true);
         } else {
-            dayList = daysDown(stockDaoAll);
+            dayList = daysDown(stockDaoAll, true);
         }
         Map<String, Object> result = new HashMap<>();
         if (CollectionUtils.isEmpty(stockDaoAll)) {
@@ -607,98 +607,103 @@ public class ETFViewService {
     private static final Integer upDayCount = 8;
     private static final Integer downDayCount = -5;
 
-//    private static List<EtfFlowVO> daysDown(List<StockNameVO> stockDaoAll, boolean up) {
-//        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null).forEach(vo -> {
-//            vo.setStockName(vo.getStockName().replace("ETF", ""));
-//            Integer upwardDaysFive = vo.getUpwardDaysFive();
-//            if (upwardDaysFive <= downDayCount) {
-//                DayListMap.get(downDayCount).add(vo);
-//            }
-//            if (upwardDaysFive >= upDayCount) {
-//                DayListMap.get(upDayCount).add(vo);
-//            }
-//            DayListMap.get(upwardDaysFive).add(vo);
-//        });
-//
-//        List<Integer> listSize = new ArrayList<>();
-//        DayListMap.keySet().forEach(key -> {
-//            listSize.add(DayListMap.get(key).size());
-//        });
-//        int size = Optional.of(listSize.size()).get();
-//        List<EtfFlowVO> rets = new ArrayList<>(size);
-//        if(up){
-//
-//            for (int i = 1; i <= size; i++) {
-//                EtfFlowVO vo = new EtfFlowVO();
-//                for (int j = 0; j < upDayCount; j++) {
-//                    StockNameVO oneDayVo = DayListMap.get(j).get(i);
-//                    vo.setOneDayUp(oneDayVo.getGainPercentFive().toString() + "|" + oneDayVo.getFlipUpwardDaysFive() + "|" + oneDayVo.getStockName());
-//                }
-//                rets.add(vo);
-//            }
-//        }else {
-//
-//        }
-//
-//        return rets;
-//    }
 
-    private static List<EtfFlowVO> daysDown(List<StockNameVO> stockDaoAll) {
+    private static final Map<Integer, String> indexSetMethodMap = new HashMap<>();
+
+    static {
+        indexSetMethodMap.put(0, "setOneDayUp");
+        indexSetMethodMap.put(1, "setTwoDayUp");
+        indexSetMethodMap.put(2, "setThreeDayUp");
+        indexSetMethodMap.put(3, "setFourDayUp");
+        indexSetMethodMap.put(4, "setFiveDayUp");
+        indexSetMethodMap.put(5, "setSixDayUp");
+        indexSetMethodMap.put(6, "setSevenDayUp");
+        indexSetMethodMap.put(7, "setEightDayUp");
+    }
+
+    private List<EtfFlowVO> daysDown(List<StockNameVO> stockDaoAll, boolean isManuEtf) {
         List<StockNameVO> oneDaydownVOs = new ArrayList<>();
         List<StockNameVO> twoDaydownVOs = new ArrayList<>();
         List<StockNameVO> threeDaydownVOs = new ArrayList<>();
         List<StockNameVO> fourDaydownVOs = new ArrayList<>();
         List<StockNameVO> fiveDaydownVOs = new ArrayList<>();
-        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null).forEach(vo -> {
-            vo.setStockName(vo.getStockName().replace("ETF", ""));
-            if (vo.getUpwardDaysFive().equals(-1)) {
-                oneDaydownVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(-2)) {
-                twoDaydownVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(-3)) {
-                threeDaydownVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(-4)) {
-                fourDaydownVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive() <= -5) {
-                vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
-                fiveDaydownVOs.add(vo);
-            }
-        });
+        List<List<StockNameVO>> arrayLists = new ArrayList<>();
+        arrayLists.add(oneDaydownVOs);
+        arrayLists.add(twoDaydownVOs);
+        arrayLists.add(threeDaydownVOs);
+        arrayLists.add(fourDaydownVOs);
+        arrayLists.add(fiveDaydownVOs);
+
+        ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
+        Set<String> stringSet = new HashSet<>(mainKlineIds);
+        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
+                .filter(vo -> isManuEtf || !stringSet.contains(vo.getStockId())).forEach(vo -> {
+                    vo.setStockName(vo.getStockName().replace("ETF", ""));
+                    if (vo.getUpwardDaysFive().equals(-1)) {
+                        oneDaydownVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(-2)) {
+                        twoDaydownVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(-3)) {
+                        threeDaydownVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(-4)) {
+                        fourDaydownVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive() <= -5) {
+                        vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        fiveDaydownVOs.add(vo);
+                    }
+                });
 
         int size = Stream.of(oneDaydownVOs.size(), twoDaydownVOs.size(), threeDaydownVOs.size(), fourDaydownVOs.size(), fiveDaydownVOs.size()).max(Comparator.naturalOrder()).get();
         List<EtfFlowVO> rets = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            EtfFlowVO vo = new EtfFlowVO();
+            EtfFlowVO etfFlowVO = new EtfFlowVO();
             if (oneDaydownVOs.size() > i) {
-                StockNameVO oneDayVo = oneDaydownVOs.get(i);
-                vo.setOneDayUp(oneDayVo.getGainPercentFive().toString() + "|" + oneDayVo.getFlipUpwardDaysFive() + "|" + oneDayVo.getStockName());
+                StockNameVO vo = oneDaydownVOs.get(i);
+                String surfix = "_";
+                if (StringUtils.hasLength(vo.getStockIds())) {
+                    surfix = "#";
+                }
+                BigDecimal dayGain = getDayGain(vo);
+                StringBuilder dayGainFont = new StringBuilder("<div style=\"background-color: ");
+                if (dayGain.compareTo(BigDecimal.ZERO) < 0) {
+                    dayGainFont.append("#EEDC82 \"> ");
+                }
+                etfFlowVO.setOneDayUp(dayGainFont + dayGain.toString() + surfix + vo.getStockId() + "</br>" + vo.getGainPercentFive().toString() + "|" + vo.getFlipUpwardDaysFive() + "|" + vo.getStockName() + "</div>");
             }
             if (twoDaydownVOs.size() > i) {
                 StockNameVO twoDayVo = twoDaydownVOs.get(i);
-                vo.setTwoDayUp(twoDayVo.getGainPercentFive().toString() + "|" + twoDayVo.getFlipUpwardDaysFive() + "|" + twoDayVo.getStockName());
+                etfFlowVO.setTwoDayUp(twoDayVo.getGainPercentFive().toString() + "|" + twoDayVo.getFlipUpwardDaysFive() + "|" + twoDayVo.getStockName());
             }
             if (threeDaydownVOs.size() > i) {
                 StockNameVO threeDayVo = threeDaydownVOs.get(i);
-                vo.setThreeDayUp(threeDayVo.getGainPercentFive().toString() + "|" + threeDayVo.getFlipUpwardDaysFive() + "|" + threeDayVo.getStockName());
+                etfFlowVO.setThreeDayUp(threeDayVo.getGainPercentFive().toString() + "|" + threeDayVo.getFlipUpwardDaysFive() + "|" + threeDayVo.getStockName());
             }
             if (fourDaydownVOs.size() > i) {
                 StockNameVO fourDayVo = fourDaydownVOs.get(i);
-                vo.setFourDayUp(fourDayVo.getGainPercentFive().toString() + "|" + fourDayVo.getFlipUpwardDaysFive() + "|" + fourDayVo.getStockName());
+                etfFlowVO.setFourDayUp(fourDayVo.getGainPercentFive().toString() + "|" + fourDayVo.getFlipUpwardDaysFive() + "|" + fourDayVo.getStockName());
             }
             if (fiveDaydownVOs.size() > i) {
                 StockNameVO fiveDayVo = fiveDaydownVOs.get(i);
-                vo.setFiveDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
+                etfFlowVO.setFiveDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
             }
-            rets.add(vo);
+            rets.add(etfFlowVO);
         }
         return rets;
     }
 
-    private static List<EtfFlowVO> daysUp(List<StockNameVO> stockDaoAll) {
+    private BigDecimal getDayGain(StockNameVO vo) {
+        List<StockDailyVO> lastTwoDayPriceByStockId = stockDailyDao.findLastTwoDayPriceByStockId(vo.getStockId());
+        StockDailyVO lastPriceVo = lastTwoDayPriceByStockId.get(0);
+        StockDailyVO yesterdayPriceVo = lastTwoDayPriceByStockId.get(1);
+        BigDecimal bigDecimal = Utils.calculateDayGainPercentage(lastPriceVo.getClosingPrice(), yesterdayPriceVo.getClosingPrice());
+        return bigDecimal;
+    }
+
+    private List<EtfFlowVO> daysUp(List<StockNameVO> stockDaoAll, boolean isManuEtf) {
         List<StockNameVO> oneDayUpVOs = new ArrayList<>();
         List<StockNameVO> twoDayUpVOs = new ArrayList<>();
         List<StockNameVO> threeDayUpVOs = new ArrayList<>();
@@ -707,37 +712,40 @@ public class ETFViewService {
         List<StockNameVO> sixDayUpVOs = new ArrayList<>();
         List<StockNameVO> sevenDayUpVOs = new ArrayList<>();
         List<StockNameVO> eightDayUpVOs = new ArrayList<>();
-        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null).forEach(vo -> {
-            vo.setStockName(vo.getStockName().replace("ETF", ""));
-            if (vo.getUpwardDaysFive().equals(1)) {
-                oneDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(2)) {
-                twoDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(3)) {
-                threeDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(4)) {
-                fourDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(5)) {
-                fiveDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(6)) {
-                sixDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive().equals(7)) {
-                sevenDayUpVOs.add(vo);
-            }
-            if (vo.getUpwardDaysFive() >= 8) {
-                vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
-                eightDayUpVOs.add(vo);
-            }
-        });
+        ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
+        Set<String> stringSet = new HashSet<>(mainKlineIds);
+        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
+                .filter(vo -> isManuEtf || !stringSet.contains(vo.getStockId())).forEach(vo -> {
+                    vo.setStockName(vo.getStockName().replace("ETF", ""));
+                    if (vo.getUpwardDaysFive().equals(1)) {
+                        oneDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(2)) {
+                        twoDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(3)) {
+                        threeDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(4)) {
+                        fourDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(5)) {
+                        fiveDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(6)) {
+                        sixDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive().equals(7)) {
+                        sevenDayUpVOs.add(vo);
+                    }
+                    if (vo.getUpwardDaysFive() >= 8) {
+                        vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        eightDayUpVOs.add(vo);
+                    }
+                });
 
         int size = Stream.of(oneDayUpVOs.size(), twoDayUpVOs.size(), threeDayUpVOs.size(), fourDayUpVOs.size(), fiveDayUpVOs.size(),
-                sixDayUpVOs.size(),sevenDayUpVOs.size(), eightDayUpVOs.size()).max(Comparator.naturalOrder()).get();
+                sixDayUpVOs.size(), sevenDayUpVOs.size(), eightDayUpVOs.size()).max(Comparator.naturalOrder()).get();
         List<EtfFlowVO> rets = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             EtfFlowVO vo = new EtfFlowVO();
