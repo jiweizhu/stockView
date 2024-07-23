@@ -15,7 +15,7 @@
 }
 
 #container {
-    width: 1350px;
+    width: 2050px;
     height: 850px;
     position: relative;
     border: 1px solid black;
@@ -79,7 +79,7 @@ async function updateChart() {
     const promises = names.map(name => new Promise(resolve => {
         (async () => {
             const data = await fetch(
-                 'http://124.71.19.6:8888/multiK/'+ name
+                 'http://localhost:8888/multiK/'+ name
             )
                 .then(response => response.json());
             resolve({ name, data });
@@ -95,7 +95,7 @@ async function updateChart() {
 updateChart();
 
 function fetchData() {
-    fetch('http://124.71.19.6:8888/etfsCurveView')
+    fetch('http://localhost:8888/etfsCurveView')
     .then(response => response.text())
         .then(data => { const dataContainer = document.getElementById('myTable');
     dataContainer.innerHTML = data; })
@@ -134,7 +134,7 @@ function modifyScriptContent(clickedText) {
 }
 
 function fetchEtfStockIdsData(etfId) {
-    return fetch(`http://124.71.19.6:8888/etf/belongStockIds/${etfId.textContent}`)
+    return fetch(`http://localhost:8888/etf/belongStockIds/${etfId.textContent}`)
         .then(response => response.text())
         .catch(error => {
             console.error('Error fetching data:', error);

@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -470,7 +471,6 @@ public class ETFViewService {
         orders.add(new Sort.Order(Sort.Direction.DESC, "upwardDaysTen"));
         orders.add(new Sort.Order(Sort.Direction.DESC, "gainPercentTen"));
         List<StockNameVO> all = stockDao.findAll(Sort.by(orders));
-//        List<StockNameVO> fiveDayUpwardDays = all.stream().filter(vo -> (vo.getUpwardDaysFive() >= 1)).toList();
         List<StockNameVO> fiveDayUpwardDays = all;
         if (CollectionUtils.isEmpty(fiveDayUpwardDays)) {
             result.put(ROWS, Arrays.asList());
@@ -564,7 +564,7 @@ public class ETFViewService {
         }
     }
 
-    public Object findAllEtfFlowView(String way) {
+    public Object findAllEtfFlowView(String way) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         List<Sort.Order> orders = new ArrayList<Sort.Order>();
         orders.add(new Sort.Order(Sort.Direction.DESC, "gainPercentFive"));
         List<StockNameVO> stockDaoAll = stockDao.findAll(Sort.by(orders));
@@ -584,7 +584,7 @@ public class ETFViewService {
         return result;
     }
 
-    public Object findMainEtfFlow(String way) {
+    public Object findMainEtfFlow(String way) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
         Set<String> stringSet = new HashSet<>(mainKlineIds);
         List<StockNameVO> stockDaoAll = stockDao.findAllById(stringSet);
@@ -605,7 +605,7 @@ public class ETFViewService {
     }
 
     private static final Integer upDayCount = 8;
-    private static final Integer downDayCount = -5;
+    private static final Integer downDayCount = 5;
 
 
     private static final Map<Integer, String> indexSetMethodMap = new HashMap<>();
@@ -621,7 +621,7 @@ public class ETFViewService {
         indexSetMethodMap.put(7, "setEightDayUp");
     }
 
-    private List<EtfFlowVO> daysDown(List<StockNameVO> stockDaoAll, boolean isManuEtf) {
+    private List<EtfFlowVO> daysDown(List<StockNameVO> stockDaoAll, boolean isManuEtf) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         List<StockNameVO> oneDaydownVOs = new ArrayList<>();
         List<StockNameVO> twoDaydownVOs = new ArrayList<>();
         List<StockNameVO> threeDaydownVOs = new ArrayList<>();
@@ -652,47 +652,49 @@ public class ETFViewService {
                         fourDaydownVOs.add(vo);
                     }
                     if (vo.getUpwardDaysFive() <= -5) {
-                        vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        vo.setStockName(vo.getStockName());
+                        if (vo.getUpwardDaysFive() < -5) {
+                            vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        }
                         fiveDaydownVOs.add(vo);
                     }
                 });
-
         int size = Stream.of(oneDaydownVOs.size(), twoDaydownVOs.size(), threeDaydownVOs.size(), fourDaydownVOs.size(), fiveDaydownVOs.size()).max(Comparator.naturalOrder()).get();
         List<EtfFlowVO> rets = new ArrayList<>(size);
+
         for (int i = 0; i < size; i++) {
             EtfFlowVO etfFlowVO = new EtfFlowVO();
-            if (oneDaydownVOs.size() > i) {
-                StockNameVO vo = oneDaydownVOs.get(i);
-                String surfix = "_";
-                if (StringUtils.hasLength(vo.getStockIds())) {
-                    surfix = "#";
+            Class<? extends EtfFlowVO> aClass = etfFlowVO.getClass();
+
+            for (int j = 0; j < downDayCount; j++) {
+                List<StockNameVO> voList = arrayLists.get(j);
+                if (voList.size() > i) {
+                    StockNameVO vo = voList.get(i);
+                    BigDecimal dayGain = getDayGain(vo);
+                    String tdContent = getTdContent(dayGain, vo);
+                    String methodName = indexSetMethodMap.get(j);
+                    Method method = aClass.getMethod(methodName, String.class);
+                    method.invoke(etfFlowVO, tdContent);
                 }
-                BigDecimal dayGain = getDayGain(vo);
-                StringBuilder dayGainFont = new StringBuilder("<div style=\"background-color: ");
-                if (dayGain.compareTo(BigDecimal.ZERO) < 0) {
-                    dayGainFont.append("#EEDC82 \"> ");
-                }
-                etfFlowVO.setOneDayUp(dayGainFont + dayGain.toString() + surfix + vo.getStockId() + "</br>" + vo.getGainPercentFive().toString() + "|" + vo.getFlipUpwardDaysFive() + "|" + vo.getStockName() + "</div>");
-            }
-            if (twoDaydownVOs.size() > i) {
-                StockNameVO twoDayVo = twoDaydownVOs.get(i);
-                etfFlowVO.setTwoDayUp(twoDayVo.getGainPercentFive().toString() + "|" + twoDayVo.getFlipUpwardDaysFive() + "|" + twoDayVo.getStockName());
-            }
-            if (threeDaydownVOs.size() > i) {
-                StockNameVO threeDayVo = threeDaydownVOs.get(i);
-                etfFlowVO.setThreeDayUp(threeDayVo.getGainPercentFive().toString() + "|" + threeDayVo.getFlipUpwardDaysFive() + "|" + threeDayVo.getStockName());
-            }
-            if (fourDaydownVOs.size() > i) {
-                StockNameVO fourDayVo = fourDaydownVOs.get(i);
-                etfFlowVO.setFourDayUp(fourDayVo.getGainPercentFive().toString() + "|" + fourDayVo.getFlipUpwardDaysFive() + "|" + fourDayVo.getStockName());
-            }
-            if (fiveDaydownVOs.size() > i) {
-                StockNameVO fiveDayVo = fiveDaydownVOs.get(i);
-                etfFlowVO.setFiveDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
             }
             rets.add(etfFlowVO);
         }
         return rets;
+    }
+
+    private static String getTdContent(BigDecimal dayGain, StockNameVO vo) {
+        StringBuilder dayGainFont = new StringBuilder("<div class=");
+        if (dayGain.compareTo(BigDecimal.ZERO) < 0) {
+            dayGainFont.append("grey-color> ");
+        } else {
+            dayGainFont.append("white-color> ");
+        }
+        String hasStockIds = "";
+        if (StringUtils.hasLength(vo.getStockIds())) {
+            hasStockIds = "##";
+        }
+        String tdContent = dayGainFont + dayGain.toString() + "#" + vo.getStockId() + hasStockIds + "</br>" + vo.getGainPercentFive().toString() + "|" + vo.getFlipUpwardDaysFive() + "|" + vo.getStockName() + "</div>";
+        return tdContent;
     }
 
     private BigDecimal getDayGain(StockNameVO vo) {
@@ -703,7 +705,7 @@ public class ETFViewService {
         return bigDecimal;
     }
 
-    private List<EtfFlowVO> daysUp(List<StockNameVO> stockDaoAll, boolean isManuEtf) {
+    private List<EtfFlowVO> daysUp(List<StockNameVO> stockDaoAll, boolean isManuEtf) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         List<StockNameVO> oneDayUpVOs = new ArrayList<>();
         List<StockNameVO> twoDayUpVOs = new ArrayList<>();
         List<StockNameVO> threeDayUpVOs = new ArrayList<>();
@@ -712,6 +714,18 @@ public class ETFViewService {
         List<StockNameVO> sixDayUpVOs = new ArrayList<>();
         List<StockNameVO> sevenDayUpVOs = new ArrayList<>();
         List<StockNameVO> eightDayUpVOs = new ArrayList<>();
+
+        List<List<StockNameVO>> arrayLists = new ArrayList<>();
+        arrayLists.add(oneDayUpVOs);
+        arrayLists.add(twoDayUpVOs);
+        arrayLists.add(threeDayUpVOs);
+        arrayLists.add(fourDayUpVOs);
+        arrayLists.add(fiveDayUpVOs);
+        arrayLists.add(sixDayUpVOs);
+        arrayLists.add(sevenDayUpVOs);
+        arrayLists.add(eightDayUpVOs);
+
+
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
         Set<String> stringSet = new HashSet<>(mainKlineIds);
         stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
@@ -739,7 +753,10 @@ public class ETFViewService {
                         sevenDayUpVOs.add(vo);
                     }
                     if (vo.getUpwardDaysFive() >= 8) {
-                        vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        vo.setStockName(vo.getStockName());
+                        if (vo.getUpwardDaysFive() > 8) {
+                            vo.setStockName(vo.getStockName() + "#" + vo.getUpwardDaysFive());
+                        }
                         eightDayUpVOs.add(vo);
                     }
                 });
@@ -748,48 +765,22 @@ public class ETFViewService {
                 sixDayUpVOs.size(), sevenDayUpVOs.size(), eightDayUpVOs.size()).max(Comparator.naturalOrder()).get();
         List<EtfFlowVO> rets = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            EtfFlowVO vo = new EtfFlowVO();
-            if (oneDayUpVOs.size() > i) {
-                StockNameVO oneDayVo = oneDayUpVOs.get(i);
-                vo.setOneDayUp(oneDayVo.getGainPercentFive().toString() + "|" + oneDayVo.getFlipUpwardDaysFive() + "|" + oneDayVo.getStockName());
+            EtfFlowVO etfFlowVO = new EtfFlowVO();
+            Class<? extends EtfFlowVO> aClass = etfFlowVO.getClass();
+
+            for (int j = 0; j < upDayCount; j++) {
+                List<StockNameVO> voList = arrayLists.get(j);
+                if (voList.size() > i) {
+                    StockNameVO vo = voList.get(i);
+                    BigDecimal dayGain = getDayGain(vo);
+                    String tdContent = getTdContent(dayGain, vo);
+                    String methodName = indexSetMethodMap.get(j);
+                    Method method = aClass.getMethod(methodName, String.class);
+                    method.invoke(etfFlowVO, tdContent);
+                }
             }
-            if (twoDayUpVOs.size() > i) {
-                StockNameVO twoDayVo = twoDayUpVOs.get(i);
-                vo.setTwoDayUp(twoDayVo.getGainPercentFive().toString() + "|" + twoDayVo.getFlipUpwardDaysFive() + "|" + twoDayVo.getStockName());
-            }
-            if (threeDayUpVOs.size() > i) {
-                StockNameVO threeDayVo = threeDayUpVOs.get(i);
-                vo.setThreeDayUp(threeDayVo.getGainPercentFive().toString() + "|" + threeDayVo.getFlipUpwardDaysFive() + "|" + threeDayVo.getStockName());
-            }
-            if (fourDayUpVOs.size() > i) {
-                StockNameVO fourDayVo = fourDayUpVOs.get(i);
-                vo.setFourDayUp(fourDayVo.getGainPercentFive().toString() + "|" + fourDayVo.getFlipUpwardDaysFive() + "|" + fourDayVo.getStockName());
-            }
-            if (fiveDayUpVOs.size() > i) {
-                StockNameVO fiveDayVo = fiveDayUpVOs.get(i);
-                vo.setFiveDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
-            }
-            if (sixDayUpVOs.size() > i) {
-                StockNameVO fiveDayVo = sixDayUpVOs.get(i);
-                vo.setSixDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
-            }
-            if (sevenDayUpVOs.size() > i) {
-                StockNameVO fiveDayVo = sevenDayUpVOs.get(i);
-                vo.setSevenDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
-            }
-            if (eightDayUpVOs.size() > i) {
-                StockNameVO fiveDayVo = eightDayUpVOs.get(i);
-                vo.setEightDayUp(fiveDayVo.getGainPercentFive().toString() + "|" + fiveDayVo.getFlipUpwardDaysFive() + "|" + fiveDayVo.getStockName());
-            }
-            rets.add(vo);
+            rets.add(etfFlowVO);
         }
         return rets;
     }
-
-
-    List<StockNameVO> oneDayDownVOs = new ArrayList<>();
-    List<StockNameVO> twoDayDownVOs = new ArrayList<>();
-    List<StockNameVO> threeDayDownVOs = new ArrayList<>();
-    List<StockNameVO> fourDayDownVOs = new ArrayList<>();
-    List<StockNameVO> fiveDayDownVOs = new ArrayList<>();
 }

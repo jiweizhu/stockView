@@ -30,6 +30,11 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
+        .multiLine-container {
+            width: 350px;
+            height: 280px;
+            margin-bottom: 2px;
+        }
         th, td {
           text-align: center;
           padding: 10px;
@@ -92,9 +97,13 @@
     setTimeout(function() {
         getDivs();
         initializeMultiCharts();
-    }, 2000);
+         $('.hide-column').hide();
+         }, 1000);
     });
 
+function toggleColumn() {
+  $('.hide-column').toggle();
+}
 
     async function getDivs() {
        const spans = document.querySelectorAll('div[id^="span_"]');

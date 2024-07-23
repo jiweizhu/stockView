@@ -19,6 +19,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.beans.PropertyEditorSupport;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -66,7 +67,7 @@ public class ETFController {
 
     @RequestMapping(value = {"/etf/flow/{way}"})
     @ResponseBody
-    public ResponseEntity findAllEtfFlow(@PathVariable String way) {
+    public ResponseEntity findAllEtfFlow(@PathVariable String way) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.info("Enter method findAllEtfFlow====" + way);
         Object body = "";
         body = etfViewService.findAllEtfFlowView(way);
@@ -76,7 +77,7 @@ public class ETFController {
 
     @RequestMapping(value = {"/etf/flow/main/{way}"})
     @ResponseBody
-    public ResponseEntity findMainEtfFlow(@PathVariable String way) {
+    public ResponseEntity findMainEtfFlow(@PathVariable String way) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         logger.info("Enter method findMainEtfFlow====" + way);
         Object body = "";
         body = etfViewService.findMainEtfFlow(way);
