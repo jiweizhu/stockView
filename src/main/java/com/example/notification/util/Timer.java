@@ -68,9 +68,6 @@ public class Timer {
     public void generateReportWhenMarketClose() {
         try {
             logger.info("Start cron job generateReportEveryMarketDay=====");
-            kLineMarketClosedService.delete_HistoryData();
-            etfViewService.generateReportEveryDay();
-
             Object body = kLineMarketClosedService.delete_HistoryData();
             kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
             etfViewService.generateReportEveryDay();
