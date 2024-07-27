@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -636,7 +637,7 @@ public class ETFViewService {
 
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
         Set<String> stringSet = new HashSet<>(mainKlineIds);
-        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
+        stockDaoAll.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentFive)).filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
                 .filter(vo -> isManuEtf || !stringSet.contains(vo.getStockId())).forEach(vo -> {
                     vo.setStockName(vo.getStockName().replace("ETF", ""));
                     if (vo.getUpwardDaysFive().equals(-1)) {
@@ -693,8 +694,22 @@ public class ETFViewService {
         if (StringUtils.hasLength(vo.getStockIds())) {
             hasStockIds = "##";
         }
-        String tdContent = dayGainFont + dayGain.toString() + "#" + vo.getStockId() + hasStockIds + "</br>" + vo.getGainPercentFive().toString() + "|" + vo.getFlipUpwardDaysFive() + "|" + vo.getStockName() + "</div>";
-        return tdContent;
+        boolean goodEtfExist = false;
+        BigDecimal flipGain = vo.getFlipGainPercentFive().setScale(2, RoundingMode.HALF_UP);
+        BigDecimal gainPercentFive = vo.getGainPercentFive();
+        if (new BigDecimal(-3).compareTo(flipGain) > 0 || new BigDecimal(-3).compareTo(gainPercentFive) > 0) {
+            goodEtfExist = true;
+        }
+        dayGainFont.append(dayGain).append("#").append(vo.getStockId().substring(2)).append(hasStockIds).append("</br>");
+        if (goodEtfExist) {
+            dayGainFont.append("<div class=goodEft>")
+                    .append(gainPercentFive.toString()).append("|").append(vo.getFlipUpwardDaysFive()).append("(").append(flipGain).append("|").append(vo.getStockName())
+                    .append("</div>");
+        } else {
+            dayGainFont.append(gainPercentFive).append("|").append(vo.getFlipUpwardDaysFive()).append("(").append(flipGain).append("|").append(vo.getStockName());
+        }
+        dayGainFont.append("</div>");
+        return dayGainFont.toString();
     }
 
     private BigDecimal getDayGain(StockNameVO vo) {
@@ -728,7 +743,7 @@ public class ETFViewService {
 
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
         Set<String> stringSet = new HashSet<>(mainKlineIds);
-        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
+        stockDaoAll.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentFive).reversed()).filter(vo -> vo.getStockName().toLowerCase().contains("etf") && vo.getUpwardDaysFive() != null)
                 .filter(vo -> isManuEtf || !stringSet.contains(vo.getStockId())).forEach(vo -> {
                     vo.setStockName(vo.getStockName().replace("ETF", ""));
                     if (vo.getUpwardDaysFive().equals(1)) {

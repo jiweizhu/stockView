@@ -22,6 +22,9 @@
         .white-color{
          background-color: #FFFAFA;
         }
+        .goodEft{
+         background-color: #FFD700;
+        }
     </style>
 </head>
 <body>
@@ -29,38 +32,38 @@
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
 </script>
 <div style="margin:20px 0;"></div>
-<div class="easyui-layout" style="width:2350px;height:500px;background-color: #FFFFCC;">
+<div class="easyui-layout" style="width:2550px;height:500px;background-color: #FFFFCC;">
     <div data-options="region:'north'" style="width:10px;height:10px">
     </div>
     <div data-options="region:'south',split:true" style="height:50px;"></div>
-    <div data-options="region:'east',split:true" title="East" style="width:100px;height:500px"></div>
-    <div data-options="region:'west',split:true" title="West" style="width:850px;">
-        <table id="dg-west-main" class="easyui-datagrid" title="Main ETFs FLOW DOWN DOWN DOWN" style="width:850px;height:500px"
-               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/main/down`,method:'get'">
+    <div data-options="region:'east',split:true" title="East" style="width:10px;height:500px"></div>
+    <div data-options="region:'west',split:true" title="West" style="width:1000px;">
+        <table id="dg-west-main" class="easyui-datagrid" title="Main ETFs FLOW DOWN DOWN DOWN" style="width:1000px;height:500px"
+               data-options="rownumbers:true,remoteSort:false,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/main/down`,method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">1 DayDown</th>
-                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">2 DayDown</th>
-                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">3 DayDown</th>
-                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">4 DayDown</th>
-                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">5 DayDown</th>
+                <th data-options="field:'oneDayUp',width:175,sortable:true,sorter:customSorter">1 DayDown</th>
+                <th data-options="field:'twoDayUp',width:175,sortable:true,sorter:customSorter">2 DayDown</th>
+                <th data-options="field:'threeDayUp',width:175,sortable:true,sorter:customSorter">3 DayDown</th>
+                <th data-options="field:'fourDayUp',width:175,sortable:true,sorter:customSorter">4 DayDown</th>
+                <th data-options="field:'fiveDayUp',width:230,sortable:true,sorter:customSorter">5 DayDown</th>
             </tr>
             </thead>
         </table>
     </div>
     <div data-options="region:'center',title:'Main Title',iconCls:'icon-ok'">
-        <table id="dg-center-main" class="easyui-datagrid" title="Main ETFs FLOW UP UP UP" style="width:1400px;height:500px"
+        <table id="dg-center-main" class="easyui-datagrid" title="Main ETFs FLOW UP UP UP" style="width:1600px;height:500px"
                data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/main/up`,method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">1 DayUp</th>
-                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">2 DayUp</th>
-                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">3 DayUp</th>
-                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">4 DayUp</th>
-                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">5 DayUp</th>
-                <th data-options="field:'sixDayUp',width:130,sortable:true,sorter:customSorter">6 DayUp</th>
-                <th data-options="field:'sevenDayUp',width:130,sortable:true,sorter:customSorter">7 DayUp</th>
-                <th data-options="field:'eightDayUp',width:130,sortable:true,sorter:customSorter">8 DayUp</th>
+                <th data-options="field:'oneDayUp',width:175,sortable:true,sorter:customSorter">1 DayUp</th>
+                <th data-options="field:'twoDayUp',width:175,sortable:true,sorter:customSorter">2 DayUp</th>
+                <th data-options="field:'threeDayUp',width:175,sortable:true,sorter:customSorter">3 DayUp</th>
+                <th data-options="field:'fourDayUp',width:175,sortable:true,sorter:customSorter">4 DayUp</th>
+                <th data-options="field:'fiveDayUp',width:175,sortable:true,sorter:customSorter">5 DayUp</th>
+                <th data-options="field:'sixDayUp',width:175,sortable:true,sorter:customSorter">6 DayUp</th>
+                <th data-options="field:'sevenDayUp',width:175,sortable:true,sorter:customSorter">7 DayUp</th>
+                <th data-options="field:'eightDayUp',width:230,sortable:true,sorter:customSorter">8 DayUp</th>
             </tr>
             </thead>
         </table>
@@ -69,38 +72,38 @@
 
 
 <div style="margin:20px 0;"></div>
-<div class="easyui-layout" style="width:2350px;height:2000px;background-color: #FFFFCC;">
+<div class="easyui-layout" style="width:2550px;height:2000px;background-color: #FFFFCC;">
     <div data-options="region:'north'" style="width:10px;height:10px">
     </div>
     <div data-options="region:'south',split:true" style="height:50px;"></div>
-    <div data-options="region:'east',split:true" title="East" style="width:100px;height:2000px"></div>
-    <div data-options="region:'west',split:true" title="West" style="width:850px;">
-        <table id="dg-west" class="easyui-datagrid" title="ETFs FLOW DOWN DOWN DOWN" style="width:850px;height:1700px"
-               data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/down`,method:'get'">
+    <div data-options="region:'east',split:true" title="East" style="width:10px;height:2000px"></div>
+    <div data-options="region:'west',split:true" title="West" style="width:1000px;">
+        <table id="dg-west" class="easyui-datagrid" title="ETFs FLOW DOWN DOWN DOWN" style="width:1000px;height:1700px"
+               data-options="rownumbers:true,remoteSort:false,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/down`,method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">oneDayDown</th>
-                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">twoDayDown</th>
-                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">threeDayDown</th>
-                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">fourDayDown</th>
-                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">fiveDayDown</th>
+                <th data-options="field:'oneDayUp',width:175,sortable:true,sorter:customSorter">oneDayDown</th>
+                <th data-options="field:'twoDayUp',width:175,sortable:true,sorter:customSorter">twoDayDown</th>
+                <th data-options="field:'threeDayUp',width:175,sortable:true,sorter:customSorter">threeDayDown</th>
+                <th data-options="field:'fourDayUp',width:175,sortable:true,sorter:customSorter">fourDayDown</th>
+                <th data-options="field:'fiveDayUp',width:230,sortable:true,sorter:customSorter">fiveDayDown</th>
             </tr>
             </thead>
         </table>
     </div>
     <div data-options="region:'center',title:'Main Title',iconCls:'icon-ok'">
-        <table id="dg-center" class="easyui-datagrid" title="ETFs FLOW UP UP UP" style="width:1400px;height:1700px"
+        <table id="dg-center" class="easyui-datagrid" title="ETFs FLOW UP UP UP" style="width:1600px;height:1700px"
                data-options="rownumbers:true,remoteSort:false,fitColumns:true,singleSelect:true,collapsible:true,url:`http://${serverIp}:8888/etf/flow/up`,method:'get'">
             <thead>
             <tr>
-                <th data-options="field:'oneDayUp',width:130,sortable:true,sorter:customSorter">oneDayUp</th>
-                <th data-options="field:'twoDayUp',width:130,sortable:true,sorter:customSorter">twoDayUp</th>
-                <th data-options="field:'threeDayUp',width:130,sortable:true,sorter:customSorter">threeDayUp</th>
-                <th data-options="field:'fourDayUp',width:130,sortable:true,sorter:customSorter">fourDayUp</th>
-                <th data-options="field:'fiveDayUp',width:130,sortable:true,sorter:customSorter">fiveDayUp</th>
-                <th data-options="field:'sixDayUp',width:130,sortable:true,sorter:customSorter">sixDayUp</th>
-                <th data-options="field:'sevenDayUp',width:130,sortable:true,sorter:customSorter">sevenDayUp</th>
-                <th data-options="field:'eightDayUp',width:130,sortable:true,sorter:customSorter">eightDayUp</th>
+                <th data-options="field:'oneDayUp',width:175,sortable:true,sorter:customSorter">oneDayUp</th>
+                <th data-options="field:'twoDayUp',width:175,sortable:true,sorter:customSorter">twoDayUp</th>
+                <th data-options="field:'threeDayUp',width:175,sortable:true,sorter:customSorter">threeDayUp</th>
+                <th data-options="field:'fourDayUp',width:175,sortable:true,sorter:customSorter">fourDayUp</th>
+                <th data-options="field:'fiveDayUp',width:175,sortable:true,sorter:customSorter">fiveDayUp</th>
+                <th data-options="field:'sixDayUp',width:175,sortable:true,sorter:customSorter">sixDayUp</th>
+                <th data-options="field:'sevenDayUp',width:175,sortable:true,sorter:customSorter">sevenDayUp</th>
+                <th data-options="field:'eightDayUp',width:230,sortable:true,sorter:customSorter">eightDayUp</th>
             </tr>
             </thead>
         </table>
