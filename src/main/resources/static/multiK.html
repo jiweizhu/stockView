@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Stocks curve 图表</title>
+    <title>MultiK Stocks</title>
 <style>
 .cell {
     display: inline-block;
@@ -42,68 +42,69 @@
 <table id="myTable" ></table>
 
 <script>
-var names = [];
-async function updateChart() {
-    // Define the function to create the chart
-    function createChart(series) {
-        Highcharts.stockChart('container', {
-            rangeSelector: {
-                selected: 4
-            },
-            yAxis: {
-                labels: {
-                    format: '{#if (gt value 0)}+{/if}{value}%'
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+
+    var names = [];
+    async function updateChart() {
+        // Define the function to create the chart
+        function createChart(series) {
+            Highcharts.stockChart('container', {
+                rangeSelector: {
+                    selected: 4
                 },
-                plotLines: [{
-                    value: 0,
-                    width: 2,
-                    color: 'silver'
-                }]
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            tooltip: {
-                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
-                valueDecimals: 2,
-                split: true
-            },
-            series
-        });
+                yAxis: {
+                    labels: {
+                        format: '{#if (gt value 0)}+{/if}{value}%'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 2,
+                        color: 'silver'
+                    }]
+                },
+                plotOptions: {
+                    series: {
+                        compare: 'percent',
+                        showInNavigator: true
+                    }
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                    valueDecimals: 2,
+                    split: true
+                },
+                series
+            });
+        }
+
+        // Fetch data for each name
+        const promises = names.map(name => new Promise(resolve => {
+            (async () => {
+                const data = await fetch(
+                     `http://${serverIp}:8888/multiK/`+ name
+                )
+                    .then(response => response.json());
+                resolve({ name, data });
+            })();
+        }));
+
+        // Wait for all promises to resolve and create the chart
+        const series = await Promise.all(promises);
+        createChart(series);
     }
 
-    // Fetch data for each name
-    const promises = names.map(name => new Promise(resolve => {
-        (async () => {
-            const data = await fetch(
-                 'http://localhost:8888/multiK/'+ name
-            )
-                .then(response => response.json());
-            resolve({ name, data });
-        })();
-    }));
+    // Call the function to create the initial chart
+    updateChart();
 
-    // Wait for all promises to resolve and create the chart
-    const series = await Promise.all(promises);
-    createChart(series);
-}
-
-// Call the function to create the initial chart
-updateChart();
-
-function fetchData() {
-    fetch('http://localhost:8888/etfsCurveView')
-    .then(response => response.text())
-        .then(data => { const dataContainer = document.getElementById('myTable');
-    dataContainer.innerHTML = data; })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-        });
-
-}
+    function fetchData() {
+        fetch(`http://${serverIp}:8888/etfsCurveView`)
+        .then(response => response.text())
+            .then(data => { const dataContainer = document.getElementById('myTable');
+        dataContainer.innerHTML = data; })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
 
 function changeColor(element) {
     // 获取当前点击的元素
@@ -134,7 +135,7 @@ function modifyScriptContent(clickedText) {
 }
 
 function fetchEtfStockIdsData(etfId) {
-    return fetch(`http://localhost:8888/etf/belongStockIds/${etfId.textContent}`)
+    return fetch(`http://${serverIp}:8888/etf/belongStockIds/${etfId.textContent}`)
         .then(response => response.text())
         .catch(error => {
             console.error('Error fetching data:', error);
