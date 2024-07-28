@@ -95,7 +95,10 @@ public class Controller {
         Object body = "";
         if (num.equals("3") || num.equals("4")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        } else if (num.equals("main")) {
+        }
+        else if (num.equals("wholeEtfsView")) {
+            body = etfViewService.findAllEtfSortView_new("wholeEtfsView");
+        }else if (num.equals("main")) {
             body = etfViewService.findAllEtfSortView_new(num);
         } else {
             body = etfViewService.findAllEtfSortView(num);
