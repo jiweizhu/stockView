@@ -23,8 +23,8 @@ public class FileUtil {
         return in;
     }
 
-    public static Reader bufferReader(String filePath) {
-        Reader in = null;
+    public static BufferedReader bufferReader(String filePath) {
+        BufferedReader in = null;
         try {
             in = new BufferedReader(new FileReader(filePath));
         } catch (FileNotFoundException e) {

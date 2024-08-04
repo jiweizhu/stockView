@@ -1,5 +1,6 @@
 package com.example.notification.service;
 
+import com.example.notification.constant.Constants;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -65,7 +67,7 @@ public class ETFViewService {
 //        }
         //just need to get all stocks from stock table, and then get today's kline price to store in db and calculate avg data
         kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY);
-        Thread.sleep(15000);
+        Thread.sleep(25000);
         kLineMarketClosedService.handleStocksFlipDaysAndGainReport();
     }
 
@@ -121,6 +123,13 @@ public class ETFViewService {
         return html;
     }
 
+
+    @Value("${notification.mainboard300.file}")
+    private String mainboard300_path;
+
+    private Integer fiveDayExceedTen_num = 0;
+
+
     public Object findAllEtfSortView_new(String num) {
         List<StockNameVO> downwardDaysStock = stockDao.findDownwardDaysStock();
         List<StockNameVO> fiveDayUpwardDays = stockDao.findupwardDaysStock();
@@ -129,27 +138,27 @@ public class ETFViewService {
             return "No data found!";
         }
 
-        List<StockNameVO> commonEtfs = new ArrayList<>();
+        List<StockNameVO> commonStockList = new ArrayList<>();
         List<StockNameVO> mainEtfs = new ArrayList<>();
 
         //group main index Kline
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
-        Set<String> stringSet = new HashSet<>(mainKlineIds);
+        Set<String> mainIndexSet = new HashSet<>(mainKlineIds);
         for (StockNameVO fiveDayUpwardDay : fiveDayUpwardDays) {
-            if (!stringSet.contains(fiveDayUpwardDay.getStockId())) {
-                commonEtfs.add(fiveDayUpwardDay);
+            if (!mainIndexSet.contains(fiveDayUpwardDay.getStockId())) {
+                commonStockList.add(fiveDayUpwardDay);
             } else {
                 mainEtfs.add(fiveDayUpwardDay);
             }
         }
         String industryEtfsTable = "";
         if (num.equals("3")) {
-            industryEtfsTable = industryEtfsView(commonEtfs);
+            industryEtfsTable = industryEtfsView(commonStockList);
         }
         if (num.equals("4")) {
             //return etfs has stock_ids
             List<StockNameVO> industryEtfs = new ArrayList<>();
-            commonEtfs.forEach(vo -> {
+            commonStockList.forEach(vo -> {
                 if (StringUtils.hasLength(vo.getStockIds())) {
                     industryEtfs.add(vo);
                 }
@@ -159,7 +168,7 @@ public class ETFViewService {
         if (num.equals("wholeEtfsView")) {
             List<StockNameVO> upWardIndustryEtfs = new ArrayList<>();
             List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
-            commonEtfs.forEach(vo -> {
+            commonStockList.forEach(vo -> {
                 if (vo.getStockName().toLowerCase().contains("etf")) {
                     if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
                         upWardIndustryEtfs.add(vo);
@@ -170,6 +179,37 @@ public class ETFViewService {
             });
             upWardIndustryEtfs.addAll(downWardIndustryEtfs);
             industryEtfsTable = dayLineEtfsView(upWardIndustryEtfs);
+        }
+        if (num.equals("300_mainBoard")) {
+            Set<String> threeHundredSet = new HashSet<>();
+            Constants.getMainBoard300(mainboard300_path).forEach(
+                    vo -> {
+                        threeHundredSet.add(vo.getStockId());
+                    }
+            );
+            List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
+            List<StockNameVO> upwardStocks = new ArrayList<>();
+            List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
+            commonStockList.forEach(vo -> {
+                if (threeHundredSet.contains(vo.getStockId())) {
+                    //check if 5day excced 10 day!!
+                    List<StockDailyVO> lastTwoDayPrice = stockDailyDao.findLastTwoDayPriceByStockId(vo.getStockId());
+                    StockDailyVO yesterdayVo = lastTwoDayPrice.get(1);
+                    StockDailyVO todayVo = lastTwoDayPrice.get(0);
+                    if (yesterdayVo.getDayAvgFive().compareTo(yesterdayVo.getDayAvgTen()) <= 0 && todayVo.getDayAvgFive().compareTo(todayVo.getDayAvgTen()) >= 0) {
+                        fiveDayExceedTenDay.add(vo);
+                        fiveDayExceedTen_num ++;
+                    }
+                    if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
+                        upwardStocks.add(vo);
+                    } else {
+                        downWardIndustryEtfs.add(vo);
+                    }
+                }
+            });
+            fiveDayExceedTenDay.addAll(upwardStocks);
+            fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
+            industryEtfsTable = dayLineEtfsView(fiveDayExceedTenDay);
         }
         if (num.equals("main")) {
             industryEtfsTable = mainEtfsView(mainEtfs);
@@ -209,20 +249,29 @@ public class ETFViewService {
         StringBuilder html = new StringBuilder();
         for (int i = 0; i < industryEtfs.size(); i++) {
             StockNameVO stock = industryEtfs.get(i);
-            int columnSizw = 8;
+            int columnSizw = 6;
             if (i % columnSizw == 0) {
                 html.append("<tr>");
             }
+
             String id_name = stock.getStockId() + "_" + stock.getStockName();
             String fiveBackGroudColor = "#C0C0C0";
             String tenBackGroudColor = "#C0C0C0";
+
             if (stock.getUpwardDaysFive() >= 0) {
                 fiveBackGroudColor = "#00FF00";
+            }
+
+            if (i < fiveDayExceedTen_num) {
+                fiveBackGroudColor = " pink";
             }
             if (stock.getUpwardDaysTen() >= 0) {
                 tenBackGroudColor = "#00FF00";
             }
-            html.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">").append(id_name).append("(" + stock.getUpwardDaysFive()).append("|")
+
+            html.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">")
+                    .append("<a href=\"https://gushitong.baidu.com/fund/ab-").append(stock.getStockId().substring(2)).append("\">").append(id_name).append("</a>")
+                    .append("(" + stock.getUpwardDaysFive()).append("|")
                     .append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>")
                     .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
                     .append("10Day(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")

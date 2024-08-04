@@ -96,6 +96,9 @@ public class Controller {
         if (num.equals("3") || num.equals("4")) {
             body = etfViewService.findAllEtfSortView_new(num);
         }
+        else if (num.equals("300_mainBoard")) {
+            body = etfViewService.findAllEtfSortView_new("300_mainBoard");
+        }
         else if (num.equals("wholeEtfsView")) {
             body = etfViewService.findAllEtfSortView_new("wholeEtfsView");
         }else if (num.equals("main")) {
