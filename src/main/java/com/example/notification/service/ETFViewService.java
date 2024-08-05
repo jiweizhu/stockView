@@ -198,7 +198,7 @@ public class ETFViewService {
                     StockDailyVO todayVo = lastTwoDayPrice.get(0);
                     if (yesterdayVo.getDayAvgFive().compareTo(yesterdayVo.getDayAvgTen()) <= 0 && todayVo.getDayAvgFive().compareTo(todayVo.getDayAvgTen()) >= 0) {
                         fiveDayExceedTenDay.add(vo);
-                        fiveDayExceedTen_num ++;
+                        fiveDayExceedTen_num++;
                     }
                     if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
                         upwardStocks.add(vo);
@@ -209,7 +209,7 @@ public class ETFViewService {
             });
             fiveDayExceedTenDay.addAll(upwardStocks);
             fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
-            industryEtfsTable = dayLineEtfsView(fiveDayExceedTenDay);
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay);
         }
         if (num.equals("main")) {
             industryEtfsTable = mainEtfsView(mainEtfs);
@@ -242,6 +242,103 @@ public class ETFViewService {
             }
         }
         return html.toString();
+    }
+
+    private static Map<Integer, List<String>> stocksFlowMap = new LinkedHashMap<>();
+    private static List<Integer> stocksFlowIndexList = new ArrayList<>();
+
+    private void constructMap() {
+        stocksFlowMap.put(-3, new ArrayList<>());
+        stocksFlowMap.put(-2, new ArrayList<>());
+        stocksFlowMap.put(-1, new ArrayList<>());
+        stocksFlowMap.put(1, new ArrayList<>());
+        stocksFlowMap.put(2, new ArrayList<>());
+        stocksFlowMap.put(3, new ArrayList<>());
+        stocksFlowMap.put(4, new ArrayList<>());
+        stocksFlowMap.put(5, new ArrayList<>());
+        stocksFlowIndexList.clear();
+        stocksFlowIndexList.add(-1);
+        stocksFlowIndexList.add(-2);
+        stocksFlowIndexList.add(-3);
+        stocksFlowIndexList.add(1);
+        stocksFlowIndexList.add(2);
+        stocksFlowIndexList.add(3);
+        stocksFlowIndexList.add(4);
+        stocksFlowIndexList.add(5);
+    }
+
+    private String dayLineStocksFlowView(List<StockNameVO> industryEtfs) {
+        constructMap();
+        for (int i = 0; i < industryEtfs.size(); i++) {
+            StringBuilder tdHtml = new StringBuilder();
+            StockNameVO stock = industryEtfs.get(i);
+
+            String id_name = stock.getStockId() + "_" + stock.getStockName();
+            String fiveBackGroudColor = "#C0C0C0";
+            String tenBackGroudColor = "#C0C0C0";
+
+            Integer upwardDaysFive = stock.getUpwardDaysFive();
+            if (upwardDaysFive >= 0) {
+                fiveBackGroudColor = "#00FF00";
+            }
+
+            if (i < fiveDayExceedTen_num) {
+                fiveBackGroudColor = " pink";
+            }
+            if (stock.getUpwardDaysTen() >= 0) {
+                tenBackGroudColor = "#00FF00";
+            }
+
+            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">")
+                    .append("<a href=\"https://gushitong.baidu.com/fund/ab-").append(stock.getStockId().substring(2)).append("\">").append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
+                    .append("(" + upwardDaysFive).append("|")
+                    .append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>")
+                    .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
+                    .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")
+                    .append("</div>")
+                    .append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
+            if (stocksFlowMap.get(upwardDaysFive) == null) {
+                if (upwardDaysFive < -3) {
+                    stocksFlowMap.get(-3).add(tdHtml.toString());
+                } else {
+                    stocksFlowMap.get(5).add(tdHtml.toString());
+                }
+            } else {
+                stocksFlowMap.get(upwardDaysFive).add(tdHtml.toString());
+            }
+        }
+
+        List<Integer> intList = new ArrayList<>();
+        stocksFlowMap.keySet().forEach(
+                key -> {
+                    intList.add(stocksFlowMap.get(key).size());
+                });
+        int trLineSize = intList.stream().sorted(Comparator.reverseOrder()).toList().get(0);
+        StringBuilder retHtml = new StringBuilder();
+        retHtml.append("<tr>");
+        for (Integer integer : stocksFlowIndexList) {
+            List<String> tdList = stocksFlowMap.get(integer);
+            int size = tdList.size();
+            retHtml.append("<td>").append(size).append("</td>");
+        }
+
+        retHtml.append("</tr>");
+        for (int i = 0; i < trLineSize; i++) {
+            StringBuilder trString = new StringBuilder();
+            trString.append("<tr>");
+            for (Integer integer : stocksFlowIndexList) {
+                List<String> tdList = stocksFlowMap.get(integer);
+                int size = tdList.size();
+                if (i < size) {
+                    trString.append(tdList.get(i));
+                } else {
+                    trString.append("<td>null</td>");
+                }
+            }
+            trString.append("</tr>");
+            retHtml.append(trString);
+        }
+        return retHtml.toString();
     }
 
 
