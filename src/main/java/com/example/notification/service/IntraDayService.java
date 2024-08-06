@@ -135,7 +135,7 @@ public class IntraDayService {
                 StockDailyVO stockDailyVO = new StockDailyVO();
                 stockDailyVO.setStockId(stockVO.getStockId());
                 stockDailyVO.setDay(today);
-                stockDailyVO.setClosingPrice(BigDecimal.valueOf(Double.valueOf(split[1])));
+                stockDailyVO.setClosingPrice(new BigDecimal(split[1]));
                 stockDailyDao.save(stockDailyVO);
                 return null;
             });

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 
 @Data
@@ -51,10 +52,10 @@ public class StockDailyVO {
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
         this.stockId = stockId;
         this.day = Date.valueOf(day);
-        this.openingPrice = new BigDecimal(openingPrice);
-        this.closingPrice = new BigDecimal(closingPrice);
-        this.intradayHigh = new BigDecimal(intradayHigh);
-        this.intradayLow = new BigDecimal(intradayLow);
+        this.openingPrice = new BigDecimal(openingPrice).setScale(3, RoundingMode.DOWN);
+        this.closingPrice = new BigDecimal(closingPrice).setScale(3, RoundingMode.DOWN);
+        this.intradayHigh = new BigDecimal(intradayHigh).setScale(3, RoundingMode.DOWN);
+        this.intradayLow = new BigDecimal(intradayLow).setScale(3, RoundingMode.DOWN);
     }
 
     public StockDailyVO() {
