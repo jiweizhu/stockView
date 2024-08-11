@@ -165,7 +165,12 @@ public class ETFViewService {
             });
             industryEtfsTable = industryEtfsView(industryEtfs);
         }
-        if (num.equals("wholeEtfsView")) {
+
+        Boolean returnFiveSort = true;
+        if(num.split("_").length > 1){
+            returnFiveSort= false;
+        }
+        if (num.contains("wholeEtfsView")) {
             List<StockNameVO> upWardIndustryEtfs = new ArrayList<>();
             List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
             commonStockList.forEach(vo -> {
@@ -178,9 +183,9 @@ public class ETFViewService {
                 }
             });
             upWardIndustryEtfs.addAll(downWardIndustryEtfs);
-            industryEtfsTable = dayLineEtfsView(upWardIndustryEtfs);
+            industryEtfsTable = dayLineStocksFlowView(upWardIndustryEtfs, returnFiveSort);
         }
-        if (num.equals("300_mainBoard")) {
+        if (num.contains("300mainBoard")) {
             Set<String> threeHundredSet = new HashSet<>();
             Constants.getMainBoard300(mainboard300_path).forEach(
                     vo -> {
@@ -209,7 +214,8 @@ public class ETFViewService {
             });
             fiveDayExceedTenDay.addAll(upwardStocks);
             fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay);
+
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnFiveSort);
         }
         if (num.equals("main")) {
             industryEtfsTable = mainEtfsView(mainEtfs);
@@ -267,7 +273,7 @@ public class ETFViewService {
         stocksFlowIndexList.add(5);
     }
 
-    private String dayLineStocksFlowView(List<StockNameVO> industryEtfs) {
+    private String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
         constructMap();
         for (int i = 0; i < industryEtfs.size(); i++) {
             StringBuilder tdHtml = new StringBuilder();
@@ -277,8 +283,11 @@ public class ETFViewService {
             String fiveBackGroudColor = "#C0C0C0";
             String tenBackGroudColor = "#C0C0C0";
 
-            Integer upwardDaysFive = stock.getUpwardDaysFive();
-            if (upwardDaysFive >= 0) {
+            Integer upwardDaysNum = stock.getUpwardDaysFive();
+            if(!returnFiveSort){
+                upwardDaysNum = stock.getUpwardDaysTen();
+            }
+            if (upwardDaysNum >= 0) {
                 fiveBackGroudColor = "#00FF00";
             }
 
@@ -290,21 +299,22 @@ public class ETFViewService {
             }
 
             tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">")
-                    .append("<a href=\"https://gushitong.baidu.com/fund/ab-").append(stock.getStockId().substring(2)).append("\">").append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
-                    .append("(" + upwardDaysFive).append("|")
+                    .append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stock.getStockId().substring(2)).append("\">")
+                    .append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
+                    .append("(" + stock.getUpwardDaysFive()).append("|")
                     .append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>")
                     .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
                     .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")
                     .append("</div>")
                     .append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
-            if (stocksFlowMap.get(upwardDaysFive) == null) {
-                if (upwardDaysFive < -3) {
+            if (stocksFlowMap.get(upwardDaysNum) == null) {
+                if (upwardDaysNum < -3) {
                     stocksFlowMap.get(-3).add(tdHtml.toString());
                 } else {
                     stocksFlowMap.get(5).add(tdHtml.toString());
                 }
             } else {
-                stocksFlowMap.get(upwardDaysFive).add(tdHtml.toString());
+                stocksFlowMap.get(upwardDaysNum).add(tdHtml.toString());
             }
         }
 

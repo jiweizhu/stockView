@@ -96,12 +96,12 @@ public class Controller {
         if (num.equals("3") || num.equals("4")) {
             body = etfViewService.findAllEtfSortView_new(num);
         }
-        else if (num.equals("300_mainBoard")) {
-            body = etfViewService.findAllEtfSortView_new("300_mainBoard");
+        else if (num.contains("300mainBoard")) {
+            body = etfViewService.findAllEtfSortView_new(num);
         }
-        else if (num.equals("wholeEtfsView")) {
-            body = etfViewService.findAllEtfSortView_new("wholeEtfsView");
-        }else if (num.equals("main")) {
+        else if (num.contains("wholeEtfsView")) {
+            body = etfViewService.findAllEtfSortView_new(num);
+        }else if (num.contains("main")) {
             body = etfViewService.findAllEtfSortView_new(num);
         } else {
             body = etfViewService.findAllEtfSortView(num);

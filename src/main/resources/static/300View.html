@@ -63,7 +63,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch(`http://${serverIp}:8888/etfs/300_mainBoard`)
+          fetch(`http://${serverIp}:8888/etfs/300mainBoard`)
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');
@@ -100,7 +100,6 @@
 var data_300;
 async function get300Data() {
  data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());
-  console.log('data_300====', data_300);
 }
 
 function toggleColumn() {
@@ -159,11 +158,11 @@ function toggleColumn() {
 
     const normalized_data = normalize(data, data_min, data_max);
     const normalized_data_300 = normalize(data_300_tmp, data_300_min, data_300_max);
-const line_data_300 = normalized_data_300.map(item => item[1]);
+    const line_data_300 = normalized_data_300.map(item => item[1]);
 
     option = {
       legend: {
-        data: ['日K', 'MA5', 'MA10', '300日K'],
+        data: ['MA5', 'MA10', '300日K'],
         inactiveColor: '#777'
       },
       tooltip: {
@@ -228,16 +227,6 @@ const line_data_300 = normalized_data_300.map(item => item[1]);
             borderColor0: '#0CF49B'
           }
         },
-         {
-            type: 'line',
-            name: '300日K',
-            data: line_data_300,
-              smooth: true,
-          showSymbol: false,
-          lineStyle: {
-            width: 1
-          }
-          },
         {
           name: 'MA5',
           type: 'line',
@@ -257,7 +246,18 @@ const line_data_300 = normalized_data_300.map(item => item[1]);
           lineStyle: {
             width: 1
           }
-        }
+        },
+        {
+            type: 'line',
+            name: '300日K',
+            data: line_data_300,
+              smooth: true,
+          showSymbol: false,
+          lineStyle: {
+            width: 0.5,
+             color: '#EE9A00'
+          }
+          }
       ]
     };
 

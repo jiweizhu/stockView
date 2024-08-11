@@ -58,8 +58,8 @@
 <a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
 <table border="1" id="myTable"></table>
 <script>
-      const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-      document.getElementById('getDivs').addEventListener('click', getDivs);
+  const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+  document.getElementById('getDivs').addEventListener('click', getDivs);
 
 
 var data_300;
@@ -81,17 +81,17 @@ async function get300Data() {
      }
 
 
-      function loadIndexTableData() {
-        fetch(`http://${serverIp}:8888/etfs/main`)
-           .then(response => response.text())
-           .then(data => {
-              const dataContainer = document.getElementById('mainTable');
-              dataContainer.innerHTML = data;
-           })
-           .catch(error => {
-              console.error('Error fetching data:', error);
-           })
-      }
+  function loadIndexTableData() {
+    fetch(`http://${serverIp}:8888/etfs/main`)
+       .then(response => response.text())
+       .then(data => {
+          const dataContainer = document.getElementById('mainTable');
+          dataContainer.innerHTML = data;
+       })
+       .catch(error => {
+          console.error('Error fetching data:', error);
+       })
+  }
 
 loadTableData();
 loadIndexTableData();

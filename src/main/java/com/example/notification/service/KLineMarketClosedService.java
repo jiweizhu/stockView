@@ -499,7 +499,8 @@ public class KLineMarketClosedService {
                 continue;
             }
             String[] strings = new String[7];
-            strings[0] = formatter.format(stockNameVO.getDay());
+            Date day = stockNameVO.getDay();
+            strings[0] = getFormat(day);
             strings[1] = stockNameVO.getOpeningPrice().toString();
             strings[2] = stockNameVO.getClosingPrice().toString();
             strings[3] = stockNameVO.getIntradayHigh().toString();
@@ -508,6 +509,10 @@ public class KLineMarketClosedService {
             result.add(strings);
         }
         return result;
+    }
+
+    private static synchronized String getFormat(Date day) {
+        return formatter.format(day);
     }
 
 
@@ -705,7 +710,7 @@ public class KLineMarketClosedService {
         ArrayList<String[]> result = new ArrayList<>();
         for (WeekPriceVO weekPriceVO : resultList) {
             String[] strings = new String[7];
-            strings[0] = formatter.format(weekPriceVO.getDay());
+            strings[0] = getFormat(weekPriceVO.getDay());
             strings[1] = weekPriceVO.getOpeningPrice().toString();
             strings[2] = weekPriceVO.getClosingPrice().toString();
             strings[3] = weekPriceVO.getWeekHigh().toString();

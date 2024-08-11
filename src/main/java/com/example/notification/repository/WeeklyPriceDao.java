@@ -15,7 +15,7 @@ public interface WeeklyPriceDao extends JpaRepository<WeekPriceVO, WeekPriceKey>
     @Query(value = "SELECT day FROM week_price where stock_id = ?1 order by day ", nativeQuery = true)
     List<String> findWeekDaysByStockId(String stock_id);
 
-    @Query(value = "SELECT * FROM week_price where stock_id = ?1 order by day limit 300", nativeQuery = true)
+    @Query(value = "SELECT * FROM week_price where stock_id = ?1 order by day ", nativeQuery = true)
     List<WeekPriceVO> findAllByStockId(String stock_id);
 
 
