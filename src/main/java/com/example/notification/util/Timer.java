@@ -1,5 +1,6 @@
 package com.example.notification.util;
 
+import com.example.notification.baidu.service.BaiduInfoService;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
@@ -26,6 +27,8 @@ public class Timer {
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
+    @Autowired
+    private BaiduInfoService baiduInfoService;
 
     @Autowired
     private IntraDayService intraDayService;
@@ -50,6 +53,12 @@ public class Timer {
         return list;
     }
 
+    @Scheduled(cron = "5 * 15 ? * MON-FRI")
+    public Object calculateIndicatorsAvg() {
+        logger.info("========= cron exec calculateIndicatorsAvg =======");
+        baiduInfoService.calculateIndicatorsAvg();
+        return "ok...done";
+    }
 
     //   every day in 8:00
     @Scheduled(cron = "0 0 8 * * ?")

@@ -167,8 +167,8 @@ public class ETFViewService {
         }
 
         Boolean returnFiveSort = true;
-        if(num.split("_").length > 1){
-            returnFiveSort= false;
+        if (num.split("_").length > 1) {
+            returnFiveSort = false;
         }
         if (num.contains("wholeEtfsView")) {
             List<StockNameVO> upWardIndustryEtfs = new ArrayList<>();
@@ -273,18 +273,19 @@ public class ETFViewService {
         stocksFlowIndexList.add(5);
     }
 
-    private String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+    public String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
         constructMap();
         for (int i = 0; i < industryEtfs.size(); i++) {
             StringBuilder tdHtml = new StringBuilder();
             StockNameVO stock = industryEtfs.get(i);
 
-            String id_name = stock.getStockId() + "_" + stock.getStockName();
+            String stockId = stock.getStockId();
+            String id_name = stockId + "_" + stock.getStockName();
             String fiveBackGroudColor = "#C0C0C0";
             String tenBackGroudColor = "#C0C0C0";
 
             Integer upwardDaysNum = stock.getUpwardDaysFive();
-            if(!returnFiveSort){
+            if (!returnFiveSort) {
                 upwardDaysNum = stock.getUpwardDaysTen();
             }
             if (upwardDaysNum >= 0) {
@@ -298,9 +299,13 @@ public class ETFViewService {
                 tenBackGroudColor = "#00FF00";
             }
 
-            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">")
-                    .append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stock.getStockId().substring(2)).append("\">")
-                    .append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
+            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");
+            if (stockId.startsWith("sh") || stockId.startsWith("sz")) {
+                tdHtml.append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stockId.substring(2)).append("\">");
+            } else {
+                tdHtml.append(stockId+"#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+            }
+            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
                     .append("(" + stock.getUpwardDaysFive()).append("|")
                     .append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>")
                     .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")

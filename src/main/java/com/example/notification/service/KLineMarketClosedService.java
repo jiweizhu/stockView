@@ -1,5 +1,6 @@
 package com.example.notification.service;
 
+import com.example.notification.constant.Constants;
 import com.example.notification.http.RestRequest;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
@@ -451,7 +452,7 @@ public class KLineMarketClosedService {
         stockNameVO.setStockName(stockChineseName);
     }
 
-    private static SimpleDateFormat formatter = new SimpleDateFormat("YYYY/MM/dd");
+
     private static SimpleDateFormat formatter_yyyy_mm_day = new SimpleDateFormat("YYYY-MM-dd");
 
     public Object multiK(String stockId) {
@@ -486,9 +487,9 @@ public class KLineMarketClosedService {
         Set<String> stringSet = mainKlineIds.stream().collect(Collectors.toSet());
         List<StockDailyVO> resultList;
         if (stringSet.contains(stockId)) {
-            resultList = stockDailyDao.findByIndexStockIdOrderByDay(stockId);
+            resultList = stockDailyDao.findByIndexStockIdOrderByDay(stockId, Constants.rangeSize);
         } else {
-            resultList = stockDailyDao.findByStockIdOrderByDay(stockId);
+            resultList = stockDailyDao.findByStockIdOrderByDay(stockId, Constants.rangeSize);
         }
         Collections.reverse(resultList);
         ArrayList<String[]> result = new ArrayList<>();
@@ -500,7 +501,7 @@ public class KLineMarketClosedService {
             }
             String[] strings = new String[7];
             Date day = stockNameVO.getDay();
-            strings[0] = getFormat(day);
+            strings[0] = Utils.getFormat(day);
             strings[1] = stockNameVO.getOpeningPrice().toString();
             strings[2] = stockNameVO.getClosingPrice().toString();
             strings[3] = stockNameVO.getIntradayHigh().toString();
@@ -510,11 +511,6 @@ public class KLineMarketClosedService {
         }
         return result;
     }
-
-    private static synchronized String getFormat(Date day) {
-        return formatter.format(day);
-    }
-
 
     public Object listEtfs() throws JsonProcessingException {
         logger.info("enter listEtfs ====");
@@ -547,7 +543,6 @@ public class KLineMarketClosedService {
             setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             stockNameVO.setLastUpdatedTime(timestamp);
-            logger.info("handle flip days and gain ====stock: {}, day={} ", stockNameVO, formatter.format(timestamp));
             stockDao.save(stockNameVO);
             retStr.append(stockNameVO.getStockId() + "_" + stockNameVO.getStockName() + "</br>");
         }
@@ -710,7 +705,7 @@ public class KLineMarketClosedService {
         ArrayList<String[]> result = new ArrayList<>();
         for (WeekPriceVO weekPriceVO : resultList) {
             String[] strings = new String[7];
-            strings[0] = getFormat(weekPriceVO.getDay());
+            strings[0] = Utils.getFormat(weekPriceVO.getDay());
             strings[1] = weekPriceVO.getOpeningPrice().toString();
             strings[2] = weekPriceVO.getClosingPrice().toString();
             strings[3] = weekPriceVO.getWeekHigh().toString();

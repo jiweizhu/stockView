@@ -1,5 +1,6 @@
 package com.example.notification.controller;
 
+import com.example.notification.constant.Constants;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
@@ -40,6 +41,13 @@ public class Controller {
         return "ok";
     }
 
+    @RequestMapping(value = {"/range/{size}"})
+    @ResponseBody
+    public String updateGraphRange(@PathVariable String size) {
+        Constants.rangeSize = Integer.parseInt(size);
+        return "ok";
+    }
+
     @RequestMapping(value = {"/stock/list"})
     @ResponseBody
     public ResponseEntity listAllETFs() throws JsonProcessingException {
@@ -73,7 +81,7 @@ public class Controller {
 
     @RequestMapping(value = {"/stock/weekly/{stockId}"})
     @ResponseBody
-    public ResponseEntity stockWeeklyDataById(@PathVariable String stockId)  {
+    public ResponseEntity stockWeeklyDataById(@PathVariable String stockId) {
         Object body = kLineMarketClosedService.stockWeeklyJsonData(stockId);
         return ResponseEntity.ofNullable(body);
     }
@@ -95,13 +103,11 @@ public class Controller {
         Object body = "";
         if (num.equals("3") || num.equals("4")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        }
-        else if (num.contains("300mainBoard")) {
+        } else if (num.contains("300mainBoard")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        }
-        else if (num.contains("wholeEtfsView")) {
+        } else if (num.contains("wholeEtfsView")) {
             body = etfViewService.findAllEtfSortView_new(num);
-        }else if (num.contains("main")) {
+        } else if (num.contains("main")) {
             body = etfViewService.findAllEtfSortView_new(num);
         } else {
             body = etfViewService.findAllEtfSortView(num);

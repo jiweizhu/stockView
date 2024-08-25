@@ -13,13 +13,19 @@ import java.util.List;
 public class Constants {
     private static final Logger logger = LoggerFactory.getLogger(Constants.class);
     // should set bigger than 9, then it can get 10 days avg value
-    public static Integer MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY= 15;
+    public static Integer MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY = 15;
 
-    public static String TOTAL= "total";
-    public static String ROWS= "rows";
+    public static String TOTAL = "total";
+    public static String ROWS = "rows";
+
+    public static Integer rangeSize = 250;
+
+    public static Integer getRangeSize() {
+        return rangeSize;
+    }
 
 
-    public static List<StockNameVO> getMainBoard300(String path){
+    public static List<StockNameVO> getMainBoard300(String path) {
         String line;
         List<StockNameVO> retList = new ArrayList<>();
         try {
@@ -31,9 +37,26 @@ public class Constants {
                     retList.add(new StockNameVO(split[0]));
                 }
             }
-        }catch (IOException exception){
-            logger.error("Error : ",exception);
+        } catch (IOException exception) {
+            logger.error("Error : ", exception);
         }
         return retList;
     }
+
+    public static List<String> getBaiduIndictorImportList(String path) {
+        String line;
+        List<String> retList = new ArrayList<>();
+        try {
+            BufferedReader reader = FileUtil.bufferReader(path);
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("#")) continue;
+                retList.add(line);
+            }
+        } catch (IOException exception) {
+            logger.error("Error : ", exception);
+        }
+        return retList;
+    }
+
+
 }
