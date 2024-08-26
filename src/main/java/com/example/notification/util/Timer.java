@@ -46,18 +46,11 @@ public class Timer {
         return list;
     }
 
-    @Scheduled(cron = "5 * 15 ? * MON-FRI")
+    @Scheduled(cron = "5 * 15 ? * *")
     public Object getPriceByminute1() throws ParseException {
         logger.info("========= cron exec getPriceByminute =======");
         Object list = intraDayService.getPriceByminute();
         return list;
-    }
-
-    @Scheduled(cron = "5 * 15 ? * MON-FRI")
-    public Object calculateIndicatorsAvg() {
-        logger.info("========= cron exec calculateIndicatorsAvg =======");
-        baiduInfoService.calculateIndicatorsAvg();
-        return "ok...done";
     }
 
     //   every day in 8:00
@@ -73,9 +66,13 @@ public class Timer {
         }
     }
 
-    @Scheduled(cron = "0 10 15 * * MON-FRI")
+    @Scheduled(cron = "0 10 15 * * *")
     public void generateReportWhenMarketClose() {
         try {
+            logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
+            baiduInfoService.calculateIndicatorsAvg();
+            logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
+
             logger.info("Start cron job generateReportEveryMarketDay=====");
             Object body = kLineMarketClosedService.delete_HistoryData();
             kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
