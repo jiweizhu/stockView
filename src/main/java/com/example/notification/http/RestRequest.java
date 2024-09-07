@@ -64,6 +64,7 @@ public class RestRequest {
     }
 
     public List<IndicatorDayVO> queryBaiduIndustriesKline(String code, String kType, String startDay) {
+        logger.info("Enter queryBaiduIndustriesKline ============ code==${}, kType=${}, startDay=${},", code, kType, startDay);
         String code1 = code.replace("sh", "").replace("sz", "");
         String url = BaiduIndustry_KLine_Url.replace("$code", code1).replace("$ktype", kType).replace("$startTime", startDay);
         List blockList = new ArrayList();
@@ -81,6 +82,7 @@ public class RestRequest {
                 }
             }
         } catch (Exception e) {
+            logger.info("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
             logger.error("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
             return blockList;
         }

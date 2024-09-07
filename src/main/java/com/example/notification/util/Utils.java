@@ -36,6 +36,11 @@ public class Utils {
         return FORMATTER_YYYYMMDD.format(day);
     }
 
+    private static SimpleDateFormat FORMATTER_YYYY_MM_DD = new SimpleDateFormat("YYYY-MM-dd");
+    public static synchronized String getFormat_YYYY_MM_DD(java.sql.Date day) {
+        return FORMATTER_YYYY_MM_DD.format(day);
+    }
+
     public static boolean isWinSystem() {
         String os = System.getenv("OS");
         if (null != os && os.toLowerCase().contains("windows")) {

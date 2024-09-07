@@ -22,6 +22,7 @@
             <!-- 设置控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch)-->
             <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <!-- 设置输出格式,不设置默认为:%m%n -->
             <PatternLayout pattern="${consoleLogPattern}"/>
         </Console>
@@ -43,6 +44,7 @@
             <Filters>
                 <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
                 <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
         </RollingFile>
         <!-- ============================打印ERROR级别的日志到文件中=======配置和INFO的一样,就修改下保存文件名称和压缩文件名称==================== -->
@@ -63,7 +65,7 @@
     <!--定义logger,只有定义了logger并引入的appender,appender才会生效-->
     <loggers>
         <!-- 设置java.sql包下的日志只打印INFO及以上级别的日志,此设置可以支持sql语句的日志打印 -->
-        <logger name="com.example.notification" level="debug" additivity="false">
+        <logger name="com.example.notification" level="debug" additivity="true">
             <appender-ref ref="Console"/>
         </logger>
         <logger name="com" level="info" additivity="false">

@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-public class LocalTest {
+public class LocalTest2 {
 
 
     private static ObjectMapper objectMapper = new ObjectMapper()
@@ -18,7 +18,7 @@ public class LocalTest {
     public static void main(String[] args) throws JsonProcessingException, InterruptedException {
         // Initialize Wind connection
 
-        String url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=931811&startDate=20190829&endDate=20240828";
+        String url = "https://finance.pae.baidu.com/vapi/v2/blocks?pn=0&rn=20&market=ab&typeCode=HY&finClientType=pc";
 
         RestTemplate restTemplate = new RestTemplate();
 

@@ -3,10 +3,13 @@ package com.example.notification.baidu.service;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.http.RestRequest;
+import com.example.notification.repository.BdIndicatorDailyDao;
 import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
+import com.example.notification.util.Utils;
+import com.example.notification.vo.BdIndicatorDailyVO;
 import com.example.notification.vo.BdIndicatorVO;
 import com.example.notification.vo.StockDailyVO;
 import com.example.notification.vo.StockNameVO;
@@ -19,10 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -56,6 +61,9 @@ public class BaiduInfoService {
     @Autowired
     private StockDailyDao stockDailyDao;
 
+    @Autowired
+    private BdIndicatorDailyDao bdIndicatorDailyDao;
+
 
     public List<IndicatorVO> queryBaiduIndustriesRealInfo() {
         List<IndicatorVO> list = restRequest.queryBaiduIndustriesRealInfo();
@@ -65,7 +73,8 @@ public class BaiduInfoService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public Object stockJsonData(String stockId) {
-        logger.debug("enter BaiduInfoService stockJsonData stockId =============" + stockId);
+        ArrayList<String[]> result = new ArrayList<>();
+        logger.info("enter BaiduInfoService stockJsonData stockId =============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
@@ -78,7 +87,41 @@ public class BaiduInfoService {
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
         Set<String> stringSet = mainKlineIds.stream().collect(Collectors.toSet());
         List<IndicatorDayVO> kLineList = restRequest.queryBaiduIndustriesKline(stockId, "day", formattedDate);
-        ArrayList<String[]> result = new ArrayList<>();
+        List<BdIndicatorDailyVO> voList = bdIndicatorDailyDao.findByIndexStockIdOrderByDay(stockId, rangeSize);
+        if (kLineList.isEmpty()) {
+            //as baidu restrict to query
+            // return db data
+            for (BdIndicatorDailyVO vo : voList) {
+                String[] strings = new String[7];
+                strings[0] = Utils.getFormat(vo.getDay());
+                strings[1] = vo.getOpeningPrice().toString();
+                strings[2] = vo.getClosingPrice().toString();
+                strings[3] = vo.getIntradayHigh().toString();
+                strings[4] = vo.getIntradayLow().toString();
+                result.add(strings);
+            }
+            return result;
+        }
+        // save new in db
+        Set<String> dayLinesInDbSet = new HashSet<>();
+        for (BdIndicatorDailyVO vo : voList) {
+            dayLinesInDbSet.add(Utils.getFormat_YYYY_MM_DD(vo.getDay()));
+        }
+        for (int i = kLineList.size() - 1; i >= 0; i--) {
+            IndicatorDayVO dayVO = kLineList.get(i);
+            if (dayLinesInDbSet.contains(dayVO.getTime())) {
+                break;
+            }
+            BdIndicatorDailyVO newVo = new BdIndicatorDailyVO();
+            newVo.setStockId(stockId);
+            newVo.setDay(new Date(dayVO.getTimestamp()));
+            newVo.setOpeningPrice(BigDecimal.valueOf(dayVO.getOpen()));
+            newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
+            newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
+            newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
+            bdIndicatorDailyDao.save(newVo);
+        }
+        //return
         for (IndicatorDayVO vo : kLineList) {
             String[] strings = new String[7];
             strings[0] = vo.getTime();
@@ -91,7 +134,6 @@ public class BaiduInfoService {
         return result;
     }
 
-
     public void calculateIndicatorsAvg() {
         logger.debug("enter BaiduInfoService calculateIndicatorsAvg =============");
         List<BdIndicatorVO> ids = bdIndicatorDao.findAll();
@@ -103,6 +145,7 @@ public class BaiduInfoService {
             tasks.add(() -> {
                 //get from baidu net, 200 days
                 List<IndicatorDayVO> dayLine = restRequest.queryBaiduIndustriesKline(id.getStockId(), "day", formattedDate);
+                logger.info("Finish queryBaiduIndustriesKline======" + id.getStockId() + "========" + dayLine.size());
                 //calculate avg
                 setUpwardDaysFive(id, dayLine);
                 setUpwardDaysTen(id, dayLine);
@@ -168,5 +211,10 @@ public class BaiduInfoService {
         });
         String html = etfViewService.dayLineStocksFlowView(industryEtfs, true);
         return html;
+    }
+
+    public Object indicatorStocksView(String indicatorId) {
+
+        return null;
     }
 }

@@ -68,7 +68,17 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/indicatorsView"})
     @ResponseBody
     public ResponseEntity indicatorsView() {
+//        baiduInfoService.calculateIndicatorsAvg();
         Object body = baiduInfoService.indicatorsView();
+        return ResponseEntity.ofNullable(body);
+    }
+
+
+    @RequestMapping(value = {"/bd/indicatorStocksView"})
+    @ResponseBody
+    public ResponseEntity indicatorStocksView(@PathVariable String indicatorId) {
+        logger.info("Enter method indicatorStocksView=========");
+        Object body = baiduInfoService.indicatorStocksView(indicatorId);
         return ResponseEntity.ofNullable(body);
     }
 
@@ -90,7 +100,7 @@ public class BaiDuController {
     @ResponseBody
     public ResponseEntity test() {
         baiduInfoService.calculateIndicatorsAvg();
-        return ResponseEntity.ofNullable("null");
+        return ResponseEntity.ofNullable("finish calculateIndicatorsAvg");
     }
 
 

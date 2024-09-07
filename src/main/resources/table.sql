@@ -1,6 +1,46 @@
 SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS 'Size (MB)' FROM information_schema.tables GROUP BY table_schema;
 
 Create schema stock;
+
+CREATE TABLE  bd_indicator(
+indicator_id VARCHAR(12) primary key,
+indicator_name VARCHAR(20),
+upward_days_five INT,
+gain_percent_five DECIMAL(10,2),
+flip_upward_days_five INT,
+flip_gain_percent_five DECIMAL(10,2),
+flip_day_five DATE,
+flip_end_day_five DATE,
+
+upward_days_ten INT,
+gain_percent_ten DECIMAL(10,2),
+flip_upward_days_ten INT,
+flip_gain_percent_ten DECIMAL(10,2),
+flip_day_ten DATE,
+flip_end_day_ten DATE,
+
+stock_ids VARCHAR(1000),
+last_updated_time time
+
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE bd_daily_price (
+stock_id VARCHAR(12) NOT NULL,
+day DATE NOT NULL,
+opening_price DECIMAL(10,3),
+closing_price DECIMAL(10,3),
+intraday_high DECIMAL(10,3),
+intraday_low DECIMAL(10,3),
+day_avg_five DECIMAL(10,3),
+day_avg_ten DECIMAL(10,3),
+day_avg_twenty DECIMAL(10,3),
+day_gain_of_five DECIMAL(10,2),
+day_gain_of_ten DECIMAL(10,2),
+day_gain_of_twenty DECIMAL(10,2),
+PRIMARY KEY(stock_id, day)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE  imported_stock(
 stock_id VARCHAR(12) primary key,
 stock_name VARCHAR(20)
@@ -93,24 +133,4 @@ customer_range_gain_post DECIMAL(10,2)
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE  bd_indicator(
-indicator_id VARCHAR(12) primary key,
-indicator_name VARCHAR(20),
-upward_days_five INT,
-gain_percent_five DECIMAL(10,2),
-flip_upward_days_five INT,
-flip_gain_percent_five DECIMAL(10,2),
-flip_day_five DATE,
-flip_end_day_five DATE,
 
-upward_days_ten INT,
-gain_percent_ten DECIMAL(10,2),
-flip_upward_days_ten INT,
-flip_gain_percent_ten DECIMAL(10,2),
-flip_day_ten DATE,
-flip_end_day_ten DATE,
-
-stock_ids VARCHAR(1000),
-last_updated_time time
-
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;

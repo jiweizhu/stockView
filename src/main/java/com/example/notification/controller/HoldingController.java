@@ -6,6 +6,7 @@ import com.example.notification.requestVO.HoldingStockRequestVO;
 import com.example.notification.service.HoldingService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
+import com.example.notification.util.Utils;
 import com.example.notification.vo.HoldingStockVO;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -128,7 +129,10 @@ public class HoldingController {
 
     @RequestMapping(value = {"/holdingStock/datagridList"})
     @ResponseBody
-    public Object datagridList() {
+    public Object datagridList() throws ParseException {
+        if (Utils.isWinSystem()) {
+            intraDayService.getPriceByminute();
+        }
         Object list = holdingService.datagridList();
         return list;
     }

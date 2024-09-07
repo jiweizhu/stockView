@@ -88,7 +88,6 @@ $(function(){
         sortOrder: 'asc',
         remoteSort: false,
         fitColumns: false,
-<!--        change row color -->
         rowStyler:function(index,row,value){
             if (row.oneDayGain<0){
                 return 'background-color:#e0e3ea;';
@@ -98,7 +97,6 @@ $(function(){
     });
 startAutoRefresh();
 
-// 更新当前时间显示
 setInterval(updateCurrentTime, 1000);
 });
 
@@ -107,7 +105,6 @@ function startAutoRefresh() {
         location.reload();
     }, 60000); // 60000 毫秒 = 1 分钟
 
-    // 设置下次刷新时间
     nextRefreshTime = new Date(Date.now() + 60000);
     updateRefreshTime();
 }
