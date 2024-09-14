@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.getRangeSize;
 
@@ -85,7 +84,7 @@ public class BaiduInfoService {
         String formattedDate = day.toLocalDate().format(formatter);
 
         ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
-        Set<String> stringSet = mainKlineIds.stream().collect(Collectors.toSet());
+        Set<String> stringSet = new HashSet<>(mainKlineIds);
         List<IndicatorDayVO> kLineList = restRequest.queryBaiduIndustriesKline(stockId, "day", formattedDate);
         List<BdIndicatorDailyVO> voList = bdIndicatorDailyDao.findByIndexStockIdOrderByDay(stockId, rangeSize);
         if (kLineList.isEmpty()) {
