@@ -65,6 +65,13 @@ public class BaiDuController {
         return ResponseEntity.ofNullable(body);
     }
 
+    @RequestMapping(value = {"/bd/wk/stock/{stockId}"})
+    @ResponseBody
+    public ResponseEntity stockWeekDataById(@PathVariable String stockId) {
+        Object body = baiduInfoService.stockWeekJsonData(stockId);
+        return ResponseEntity.ofNullable(body);
+    }
+
     @RequestMapping(value = {"/bd/indicatorsView"})
     @ResponseBody
     public ResponseEntity indicatorsView() {

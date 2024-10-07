@@ -99,7 +99,7 @@
 
 var data_300;
 async function get300Data() {
- data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());
+ data_300 = await fetch(`http://${serverIp}:8888/stock/weekly/sh510300`).then(response => response.json());
 }
 
 function toggleColumn() {
@@ -111,7 +111,7 @@ function toggleColumn() {
     spans.forEach(span => {
        createETFChart(span);
     });
- }
+}
     async function createETFChart(span) {
 
     var myChart = echarts.init(span, null, {
@@ -119,7 +119,7 @@ function toggleColumn() {
       useDirtyRect: false
     });
 
-    const rawData = await fetch(`http://${serverIp}:8888/stock/`+span.id.replace('span_', '')).then(response => response.json());
+    const rawData = await fetch(`http://${serverIp}:8888/stock/weekly/`+span.id.replace('span_', '')).then(response => response.json());
 
     function calculateMA(dayCount, data) {
       var result = [];

@@ -63,7 +63,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch(`http://${serverIp}:8888/etfs/300mainBoard`)
+          fetch(`http://${serverIp}:8888/bd/indicatorsView`)
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');
@@ -92,9 +92,9 @@
  setTimeout(function() {
  get300Data();
      getDivs();
-     $('.hide-column').hide();
+<!--     $('.hide-column').hide();-->
 
- }, 1000);
+ }, 8000);
  });
 
 var data_300;
@@ -111,7 +111,14 @@ function toggleColumn() {
     spans.forEach(span => {
        createETFChart(span);
     });
- }
+
+    const weeks = document.querySelectorAll('div[id^="week_"]');
+            weeks.forEach(span => {
+               createWeekChart(span);
+        });
+    }
+
+
     async function createETFChart(span) {
 
     var myChart = echarts.init(span, null, {
@@ -119,7 +126,7 @@ function toggleColumn() {
       useDirtyRect: false
     });
 
-    const rawData = await fetch(`http://${serverIp}:8888/stock/`+span.id.replace('span_', '')).then(response => response.json());
+    const rawData = await fetch(`http://${serverIp}:8888/bd/wk/stock/`+span.id.replace('span_', '')).then(response => response.json());
 
     function calculateMA(dayCount, data) {
       var result = [];

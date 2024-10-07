@@ -131,6 +131,7 @@ public class KLineMarketClosedService {
             if (id_name.getStockName().toLowerCase().contains("etf")) {
                 storedETFs.add(id_name);
             }
+            storedETFs.add(id_name);
         }
         return storedETFs;
     }
@@ -233,7 +234,8 @@ public class KLineMarketClosedService {
         final Integer daysToGet = days;
         List<Callable<Void>> tasks = new ArrayList<>();
         //iterator to query 50day price history and calculate 10day price, and store in db
-        List<StockNameVO> etfs = getAllEtfs();
+//        List<StockNameVO> etfs = getAllEtfs();
+        List<StockNameVO> etfs = stockDao.findAll();
         for (StockNameVO etfVO : etfs) {
             tasks.add(() -> {
                 // 降低速度，避免网站保护

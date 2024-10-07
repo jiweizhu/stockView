@@ -3,16 +3,11 @@ package com.example.notification.baidu.service;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.http.RestRequest;
-import com.example.notification.repository.BdIndicatorDailyDao;
-import com.example.notification.repository.BdIndicatorDao;
-import com.example.notification.repository.StockDailyDao;
+import com.example.notification.repository.*;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
-import com.example.notification.vo.BdIndicatorDailyVO;
-import com.example.notification.vo.BdIndicatorVO;
-import com.example.notification.vo.StockDailyVO;
-import com.example.notification.vo.StockNameVO;
+import com.example.notification.vo.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -61,7 +56,13 @@ public class BaiduInfoService {
     private StockDailyDao stockDailyDao;
 
     @Autowired
+    private WeeklyPriceDao weeklyPriceDao;
+
+    @Autowired
     private BdIndicatorDailyDao bdIndicatorDailyDao;
+
+    @Autowired
+    private BdIndicatorWeeklyDao bdIndicatorWeeklyDao;
 
 
     public List<IndicatorVO> queryBaiduIndustriesRealInfo() {
@@ -215,5 +216,66 @@ public class BaiduInfoService {
     public Object indicatorStocksView(String indicatorId) {
 
         return null;
+    }
+
+    public Object stockWeekJsonData(String stockId) {
+        ArrayList<String[]> result = new ArrayList<>();
+        logger.info("enter BaiduInfoService stockWeekJsonData stockId =============" + stockId);
+        if (stockId.contains("_")) {
+            stockId = stockId.split("_")[0];
+        }
+
+        Integer rangeSize = getRangeSize();
+        List<WeekPriceVO> sh510300 = weeklyPriceDao.findByIndexStockIdOrderByDay("sh510300", rangeSize);
+        Date day = sh510300.get(sh510300.size() - 1).getDay();
+        String formattedDate = day.toLocalDate().format(formatter);
+
+        ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
+        List<IndicatorDayVO> kLineList = restRequest.queryBaiduIndustriesKline(stockId, "week", formattedDate);
+        List<BdIndicatorWeeklyVO> voList = bdIndicatorWeeklyDao.findByIndexStockIdOrderByDay(stockId, rangeSize);
+        if (kLineList.isEmpty()) {
+            //as baidu restrict to query
+            // return db data
+            for (BdIndicatorWeeklyVO vo : voList) {
+                String[] strings = new String[7];
+                strings[0] = Utils.getFormat(vo.getDay());
+                strings[1] = vo.getOpeningPrice().toString();
+                strings[2] = vo.getClosingPrice().toString();
+                strings[3] = vo.getIntradayHigh().toString();
+                strings[4] = vo.getIntradayLow().toString();
+                result.add(strings);
+            }
+            return result;
+        }
+        // save new in db
+        Set<String> dayLinesInDbSet = new HashSet<>();
+        for (BdIndicatorWeeklyVO vo : voList) {
+            dayLinesInDbSet.add(Utils.getFormat_YYYY_MM_DD(vo.getDay()));
+        }
+        for (int i = kLineList.size() - 1; i >= 0; i--) {
+            IndicatorDayVO dayVO = kLineList.get(i);
+            if (dayLinesInDbSet.contains(dayVO.getTime())) {
+                break;
+            }
+            BdIndicatorWeeklyVO newVo = new BdIndicatorWeeklyVO();
+            newVo.setStockId(stockId);
+            newVo.setDay(new Date(dayVO.getTimestamp()));
+            newVo.setOpeningPrice(BigDecimal.valueOf(dayVO.getOpen()));
+            newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
+            newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
+            newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
+            bdIndicatorWeeklyDao.save(newVo);
+        }
+        //return
+        for (IndicatorDayVO vo : kLineList) {
+            String[] strings = new String[7];
+            strings[0] = vo.getTime();
+            strings[1] = vo.getOpen().toString();
+            strings[2] = vo.getClose().toString();
+            strings[3] = vo.getHigh().toString();
+            strings[4] = vo.getLow().toString();
+            result.add(strings);
+        }
+        return result;
     }
 }
