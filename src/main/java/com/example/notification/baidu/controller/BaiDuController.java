@@ -95,7 +95,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/import"})
     @ResponseBody
     public ResponseEntity<String> importFile() {
-        List<String> stringList = Constants.getBaiduIndictorImportList(bd_import_file);
+        List<String> stringList = Constants.getImportFileList(bd_import_file);
         stringList.forEach(vo -> {
             String[] split = vo.split("_");
             bdIndicatorDao.save(new BdIndicatorVO(split[0],split[1]));

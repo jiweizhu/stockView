@@ -43,7 +43,7 @@ public class Constants {
         return retList;
     }
 
-    public static List<String> getBaiduIndictorImportList(String path) {
+    public static List<String> getImportFileList(String path) {
         String line;
         List<String> retList = new ArrayList<>();
         try {

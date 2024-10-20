@@ -2,6 +2,7 @@ package com.example.notification.http;
 
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
+import com.example.notification.vo.CNDailyVO;
 import com.example.notification.vo.QueryFromTencentResponseVO;
 import com.example.notification.vo.WebQueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,9 +24,9 @@ public class RestRequest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
+    //https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=sh000001,day,,,10,qfq
     static String dailyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
     static String weeklyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,week,,,daysToQuery,qfq";
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
@@ -35,6 +36,11 @@ public class RestRequest {
 
     //  "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30";
     private static final String Baidu_IndustryIndicators_Url = "https://finance.pae.baidu.com/vapi/v2/blocks?pn=0&rn=150&market=ab&typeCode=HY&finClientType=pc";
+
+
+    //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=932136&startDate=20141008
+    private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
+
 
     @Autowired
     private RestTemplate restTemplate;
@@ -82,7 +88,26 @@ public class RestRequest {
                 }
             }
         } catch (Exception e) {
-            logger.info("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
+            logger.error("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
+            return blockList;
+        }
+        return blockList;
+    }
+
+
+    public List<CNDailyVO> queryCNIndustriesKline(String code, String startDay) {
+        logger.info("Enter queryCNIndustriesKline ============ code=={}, startDay={},", code, startDay);
+        String url = CNIndustry_KLine_Url.replace("$code", code).replace("$startTime", startDay);
+        List blockList = new ArrayList();
+        try {
+            Map ret = restTemplate.getForObject(url, Map.class);
+            String codeNum = (String) ret.get("code");
+            boolean scs = (boolean) ret.get("success");
+            if (!codeNum.equals("200") || !scs) throw new Exception("Fail to get data from " + url);
+
+            Object data = ret.get("data");
+            blockList = objectMapper.readValue(objectMapper.writeValueAsString(data), objectMapper.getTypeFactory().constructCollectionType(List.class, CNDailyVO.class));
+        } catch (Exception e) {
             logger.error("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
             return blockList;
         }
@@ -117,8 +142,7 @@ public class RestRequest {
         if (!webQueryParam.getToQueryDailyPrice()) {
             queryUrl = weeklyQueryUrl;
         }
-        queryUrl = queryUrl.replaceFirst("stockNum", webQueryParam.getIdentifier())
-                .replaceFirst("daysToQuery", String.valueOf(webQueryParam.getDaysToQuery()));
+        queryUrl = queryUrl.replaceFirst("stockNum", webQueryParam.getIdentifier()).replaceFirst("daysToQuery", String.valueOf(webQueryParam.getDaysToQuery()));
         logger.debug("queryUrl = " + queryUrl);
         String ret = restTemplate.getForObject(queryUrl, String.class);
         ret = ret.replaceFirst("kline_dayhfq=", "");
