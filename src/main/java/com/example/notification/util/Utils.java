@@ -2,14 +2,20 @@ package com.example.notification.util;
 
 import com.example.notification.vo.StockDailyVO;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class Utils {
 
@@ -96,6 +102,77 @@ public class Utils {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, zone);
         return formatter.format(localDateTime);
+    }
+
+
+    public static BigDecimal calculateDayAvg(String stockName, int index, List<ArrayList<String>> dailyPriceList, Integer dayCount) {
+        if (dayCount > dailyPriceList.size()) {
+            return BigDecimal.valueOf(0);
+        }
+        BigDecimal totalPrice = new BigDecimal(0);
+        for (int y = 0; y < dayCount; y++) {
+            List<String> day = dailyPriceList.get(index - y);
+            BigDecimal dayEndPrice = new BigDecimal(day.get(2));
+            totalPrice = totalPrice.add(dayEndPrice);
+        }
+        //keep three decimals
+        BigDecimal avgPrice = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
+        String lowerCase = stockName.toLowerCase();
+        if (!lowerCase.contains("etf") && !lowerCase.contains("lof")) {
+            //if it is not etf or lof, it is stock price
+            avgPrice = avgPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        }
+        return avgPrice;
+    }
+
+
+    public static List<Integer> analysisFlipDay(List<StockDailyVO> etfPriceList, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        if (etfPriceList.size() == 0) return null;
+        Integer flipBeginIndex = 0;
+        Integer flipEndIndex = 0;
+        Integer loopCount = 0;
+        Boolean countFlip = Boolean.FALSE;
+        Boolean todayKLineUpward = Boolean.TRUE;
+
+        StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
+        Method getDayGainMethod = today.getClass().getMethod(methodName);
+        BigDecimal gainValue = (BigDecimal) getDayGainMethod.invoke(today);
+        if (gainValue.compareTo(BigDecimal.ZERO) < 0) {
+            //today is downward!
+            todayKLineUpward = Boolean.FALSE;
+        }
+        //set today upwardDay count = 0!
+        for (int index = etfPriceList.size() - 1; index > 0; index--) {
+            StockDailyVO indexDay = etfPriceList.get(index);
+            loopCount++;
+            BigDecimal dayGainPercent = (BigDecimal) getDayGainMethod.invoke(indexDay);
+            if (dayGainPercent == null) {
+                flipBeginIndex = loopCount;
+                break;
+            }
+            boolean indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) >= 0;
+//            if (countFlip == Boolean.TRUE) {
+//                indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) > 0;
+//            }
+            if (!todayKLineUpward.equals(indexDayPositive)) {
+                //start to find adjustment days, turn the opposite
+                if (countFlip.equals(Boolean.FALSE)) {
+                    flipBeginIndex = loopCount - 1;
+                }
+                if (countFlip.equals(Boolean.TRUE)) {
+                    flipEndIndex = loopCount - 1;
+                    break;
+                }
+                countFlip = Boolean.TRUE;
+                if (todayKLineUpward.equals(Boolean.TRUE)) {
+                    todayKLineUpward = Boolean.FALSE;
+                } else {
+                    todayKLineUpward = Boolean.TRUE;
+                }
+            }
+        }
+        List<Integer> flipDayList = Arrays.asList(flipBeginIndex, flipEndIndex);
+        return flipDayList;
     }
 
 

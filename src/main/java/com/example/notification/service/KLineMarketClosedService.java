@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -379,14 +378,14 @@ public class KLineMarketClosedService {
             StockDailyVO stockDailyVO = new StockDailyVO(stockNameVO.getStockId(), dayPrice.get(0), dayPrice.get(1), dayPrice.get(2), dayPrice.get(3), dayPrice.get(4));
 
             //calculate 5 day avg, need at least 5 day price list
-            BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, dayList, 5);
+            BigDecimal fiveDayAvgPrice = Utils.calculateDayAvg(stockName, i, dayList, 5);
             stockDailyVO.setDayAvgFive(fiveDayAvgPrice);
             BigDecimal dayGainFive = Utils.calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
             stockDailyVO.setDayGainOfFive(dayGainFive);
             beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
 
             //get 10 day avg
-            BigDecimal tenDayAvgPrice = calculateDayAvg(stockName, i, dayList, 10);
+            BigDecimal tenDayAvgPrice = Utils.calculateDayAvg(stockName, i, dayList, 10);
             stockDailyVO.setDayAvgTen(tenDayAvgPrice);
             BigDecimal dayGainTen = Utils.calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
             stockDailyVO.setDayGainOfTen(dayGainTen);
@@ -423,25 +422,7 @@ public class KLineMarketClosedService {
         return dayList;
     }
 
-    private BigDecimal calculateDayAvg(String stockName, int index, List<ArrayList<String>> dailyPriceList, Integer dayCount) {
-        if (dayCount > dailyPriceList.size()) {
-            return BigDecimal.valueOf(0);
-        }
-        BigDecimal totalPrice = new BigDecimal(0);
-        for (int y = 0; y < dayCount; y++) {
-            List<String> day = dailyPriceList.get(index - y);
-            BigDecimal dayEndPrice = new BigDecimal(day.get(2));
-            totalPrice = totalPrice.add(dayEndPrice);
-        }
-        //keep three decimals
-        BigDecimal avgPrice = totalPrice.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.HALF_UP);
-        String lowerCase = stockName.toLowerCase();
-        if (!lowerCase.contains("etf") && !lowerCase.contains("lof")) {
-            //if it is not etf or lof, it is stock price
-            avgPrice = avgPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
-        }
-        return avgPrice;
-    }
+
 
 
     private static void extractStockName(StockNameVO stockNameVO, Map<String, Object> dataMap) {
@@ -539,8 +520,8 @@ public class KLineMarketClosedService {
             Pageable pageable = PageRequest.of(0, 60, Sort.by(Sort.Direction.DESC, "day"));
 //            List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, Pageable.ofSize(60)).stream().toList();
             List<StockDailyVO> etfPriceList = stockDailyDao.findByStockId(stockId, pageable).stream().sorted(Comparator.comparing(StockDailyVO::getDay)).collect(Collectors.toList());
-            List<Integer> flipDayFive = analysisFlipDay(etfPriceList, "getDayGainOfFive");
-            List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
+            List<Integer> flipDayFive = Utils.analysisFlipDay(etfPriceList, "getDayGainOfFive");
+            List<Integer> flipDayTen = Utils.analysisFlipDay(etfPriceList, "getDayGainOfTen");
             setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
             setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -551,62 +532,13 @@ public class KLineMarketClosedService {
         return retStr;
     }
 
-    private List<Integer> analysisFlipDay(List<StockDailyVO> etfPriceList, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (etfPriceList.size() == 0) return null;
-        Integer flipBeginIndex = 0;
-        Integer flipEndIndex = 0;
-        Integer loopCount = 0;
-        Boolean countFlip = Boolean.FALSE;
-        Boolean todayKLineUpward = Boolean.TRUE;
 
-        StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
-        Method getDayGainMethod = today.getClass().getMethod(methodName);
-        BigDecimal gainValue = (BigDecimal) getDayGainMethod.invoke(today);
-        if (gainValue.compareTo(BigDecimal.ZERO) < 0) {
-            //today is downward!
-            todayKLineUpward = Boolean.FALSE;
-        }
-        //set today upwardDay count = 0!
-        for (int index = etfPriceList.size() - 1; index > 0; index--) {
-            StockDailyVO indexDay = etfPriceList.get(index);
-            loopCount++;
-            BigDecimal dayGainPercent = (BigDecimal) getDayGainMethod.invoke(indexDay);
-            if (dayGainPercent == null) {
-                flipBeginIndex = loopCount;
-                break;
-            }
-            boolean indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) >= 0;
-//            if (countFlip == Boolean.TRUE) {
-//                indexDayPositive = dayGainPercent.compareTo(BigDecimal.ZERO) > 0;
-//            }
-            if (!todayKLineUpward.equals(indexDayPositive)) {
-                //start to find adjustment days, turn the opposite
-                if (countFlip.equals(Boolean.FALSE)) {
-                    flipBeginIndex = loopCount - 1;
-                }
-                if (countFlip.equals(Boolean.TRUE)) {
-                    flipEndIndex = loopCount - 1;
-                    break;
-                }
-                countFlip = Boolean.TRUE;
-                if (todayKLineUpward.equals(Boolean.TRUE)) {
-                    todayKLineUpward = Boolean.FALSE;
-                } else {
-                    todayKLineUpward = Boolean.TRUE;
-                }
-            }
-        }
-        List<Integer> flipDayList = Arrays.asList(flipBeginIndex, flipEndIndex);
-        return flipDayList;
-    }
 
     private void setUpwardDaysAndGain(List<StockDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, StockNameVO stockNameVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        logger.debug("Enter setUpwardDaysAndGain = " + etfPriceList.size());
         int listSize = etfPriceList.size();
         StockDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
-        logger.debug("today = " + today);
-        logger.debug("flipBeginIndex = " + flipBeginIndex);
-        logger.debug("flipEndIndex = " + flipEndIndex);
-        logger.debug("dayIdentify = " + dayIdentify);
+
         StockDailyVO flipDay = etfPriceList.get(listSize - flipBeginIndex - 1);
         BigDecimal gainPercent = getGainPercent(today, flipDay, dayIdentify);
 
