@@ -58,16 +58,19 @@ public class CNController {
 
     @RequestMapping(value = {"/cn/import"})
     @ResponseBody
-    public ResponseEntity<String> importFile() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public ResponseEntity<String> importFile() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, InterruptedException {
         List<String> stringList = Constants.getImportFileList(cn_import_file);
+        List<String> idList = new ArrayList<>();
         stringList.forEach(vo -> {
             String[] split = vo.split("_");
             cnIndicatorDao.save(new CNIndicatorVO(split[0], split[1]));
+            idList.add(split[0]);
         });
 
         //init indicator daily price from 20140101
-        cnService.initDailyPrice();
-        cnService.calculateAvgPrice();
+        cnService.initDailyPrice(idList);
+        Thread.sleep(60000);
+        cnService.calculateAvgPrice(idList);
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 

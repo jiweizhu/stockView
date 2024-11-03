@@ -7,6 +7,7 @@ import com.example.notification.vo.QueryFromTencentResponseVO;
 import com.example.notification.vo.WebQueryParam;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class RestRequest {
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     //https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=sh000001,day,,,10,qfq
-    static String dailyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
+    static String dailyQueryUrl = "https://web.jifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
     static String weeklyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,week,,,daysToQuery,qfq";
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
@@ -38,7 +39,7 @@ public class RestRequest {
     private static final String Baidu_IndustryIndicators_Url = "https://finance.pae.baidu.com/vapi/v2/blocks?pn=0&rn=150&market=ab&typeCode=HY&finClientType=pc";
 
 
-    //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=932136&startDate=20141008
+    //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930693&startDate=20241008
     private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
 
 
@@ -96,21 +97,27 @@ public class RestRequest {
 
 
     public List<CNDailyVO> queryCNIndustriesKline(String code, String startDay) {
-        logger.info("Enter queryCNIndustriesKline ============ code=={}, startDay={},", code, startDay);
+        logger.info("Enter queryCNIndustriesKline ============ code=={}, startDay={}", code, startDay);
         String url = CNIndustry_KLine_Url.replace("$code", code).replace("$startTime", startDay);
-        List blockList = new ArrayList();
-        try {
-            Map ret = restTemplate.getForObject(url, Map.class);
-            String codeNum = (String) ret.get("code");
-            boolean scs = (boolean) ret.get("success");
-            if (!codeNum.equals("200") || !scs) throw new Exception("Fail to get data from " + url);
+        List<CNDailyVO> blockList = new ArrayList();
 
-            Object data = ret.get("data");
-            blockList = objectMapper.readValue(objectMapper.writeValueAsString(data), objectMapper.getTypeFactory().constructCollectionType(List.class, CNDailyVO.class));
+        try {
+            String ret = restTemplate.getForObject(url, String.class);
+            JsonNode rootNode = objectMapper.readTree(ret);
+            if (!rootNode.path("code").toString().contains("200") || !rootNode.path("success").toString().contains("true")) {
+                logger.error("=======faiil to queryCNIndustriesKline=======" + url);
+                return blockList;
+            }
+            JsonNode dataNode = rootNode.path("data");
+
+            for (JsonNode node : dataNode) {
+                CNDailyVO indicator = objectMapper.treeToValue(node, CNDailyVO.class);
+                blockList.add(indicator);
+            }
         } catch (Exception e) {
-            logger.error("Fail to queryBaiduIndustriesKline ============ Please have a check:" + url);
-            return blockList;
+            logger.error("Fail to queryCNIndustriesKline ============ Please have a check:" + url);
         }
+
         return blockList;
     }
 

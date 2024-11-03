@@ -5,7 +5,7 @@
     <Properties>
         <!-- 公共配置 -->
         <!-- log文件存放路径./当前工程目录下 -->
-        <property name="basePath">./log2</property>
+        <property name="basePath">./log</property>
         <!-- 输入信息格式 -->
         <!-- 带行号显示,对日志输出的性能有影响,在控制台上点击可以直接定位到代码 -->
         <property name="consoleLogPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%-5level] %l - %m%n</property>

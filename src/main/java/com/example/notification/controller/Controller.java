@@ -26,6 +26,10 @@ public class Controller {
     @Value("${notification.init.history.price.day}")
     private Integer initHistoryPriceDay;
 
+
+    @Value("${notification.stock.folder}")
+    private String stockFolder;
+
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
@@ -33,6 +37,9 @@ public class Controller {
     private KLineService kLineService;
     @Autowired
     private ETFViewService etfViewService;
+
+
+
 
     @RequestMapping(value = {"/real", "/index"})
     @ResponseBody

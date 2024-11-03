@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,6 +27,9 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.getRangeSize;
@@ -42,6 +46,9 @@ public class CNService {
     private RestRequest restRequest;
 
     @Autowired
+    private ThreadPoolTaskExecutor executorService;
+
+    @Autowired
     private CNDailyDao cnDailyDao;
 
     public Object saveIndicatorsEveryDay(String stockId) {
@@ -54,32 +61,34 @@ public class CNService {
     }
 
 
-    public void calculateAvgPrice() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        List<CNIndicatorVO> cnIndicatorVOS = cnIndicatorDao.findAll();
-        for (CNIndicatorVO stockNameVO : cnIndicatorVOS) {
-            //loop to calculate each etf
-            String stockId = stockNameVO.getIndexCode();
-            String stockName = stockNameVO.getIndexNameCn();
+    public void calculateAvgPrice(List<String> idList) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        for (String indexId : idList) {
+            CNIndicatorVO cnIndicatorVO = cnIndicatorDao.findById(indexId).orElse(new CNIndicatorVO());
+            String stockName = cnIndicatorVO.getIndexNameCn();
             if (stockName == null) {
                 continue;
             }
             Pageable pageable = PageRequest.of(0, 60, Sort.by(Sort.Direction.DESC, "tradeDate"));
-            List<CNDailyVO> etfPriceList = cnDailyDao.findByIndexCode(stockId, pageable).stream().sorted(Comparator.comparing(CNDailyVO::getTradeDate)).collect(Collectors.toList());
+            List<CNDailyVO> etfPriceList = cnDailyDao.findByIndexCode(indexId, pageable).stream().sorted(Comparator.comparing(CNDailyVO::getTradeDate)).collect(Collectors.toList());
+            if (etfPriceList.isEmpty()) {
+                logger.error("=====failed=======can not find daily data of ={}={}====", indexId, stockName);
+                break;
+            }
             List<Integer> flipDayFive = analysisFlipDay(etfPriceList, "getDayGainOfFive");
             List<Integer> flipDayTen = analysisFlipDay(etfPriceList, "getDayGainOfTen");
-            setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), stockNameVO, "Five");
-            setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), stockNameVO, "Ten");
+            setUpwardDaysAndGain(etfPriceList, flipDayFive.get(0), flipDayFive.get(1), cnIndicatorVO, "Five");
+            setUpwardDaysAndGain(etfPriceList, flipDayTen.get(0), flipDayTen.get(1), cnIndicatorVO, "Ten");
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            stockNameVO.setLastUpdatedTime(timestamp);
-            cnIndicatorDao.save(stockNameVO);
+            cnIndicatorVO.setLastUpdatedTime(timestamp);
+            cnIndicatorDao.save(cnIndicatorVO);
         }
     }
 
     public static List<Integer> analysisFlipDay(List<CNDailyVO> etfPriceList, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (etfPriceList.size() == 0) return null;
-        Integer flipBeginIndex = 0;
-        Integer flipEndIndex = 0;
-        Integer loopCount = 0;
+        if (etfPriceList.isEmpty()) return null;
+        int flipBeginIndex = 0;
+        int flipEndIndex = 0;
+        int loopCount = 0;
         Boolean countFlip = Boolean.FALSE;
         Boolean todayKLineUpward = Boolean.TRUE;
 
@@ -120,12 +129,11 @@ public class CNService {
                 }
             }
         }
-        List<Integer> flipDayList = Arrays.asList(flipBeginIndex, flipEndIndex);
-        return flipDayList;
+        return Arrays.asList(flipBeginIndex, flipEndIndex);
     }
 
 
-    private void setUpwardDaysAndGain(List<CNDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, CNIndicatorVO stockNameVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private void setUpwardDaysAndGain(List<CNDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, CNIndicatorVO cnIndicatorVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         logger.debug("Enter setUpwardDaysAndGain = " + etfPriceList.size());
         int listSize = etfPriceList.size();
         CNDailyVO today = etfPriceList.get(etfPriceList.size() - 1);
@@ -147,13 +155,13 @@ public class CNService {
             flipUpwardDays = -flipUpwardDays;
         }
 
-        Class<? extends CNIndicatorVO> aClass = stockNameVO.getClass();
-        aClass.getMethod("setUpwardDays" + dayIdentify, Integer.class).invoke(stockNameVO, flipBeginIndex);
-        aClass.getMethod("setGainPercent" + dayIdentify, BigDecimal.class).invoke(stockNameVO, gainPercent);
-        aClass.getMethod("setFlipUpwardDays" + dayIdentify, Integer.class).invoke(stockNameVO, flipUpwardDays);
-        aClass.getMethod("setFlipGainPercent" + dayIdentify, BigDecimal.class).invoke(stockNameVO, gainPercentFlip);
-        aClass.getMethod("setFlipDay" + dayIdentify, Date.class).invoke(stockNameVO, Date.valueOf(LocalDate.parse(flipDay.getTradeDate(), DateTimeFormatter.ofPattern("yyyyMMdd"))));
-        aClass.getMethod("setFlipEndDay" + dayIdentify, Date.class).invoke(stockNameVO, Date.valueOf(LocalDate.parse(flipDay.getTradeDate(), DateTimeFormatter.ofPattern("yyyyMMdd"))));
+        Class<? extends CNIndicatorVO> aClass = cnIndicatorVO.getClass();
+        aClass.getMethod("setUpwardDays" + dayIdentify, Integer.class).invoke(cnIndicatorVO, flipBeginIndex);
+        aClass.getMethod("setGainPercent" + dayIdentify, BigDecimal.class).invoke(cnIndicatorVO, gainPercent);
+        aClass.getMethod("setFlipUpwardDays" + dayIdentify, Integer.class).invoke(cnIndicatorVO, flipUpwardDays);
+        aClass.getMethod("setFlipGainPercent" + dayIdentify, BigDecimal.class).invoke(cnIndicatorVO, gainPercentFlip);
+        aClass.getMethod("setFlipDay" + dayIdentify, Date.class).invoke(cnIndicatorVO, Date.valueOf(LocalDate.parse(flipDay.getTradeDate(), DateTimeFormatter.ofPattern("yyyyMMdd"))));
+        aClass.getMethod("setFlipEndDay" + dayIdentify, Date.class).invoke(cnIndicatorVO, Date.valueOf(LocalDate.parse(flipDay.getTradeDate(), DateTimeFormatter.ofPattern("yyyyMMdd"))));
     }
 
     private BigDecimal getGainPercent(CNDailyVO newPrice, CNDailyVO oldPrice, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -180,77 +188,69 @@ public class CNService {
     @Value("${notification.cn.indicators.startDay}")
     private String startDay;
 
-    public void initDailyPrice() {
-        ArrayList<String[]> result = new ArrayList<>();
+    public void initDailyPrice(List<String> idList) {
         logger.info("enter CNService initDailyPrice =============");
+        List<Callable<Void>> tasks = new ArrayList<>();
 
-        Integer rangeSize = getRangeSize();
+        for (String id : idList) {
+            tasks.add(() -> {
+                List<CNDailyVO> kLineList = restRequest.queryCNIndustriesKline(id, startDay);
 
-        List<String> cnIndicators = cnIndicatorDao.findIds();
+                // save new in db
+                Set<String> dayLinesInDbSet = new HashSet<>(cnDailyDao.findAllTradeDayById(id));
 
-        cnIndicators.forEach(id -> {
-            List<CNDailyVO> kLineList = restRequest.queryCNIndustriesKline(id, startDay);
+                //===============
+                BigDecimal beforeDay_FiveDayAvgPrice = null;
+                BigDecimal beforeDay_TenDayAvgPrice = null;
+                int size = kLineList.size();
+                logger.info("==CN initDailyPrice=====got {} days, == lastest day is {}", size, kLineList.get(size - 1));
+                for (int i = 0; i < size; i++) {
+                    CNDailyVO dailyVO = kLineList.get(i);
 
-            // save new in db
-            List<CNDailyVO> all = cnDailyDao.findAll();
-            List<CNDailyVO> allById = cnDailyDao.findAllById(id);
-            Set<String> dayLinesInDbSet = new HashSet<>();
-            for (CNDailyVO vo : allById) {
-                dayLinesInDbSet.add(vo.getTradeDate());
-            }
+                    String stockName = dailyVO.getIndexNameCn();
+                    if (stockName == null || i < 9) {
+                        //i < 9 just ignore to store avg price = null
+                        continue;
+                    }
 
+                    //calculate 5 day avg, need at least 5 day price list
+                    BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, kLineList, 5);
+                    dailyVO.setDayAvgFive(fiveDayAvgPrice);
+                    BigDecimal dayGainFive = Utils.calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
+                    dailyVO.setDayGainOfFive(dayGainFive);
+                    beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
 
-            //no calculate day avg
-//            for (int i = kLineList.size() - 1; i >= 0; i--) {
-//                CNDailyVO dayVO = kLineList.get(i);
-//                if (dayLinesInDbSet.contains(dayVO.getTradeDate())) {
-//                    break;
-//                }
-//                CNDailyVO newVo = new CNDailyVO();
-//                newVo.setIndexCode(dayVO.getIndexCode());
-//                newVo.setTradeDate(dayVO.getTradeDate());
-//                newVo.setOpen(dayVO.getOpen());
-//                newVo.setClose(dayVO.getClose());
-//                newVo.setHigh(dayVO.getHigh());
-//                newVo.setLow(dayVO.getLow());
-//                cnDailyDao.save(newVo);
-//            }
+                    //get 10 day avg
+                    BigDecimal tenDayAvgPrice = calculateDayAvg(stockName, i, kLineList, 10);
+                    dailyVO.setDayAvgTen(tenDayAvgPrice);
+                    BigDecimal dayGainTen = Utils.calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
+                    dailyVO.setDayGainOfTen(dayGainTen);
+                    beforeDay_TenDayAvgPrice = tenDayAvgPrice;
 
-            //===============
-            BigDecimal beforeDay_FiveDayAvgPrice = null;
-            BigDecimal beforeDay_TenDayAvgPrice = null;
-            int size = kLineList.size();
-            logger.info("==CN initDailyPrice=====got {} days, == lastest day is {}", size, kLineList.get(size - 1));
-            for (int i = 0; i < size; i++) {
-                CNDailyVO dailyVO = kLineList.get(i);
-
-                String stockName = dailyVO.getIndexNameCn();
-                if (stockName == null || i < 9) {
-                    //i < 9 just ignore to store avg price = null
-                    continue;
+                    if (dayLinesInDbSet.contains(dailyVO.getTradeDate())) {
+                        //history day already stored
+                        continue;
+                    }
+                    cnDailyDao.save(dailyVO);
                 }
+                return null;
+            });
+        }
 
-                //calculate 5 day avg, need at least 5 day price list
-                BigDecimal fiveDayAvgPrice = calculateDayAvg(stockName, i, kLineList, 5);
-                dailyVO.setDayAvgFive(fiveDayAvgPrice);
-                BigDecimal dayGainFive = Utils.calculateDayGainPercentage(fiveDayAvgPrice, beforeDay_FiveDayAvgPrice);
-                dailyVO.setDayGainOfFive(dayGainFive);
-                beforeDay_FiveDayAvgPrice = fiveDayAvgPrice;
-
-                //get 10 day avg
-                BigDecimal tenDayAvgPrice = calculateDayAvg(stockName, i, kLineList, 10);
-                dailyVO.setDayAvgTen(tenDayAvgPrice);
-                BigDecimal dayGainTen = Utils.calculateDayGainPercentage(tenDayAvgPrice, beforeDay_TenDayAvgPrice);
-                dailyVO.setDayGainOfTen(dayGainTen);
-                beforeDay_TenDayAvgPrice = tenDayAvgPrice;
-
-                if (dayLinesInDbSet.contains(dailyVO.getTradeDate())) {
-                    //history day already stored
-                    continue;
+        try {
+            List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    logger.error("Error executing task", e.getCause());
                 }
-                cnDailyDao.save(dailyVO);
             }
-        });
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Task execution interrupted", e);
+        }
+
     }
 
     public static BigDecimal calculateDayAvg(String stockName, int index, List<CNDailyVO> dailyPriceList, Integer dayCount) {
@@ -281,19 +281,30 @@ public class CNService {
         Integer rangeSize = getRangeSize();
         List<CNDailyVO> voList = cnDailyDao.findByIndexStockIdOrderByDay(indexId, rangeSize).stream().sorted(Comparator.comparing(CNDailyVO::getTradeDate)).toList();
         if (!voList.isEmpty()) {
-            //as baidu restrict to query
-            // return db data
-            for (CNDailyVO vo : voList) {
-                String[] strings = new String[7];
-                strings[0] = vo.getTradeDate();
-                strings[1] = vo.getOpen().toString();
-                strings[2] = vo.getClose().toString();
-                strings[3] = vo.getHigh().toString();
-                strings[4] = vo.getLow().toString();
-                result.add(strings);
+            if (voList.get(voList.size() - 1).getOpen() == null) {
+                for (CNDailyVO vo : voList) {
+                    String[] strings = new String[7];
+                    strings[0] = vo.getTradeDate();
+                    String closeVal = vo.getClose().toString();
+                    strings[1] = closeVal;
+                    strings[2] = closeVal;
+                    strings[3] = closeVal;
+                    strings[4] = closeVal;
+                    result.add(strings);
+                }
+            } else {
+                for (CNDailyVO vo : voList) {
+                    String[] strings = new String[7];
+                    strings[0] = vo.getTradeDate();
+                    strings[1] = vo.getOpen().toString();
+                    strings[2] = vo.getClose().toString();
+                    strings[3] = vo.getHigh().toString();
+                    strings[4] = vo.getLow().toString();
+                    result.add(strings);
+                }
             }
             return result;
         }
-        return null;
+        return result;
     }
 }
