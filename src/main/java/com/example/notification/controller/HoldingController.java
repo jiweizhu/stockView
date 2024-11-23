@@ -81,7 +81,6 @@ public class HoldingController {
         String stockName = holdingService.getStockIdOrNameByMap(holdingStockVO.getStockId());
         holdingStockVO.setStockName(stockName);
         holdingService.save(holdingStockVO);
-        intraDayService.getPriceByminute();
         return "ok";
     }
 
@@ -138,12 +137,12 @@ public class HoldingController {
     }
 
 
-    @RequestMapping(value = {"/getPriceByminute"})
-    @ResponseBody
-    public Object getPriceByminute() throws ParseException {
-        logger.info("======= Enter HoldingController getPriceByminute =========");
-        Object list = intraDayService.getPriceByminute();
-        return list;
-    }
+//    @RequestMapping(value = {"/getPriceByminute"})
+//    @ResponseBody
+//    public Object getPriceByminute() throws ParseException {
+//        logger.info("======= Enter HoldingController getPriceByminute =========");
+//        Object list = intraDayService.getPriceByminute();
+//        return list;
+//    }
 
 }

@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.ParseException;
-
 @Component
 public class Timer {
 
@@ -39,19 +37,19 @@ public class Timer {
         intraDayService.clearTodayIntraPrice();
     }
 
-    @Scheduled(cron = "5 */1 9,10,11,13,14 ? * MON-FRI")
-    public Object getPriceByminute() throws ParseException {
-        logger.info("========= cron exec getPriceByminute =======");
-        Object list = intraDayService.getPriceByminute();
-        return list;
-    }
-
-    @Scheduled(cron = "5 * 15 ? * *")
-    public Object getPriceByminute1() throws ParseException {
-        logger.info("========= cron exec getPriceByminute =======");
-        Object list = intraDayService.getPriceByminute();
-        return list;
-    }
+//    @Scheduled(cron = "5 */1 9,10,11,13,14 ? * MON-FRI")
+//    public Object getPriceByminute() throws ParseException {
+//        logger.info("========= cron exec getPriceByminute =======");
+//        Object list = intraDayService.getPriceByminute();
+//        return list;
+//    }
+//
+//    @Scheduled(cron = "5 * 15 ? * *")
+//    public Object getPriceByminute1() throws ParseException {
+//        logger.info("========= cron exec getPriceByminute =======");
+//        Object list = intraDayService.getPriceByminute();
+//        return list;
+//    }
 
     //   every day in 8:00
     @Scheduled(cron = "0 0 8 * * ?")
