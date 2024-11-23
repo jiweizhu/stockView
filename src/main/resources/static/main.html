@@ -11,20 +11,45 @@
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const url = 'http://124.71.19.6:8888/listStockFiles';
 
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('targetFiles').innerHTML  = data;
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+});
+
+
+</script>
 
 <div id="container"></div>
 <h3>View Data</h3>
+<h2>============files=============</h2>
+<div id = "targetFiles"></div>
+<a href="http://124.71.19.6:8888/stocksDayView.html"><font size="5">targetFile.html</font></a><br>
 
+<h2>===================CN=============</h2>
 <a href="http://124.71.19.6:8888/cnIndexView.html"><font size="5">cnIndexView.html</font></a><br>
 <a href="http://124.71.19.6:8888/cn/import"><font size="5">cn/import</font></a><br>
 <a href="http://124.71.19.6:8888/cn/indicatorsView"><font size="5">/cn/indicatorsView</font></a><br>
-===================CN=============
+
+<h2>===================baidu=============</h2>
 <a href=""><font size="5">http://124.71.19.6:8888/range/500</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicators.html"><font size="5">bdIndicators</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicatorsKlineView.html"><font size="5">bdIndicatorsKlineView</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicatorsKlineWeekView.html"><font size="5">bdIndicatorsKlineWeekView.html</font></a><br>
-===================baidu=============
+
 
 <a href="http://124.71.19.6:8888/flow.html"><font size="5">flow</font></a><br>
 <a href="http://124.71.19.6:8888/300View.html"><font size="5">300View.html</font></a><br>
@@ -36,6 +61,7 @@
 <a href="http://124.71.19.6:8888/multiK_etfs.html"><font size="5">multiK_etfs.html</font></a><br>
 <a href="http://124.71.19.6:8888/weekDay.html"><font size="5">weekDay.html</font></a><br>
 <a href="http://124.71.19.6:8888/avg.html"><font size="5">avg</font></a><br>
+<!--avg.html return ets that contains stocks-->
 <a href="http://124.71.19.6:8888/etfs3.html"><font size="5">etfs3.html</font></a><br>
 <a href="http://124.71.19.6:8888/etfs/1"><font size="5">etfs/view1</font></a><br>
 <a href="http://124.71.19.6:8888/etfs/2"><font size="5">etfs/view2</font></a><br>
@@ -45,7 +71,7 @@
 <a href="http://124.71.19.6:8888/stock/list"><font size="5">stock/list</font></a><br>
 <a href="http://124.71.19.6:8888/crud.html"><font size="5">crud.html</font></a><br>
 <a href="http://124.71.19.6:8888/etfcrud.html"><font size="5">LinesChart.html</font></a><br>
-<h3>Operation Data</h3>
+<h2>Operation Data</h2>
 <a href="http://124.71.19.6:8888/import"><font size="5">importStock</font></a><br>
 <a href="http://124.71.19.6:8888/getPriceByminute"><font size="5">getPriceByminute</font></a><br>
 <a href="http://124.71.19.6:8888/getWeekHistoryPriceAndStoreInDb"><font size="5">getWeekHistoryPriceAndStoreInDb</font></a><br>

@@ -11,21 +11,44 @@
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const url = 'http://localhost:8888/listStockFiles';
 
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('targetFiles').innerHTML  = data;
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
+});
+
+
+</script>
 
 <div id="container"></div>
 <h3>View Data</h3>
+<h2>============files=============</h2>
+<div id = "targetFiles"></div>
+<a href="http://localhost:8888/stocksDayView.html"><font size="5">targetFile.html</font></a><br>
 
+<h2>===================CN=============</h2>
 <a href="http://localhost:8888/cnIndexView.html"><font size="5">cnIndexView.html</font></a><br>
 <a href="http://localhost:8888/cn/import"><font size="5">cn/import</font></a><br>
 <a href="http://localhost:8888/cn/indicatorsView"><font size="5">/cn/indicatorsView</font></a><br>
-===================CN=============
+<h2>===================baidu=============</h2>
 <a href=""><font size="5">http://localhost:8888/range/500</font></a><br>
 <a href="http://localhost:8888/bdIndicators.html"><font size="5">bdIndicators</font></a><br>
 <a href="http://localhost:8888/bdIndicatorsKlineView.html"><font size="5">bdIndicatorsKlineView</font></a><br>
 <a href="http://localhost:8888/bdIndicatorStocks.html"><font size="5">bdIndicatorStocks.html</font></a><br>
 <a href="http://localhost:8888/bdIndicatorsKlineWeekView.html"><font size="5">bdIndicatorsKlineWeekView.html</font></a><br>
-===================baidu=============
 
 <a href="http://localhost:8888/flow.html"><font size="5">flow</font></a><br>
 <a href="http://localhost:8888/300View.html"><font size="5">300View.html</font></a><br>
