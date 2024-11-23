@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
@@ -39,6 +40,29 @@ public class Controller {
     private ETFViewService etfViewService;
 
 
+    @RequestMapping(value = {"/listStockFiles"})
+    @ResponseBody
+    public String listStockFiles() throws Exception {
+        return kLineService.listStockFiles(stockFolder);
+    }
+
+
+    private static String targetFile;
+
+    public static String getTargetFile() {
+        return targetFile;
+    }
+
+    public static void setTargetFile(String targetFile) {
+        Controller.targetFile = targetFile;
+    }
+
+    @RequestMapping(value = {"/listTargetFileStocks/{target}"})
+    public ModelAndView listTargetFileStocks(@PathVariable String target) throws Exception {
+        targetFile = stockFolder + "/" + target;
+        setTargetFile(targetFile);
+        return new ModelAndView("redirect:/stocksDayView.html");
+    }
 
 
     @RequestMapping(value = {"/real", "/index"})
@@ -109,6 +133,9 @@ public class Controller {
         logger.info("Enter method findAllEtfSort====" + num);
         Object body = "";
         if (num.equals("3") || num.equals("4")) {
+            body = etfViewService.findAllEtfSortView_new(num);
+        } else if (num.contains("targetList")) {
+            //get target file xls to list stocks
             body = etfViewService.findAllEtfSortView_new(num);
         } else if (num.contains("300mainBoard")) {
             body = etfViewService.findAllEtfSortView_new(num);

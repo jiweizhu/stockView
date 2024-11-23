@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -293,4 +294,18 @@ public class KLineService {
         return dayAvgVO;
     }
 
+    public String listStockFiles(String stockFolder) {
+        File directory = new File(stockFolder);
+
+        String serverIp = Utils.getServerIp();
+        StringBuilder sb = new StringBuilder("<table><tr>");
+        Arrays.stream(Objects.requireNonNull(directory.listFiles())).sorted().toList().forEach(file -> {
+            sb.append("<td>");
+            sb.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append(file.getName()).append("\">")
+                    .append(file.getName()).append("</a>");
+            sb.append("</td></tr>");
+        });
+        sb.append("</tr></table>");
+        return sb.toString();
+    }
 }
