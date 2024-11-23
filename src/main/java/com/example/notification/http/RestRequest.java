@@ -28,7 +28,7 @@ public class RestRequest {
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     //https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=sh000001,day,,,10,qfq
-    static String dailyQueryUrl = "https://web.jifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
+    static String dailyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,day,,,daysToQuery,qfq";
     static String weeklyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,week,,,daysToQuery,qfq";
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
@@ -150,7 +150,7 @@ public class RestRequest {
             queryUrl = weeklyQueryUrl;
         }
         queryUrl = queryUrl.replaceFirst("stockNum", webQueryParam.getIdentifier()).replaceFirst("daysToQuery", String.valueOf(webQueryParam.getDaysToQuery()));
-        logger.debug("queryUrl = " + queryUrl);
+        logger.info("queryUrl = " + queryUrl);
         String ret = restTemplate.getForObject(queryUrl, String.class);
         ret = ret.replaceFirst("kline_dayhfq=", "");
         logger.debug("ret = " + ret);
