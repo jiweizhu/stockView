@@ -1,11 +1,15 @@
 package com.example.notification.util;
 
 import com.example.notification.vo.StockDailyVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -18,12 +22,10 @@ import java.util.Date;
 import java.util.List;
 
 public class Utils {
-
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
     public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private static final String TODAYDATE = Utils.todayDate();
-    private static final String MAIN_INDICATOR =
-            "sh510760_上证综指ETF,sh510300_沪深300ETF,sh510500_中证500ETF,sh512100_中证1000ETF,sz159949_创业板50ETF,"
-          + "sh588080_科创板50ETF,sh510190_上证50ETF,sz159915_创业板ETF,sh512910_中证100ETF,sz399306_深证ETF,sz159901_深证100ETF";
+    private static final String MAIN_INDICATOR = "sh510760_上证综指ETF,sh510300_沪深300ETF,sh510500_中证500ETF,sh512100_中证1000ETF,sz159949_创业板50ETF," + "sh588080_科创板50ETF,sh510190_上证50ETF,sz159915_创业板ETF,sh512910_中证100ETF,sz399306_深证ETF,sz159901_深证100ETF";
 
     public static String getOneWeekAgeDay() {
         LocalDate today = LocalDate.now();
@@ -37,12 +39,28 @@ public class Utils {
 
     }
 
+    public static String getServerIp() {
+        InetAddress localHost = null;
+        try {
+            localHost = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            logger.error("============Fail to get ipAddr=============", e);
+        }
+        String ipAddress = localHost.getHostAddress();
+        if (!Utils.isWinSystem()) {
+            return "124.71.19.6";
+        }
+        return "localhost";
+    }
+
     private static SimpleDateFormat FORMATTER_YYYYMMDD = new SimpleDateFormat("YYYY/MM/dd");
+
     public static synchronized String getFormat(java.sql.Date day) {
         return FORMATTER_YYYYMMDD.format(day);
     }
 
     private static SimpleDateFormat FORMATTER_YYYY_MM_DD = new SimpleDateFormat("YYYY-MM-dd");
+
     public static synchronized String getFormat_YYYY_MM_DD(java.sql.Date day) {
         return FORMATTER_YYYY_MM_DD.format(day);
     }

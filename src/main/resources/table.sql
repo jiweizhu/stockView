@@ -190,3 +190,13 @@ customer_range_gain_post DECIMAL(10,2)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
+SELECT
+    TABLE_SCHEMA AS '数据库名',
+    TABLE_NAME AS '表名',
+    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS '数据大小(MB)',
+    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS '索引大小(MB)',
+    ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS '总大小(MB)'
+FROM
+    information_schema.TABLES where TABLE_SCHEMA = 'stock'
+ORDER BY
+    (DATA_LENGTH + INDEX_LENGTH) DESC;

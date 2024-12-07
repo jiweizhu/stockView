@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
+    <link href="themes/default/easyui.css" rel="stylesheet" type="text/css">
+    <link href="themes/icon.css" rel="stylesheet" type="text/css">
+    <link href="themes/demo.css" rel="stylesheet" type="text/css">
+    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
+    <script src="js/jquery.edatagrid.js" type="text/javascript"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+    <style>
+        * {
+          margin: 0;
+          padding: 0;
+        }
+        .chart-container {
+            width: 300px;
+            height: 280px;
+            margin-bottom: 2px;
+            background-color: #FFFFCC;
+        }
+        .range-container {
+            width: 250px;
+            height: 280px;
+            margin-bottom: 2px;
+        }
+        .index-container {
+            width: 300px;
+            height: 280px;
+            margin-bottom: 2px;
+            background-color: #FFFFCC;
+        }
+        .vertical-stockId {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            border: 1px solid #000;
+            padding: 10px;
+            font-size: 5px;
+        }
+
+        th, td {
+          text-align: left;
+          padding: 10px;
+        }
+    </style>
+</head>
+<body>
+<button id="toggle_range">toggle day/week</button>
+<table border="1" id="mainTable">
+</table>
+<a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
+<script>
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+    let isWeekly = false; // 标识当前是日数据还是周数据
+
+    // 设置页面标题为指定 URL 返回的数据
+    async function setTitleFromServer() {
+        try {
+            // 请求获取数据
+            const response = await fetch(`http://${serverIp}:8888/getPageTitle`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const titleText = await response.text(); // 假设返回的数据是纯文本
+            document.title = titleText; // 设置为页面标题
+        } catch (error) {
+            console.error('Error fetching title data:', error);
+            document.title = '默认标题'; // 如果请求失败，设置一个默认标题
+        }
+    }
+
+document.addEventListener('DOMContentLoaded', function () {
+        function loadTableData() {
+            fetch(`http://${serverIp}:8888/etfs/targetList`)
+                .then(response => response.text())
+                .then(data => {
+                    const dataContainer = document.getElementById('myTable');
+                    dataContainer.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+        function loadIndexTableData() {
+            fetch(`http://${serverIp}:8888/etfs/main`)
+                .then(response => response.text())
+                .then(data => {
+                    const dataContainer = document.getElementById('mainTable');
+                    dataContainer.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        loadTableData();
+        loadIndexTableData();
+
+        setTimeout(function () {
+            get300Data();
+            getDivs();
+            $('.hide-column').hide();
+            setTitleFromServer();
+        }, 1000);
+
+        // 绑定 toggle_range 按钮事件
+        document.getElementById('toggle_range').addEventListener('click', function () {
+            isWeekly = !isWeekly; // 切换日/周数据
+            console.log(`Switched to ${isWeekly ? 'weekly' : 'daily'} mode`);
+            get300Data();
+<!--            sleep(300);-->
+            getDivs(); // 重新加载图表
+        });
+    });
+
+    var data_300;
+    async function get300Data() {
+        const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}`+'sh510300';
+        data_300 = await fetch(url).then(response => response.json());
+    }
+
+    function toggleColumn() {
+        $('.hide-column').toggle();
+    }
+
+    async function getDivs() {
+        const spans = document.querySelectorAll('div[id^="span_"]');
+        spans.forEach(span => {
+            createETFChart(span);
+        });
+    }
+
+    async function createETFChart(span) {
+        var myChart = echarts.init(span, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+
+        // 根据 isWeekly 构建 URL
+        const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}` + span.id.replace('span_', '');
+        const rawData = await fetch(url).then(response => response.json());
+
+        function calculateMA(dayCount, data) {
+            var result = [];
+            for (var i = 0, len = data.length; i < len; i++) {
+                if (i < dayCount) {
+                    result.push('-');
+                    continue;
+                }
+                var sum = 0;
+                for (var j = 0; j < dayCount; j++) {
+                    sum += +data[i - j][1];
+                }
+                result.push(sum / dayCount);
+            }
+            return result;
+        }
+
+        const dates = rawData.map(item => item[0]);
+        const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+        const data_300_tmp = data_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+
+        const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));
+        const data_min = Math.min(...data.flat());
+        const data_max = Math.max(...data.flat());
+        const data_300_min = Math.min(...data_300_tmp.flat());
+        const data_300_max = Math.max(...data_300_tmp.flat());
+        const normalized_data = normalize(data, data_min, data_max);
+        const normalized_data_300 = normalize(data_300_tmp, data_300_min, data_300_max);
+        const line_data_300 = normalized_data_300.map(item => item[1]);
+
+        const option = {
+            legend: { data: ['MA5', 'MA10', '300日K'], inactiveColor: '#777' },
+            tooltip: { trigger: 'axis', axisPointer: { animation: false, type: 'cross', lineStyle: { color: '#376df4', width: 2, opacity: 1 } } },
+            xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#8392A5' } } },
+            yAxis: {
+                scale: true,
+                axisLine: { lineStyle: { color: '#8392A5' } },
+                splitLine: { show: false },
+                axisLabel: { formatter: value => (value * (data_max - data_min) + data_min).toFixed(2) }
+            },
+            grid: { bottom: 80 },
+            dataZoom: [
+                { textStyle: { color: '#8392A5' }, handleIcon: 'path://M10.7,11.9...', dataBackground: { areaStyle: { color: '#8392A5' }, lineStyle: { opacity: 0.8, color: '#8392A5' } }, brushSelect: true },
+                { type: 'inside' }
+            ],
+            series: [
+                { type: 'candlestick', name: '日K', data: normalized_data, itemStyle: { color: '#FD1050', color0: '#0CF49B', borderColor: '#FD1050', borderColor0: '#0CF49B' } },
+                { name: 'MA5', type: 'line', data: calculateMA(5, normalized_data), smooth: true, showSymbol: false, lineStyle: { width: 1 } },
+                { name: 'MA10', type: 'line', data: calculateMA(10, normalized_data), smooth: true, showSymbol: false, lineStyle: { width: 1 } },
+                { type: 'line', name: '300日K', data: line_data_300, smooth: true, showSymbol: false, lineStyle: { width: 0.5, color: '#EE9A00' } }
+            ]
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', () => myChart.resize());
+    }
+</script>
+<table border="1" id="myTable"></table>
+<script>
+    async function createChart(span) {
+        const chartData = await fetchData(span.id);
+
+        Highcharts.chart(span.id, {
+            title: {
+                text: 'Dynamic Chart Title',
+                align: 'left'
+            },
+            subtitle: {
+                text: 'Dynamic Chart Subtitle',
+                align: 'left'
+            },
+            yAxis: {
+                title: {
+                    text: 'Price'
+                }
+            },
+            xAxis: {
+                accessibility: {
+                    rangeDescription: 'Range: 2010 to 2020'
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    compare: 'percent',
+                    showInNavigator: true
+                }
+            },
+            series: chartData.series,
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 500
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+        });
+    }
+
+    async function initializeIntraCharts() {
+    const spans = document.querySelectorAll('div[id^="multi_"]');
+        for (const span of spans) {
+            await createChart(span);
+        }
+    }
+</script>
+</body>
+</html>

@@ -46,16 +46,11 @@ public class KLineMarketClosedService {
     private static final Logger logger = LoggerFactory.getLogger(KLineMarketClosedService.class);
     private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    static String importStockFile = "C:\\kiwi\\notification\\src\\main\\resources\\import.txt";
-
     private static ArrayList<String> importStockFileList = new ArrayList<>();
     private static ArrayList<StockNameVO> storedETFs = new ArrayList<>();
 
     @Value("${notification.import.file}")
     private String importFileInCloud;
-
-    @Value("${notification.etfView.file}")
-    private String etfViewFileInCloud;
 
     @Autowired
     private HoldingService holdingService;
@@ -158,10 +153,6 @@ public class KLineMarketClosedService {
         BufferedReader reader = null;
         String line;
         try {
-            boolean winSystem = Utils.isWinSystem();
-            if (winSystem) {
-                importFileInCloud = importStockFile;
-            }
             FileReader fileReader = new FileReader(importFileInCloud);
             reader = new BufferedReader(fileReader);
             while ((line = reader.readLine()) != null) {
@@ -187,36 +178,6 @@ public class KLineMarketClosedService {
             logger.info("Successfully read stock name file !!");
         } catch (IOException e) {
             logger.error("Fail read stock name file !!", e);
-        } finally {
-            try {
-                if (null != reader) {
-                    reader.close();
-                }
-            } catch (IOException e) {
-                logger.error("error occurs. ", e);
-            }
-        }
-    }
-
-    private static ArrayList<String> etfViewLine = new ArrayList<>();
-
-    private void readETFFile() {
-        BufferedReader reader = null;
-        String line;
-        try {
-            boolean winSystem = Utils.isWinSystem();
-            if (winSystem) {
-                etfViewFileInCloud = importStockFile;
-            }
-            FileReader fileReader = new FileReader(etfViewFileInCloud);
-            reader = new BufferedReader(fileReader);
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("#")) continue;
-                etfViewLine.add(line);
-                logger.info("Successfully read etfView file !!");
-            }
-        } catch (IOException e) {
-            logger.error("Fail read etfView file !!", e);
         } finally {
             try {
                 if (null != reader) {
@@ -423,8 +384,6 @@ public class KLineMarketClosedService {
     }
 
 
-
-
     private static void extractStockName(StockNameVO stockNameVO, Map<String, Object> dataMap) {
         List identifierList = (List) ((Map) dataMap.get("qt")).get(stockNameVO.getStockId());
         if (identifierList.size() < 2) {
@@ -533,7 +492,6 @@ public class KLineMarketClosedService {
     }
 
 
-
     private void setUpwardDaysAndGain(List<StockDailyVO> etfPriceList, Integer flipBeginIndex, Integer flipEndIndex, StockNameVO stockNameVO, String dayIdentify) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         logger.debug("Enter setUpwardDaysAndGain = " + etfPriceList.size());
         int listSize = etfPriceList.size();
@@ -635,7 +593,8 @@ public class KLineMarketClosedService {
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
-        List<WeekPriceVO> resultList = weeklyPriceDao.findAllByStockId(stockId);
+        List<WeekPriceVO> resultList = weeklyPriceDao.findAllByStockId(stockId, Constants.rangeSize);
+        Collections.reverse(resultList);
         ArrayList<String[]> result = new ArrayList<>();
         for (WeekPriceVO weekPriceVO : resultList) {
             String[] strings = new String[7];

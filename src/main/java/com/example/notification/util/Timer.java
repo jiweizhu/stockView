@@ -8,6 +8,7 @@ import com.example.notification.service.KLineService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -63,26 +64,26 @@ public class Timer {
 //        }
 //    }
 
-//    @Scheduled(cron = "0 10 15 * * *")
-//    public void generateReportWhenMarketClose() {
-//        try {
-//            logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
-//            baiduInfoService.calculateIndicatorsAvg();
-//            logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
-//
-//            logger.info("Start cron job generateReportEveryMarketDay=====");
-//            Object body = kLineMarketClosedService.delete_HistoryData();
-//            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
-//            etfViewService.generateReportEveryDay();
-//
-//            //2 delete intraday_price data before one week
-//            String oneWeekAgeDay = Utils.getOneWeekAgeDay();
-//            intraDayService.removeOneWeekAgoData(oneWeekAgeDay);
-//
-//        } catch (Exception e) {
-//            logger.error("==== Timer run error! ===== Detail is: ", e);
-//        }
-//    }
+    @Scheduled(cron = "0 10 15 * * *")
+    public void generateReportWhenMarketClose() {
+        try {
+            logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
+            baiduInfoService.calculateIndicatorsAvg();
+            logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
+
+            logger.info("Start cron job generateReportEveryMarketDay=====");
+            Object body = kLineMarketClosedService.delete_HistoryData();
+            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
+            etfViewService.generateReportEveryDay();
+
+            //2 delete intraday_price data before one week
+            String oneWeekAgeDay = Utils.getOneWeekAgeDay();
+            intraDayService.removeOneWeekAgoData(oneWeekAgeDay);
+
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+    }
 
 
     //  real time query, every 15min

@@ -49,6 +49,16 @@ public class Controller {
 
     private static String targetFile;
 
+    public static String getTargetFileSize() {
+        return targetFileSize;
+    }
+
+    public static void setTargetFileSize(String targetFileSize) {
+        Controller.targetFileSize = targetFileSize;
+    }
+
+    private static String targetFileSize;
+
     public static String getTargetFile() {
         return targetFile;
     }
@@ -60,8 +70,22 @@ public class Controller {
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})
     public ModelAndView listTargetFileStocks(@PathVariable String target) throws Exception {
         targetFile = stockFolder + "/" + target;
+        logger.info("========= listTargetFileStocks ==========="+targetFile);
         setTargetFile(targetFile);
         return new ModelAndView("redirect:/stocksDayView.html");
+    }
+
+    @RequestMapping(value = {"/getPageTitle"})
+    public String getPageTitle() {
+
+        if (getTargetFile() == null) {
+            return "No Title";
+        } else {
+            StringBuilder stringBuilder = new StringBuilder("(").append(getTargetFileSize()).append(")");
+            int lastIndexOf = getTargetFile().lastIndexOf("/");
+            stringBuilder.append(getTargetFile().substring(lastIndexOf, getTargetFile().length() - 1).replace(".xls|.txt", ""));
+            return stringBuilder.toString();
+        }
     }
 
 

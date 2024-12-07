@@ -1,10 +1,12 @@
 package com.example.notification.service;
 
 import com.example.notification.constant.Constants;
+import com.example.notification.controller.Controller;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
 import com.example.notification.responseVo.EtfFlowVO;
+import com.example.notification.util.FileUtil;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.IntradayPriceVO;
 import com.example.notification.vo.StockDailyVO;
@@ -217,6 +219,36 @@ public class ETFViewService {
 
             industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnFiveSort);
         }
+
+        if (num.contains("targetList")) {
+            Set<String> stockSet = FileUtil.readTargetFileStocks(Controller.getTargetFile());
+            List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
+            List<StockNameVO> upwardStocks = new ArrayList<>();
+            List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
+            commonStockList.forEach(vo -> {
+                if (stockSet.contains(vo.getStockId())) {
+                    //check if 5day excced 10 day!!
+                    List<StockDailyVO> lastTwoDayPrice = stockDailyDao.findLastTwoDayPriceByStockId(vo.getStockId());
+                    StockDailyVO yesterdayVo = lastTwoDayPrice.get(1);
+                    StockDailyVO todayVo = lastTwoDayPrice.get(0);
+                    if (yesterdayVo.getDayAvgFive().compareTo(yesterdayVo.getDayAvgTen()) <= 0 && todayVo.getDayAvgFive().compareTo(todayVo.getDayAvgTen()) >= 0) {
+                        fiveDayExceedTenDay.add(vo);
+                        fiveDayExceedTen_num++;
+                    }
+                    if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
+                        upwardStocks.add(vo);
+                    } else {
+                        downWardIndustryEtfs.add(vo);
+                    }
+                }
+            });
+            fiveDayExceedTenDay.addAll(upwardStocks);
+            fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
+            Controller.setTargetFileSize(String.valueOf(fiveDayExceedTenDay.size()));
+
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnFiveSort);
+        }
+
         if (num.equals("main")) {
             industryEtfsTable = mainEtfsView(mainEtfs);
         }
@@ -303,7 +335,7 @@ public class ETFViewService {
             if (stockId.startsWith("sh") || stockId.startsWith("sz")) {
                 tdHtml.append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stockId.substring(2)).append("\">");
             } else {
-                tdHtml.append(stockId+"#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+                tdHtml.append(stockId + "#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             }
             tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
                     .append("(" + stock.getUpwardDaysFive()).append("|")
