@@ -27,7 +27,7 @@ public class ThreadPoolConfig {
         threadPoolTaskExecutor.setMaxPoolSize(maxSize);
         threadPoolTaskExecutor.setQueueCapacity(3000);
         threadPoolTaskExecutor.setKeepAliveSeconds(300);
-        threadPoolTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+        threadPoolTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         threadPoolTaskExecutor.initialize();
         return threadPoolTaskExecutor;
     }

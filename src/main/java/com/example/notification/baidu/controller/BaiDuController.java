@@ -61,7 +61,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/stock/{stockId}"})
     @ResponseBody
     public ResponseEntity stockDataById(@PathVariable String stockId) {
-        Object body = baiduInfoService.stockJsonData(stockId);
+        Object body = baiduInfoService.getStockJsonData(stockId);
         return ResponseEntity.ofNullable(body);
     }
 
@@ -103,11 +103,11 @@ public class BaiDuController {
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 
-    @RequestMapping(value = {"/bd/test"})
+    @RequestMapping(value = {"/bd/getFromNetAndStore"})
     @ResponseBody
-    public ResponseEntity test() {
-        baiduInfoService.calculateIndicatorsAvg();
-        return ResponseEntity.ofNullable("finish calculateIndicatorsAvg");
+    public ResponseEntity getFromNetAndStore() {
+        baiduInfoService.getFromNetAndStore();
+        return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
 
 

@@ -8,7 +8,7 @@ import java.sql.Date;
 
 @Data
 @Entity
-@IdClass(StockDailyKey.class)
+@IdClass(BdDailyKey.class)
 @Table(name = "bd_daily_price")
 public class BdIndicatorDailyVO {
     @Id

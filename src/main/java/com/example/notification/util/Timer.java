@@ -67,10 +67,6 @@ public class Timer {
     @Scheduled(cron = "0 10 15 * * *")
     public void generateReportWhenMarketClose() {
         try {
-            logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
-            baiduInfoService.calculateIndicatorsAvg();
-            logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
-
             logger.info("Start cron job generateReportEveryMarketDay=====");
             Object body = kLineMarketClosedService.delete_HistoryData();
             kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
@@ -84,6 +80,22 @@ public class Timer {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
     }
+
+    @Scheduled(cron = "0 20 15 * * *")
+    public void generateBaiduInfo() {
+        try {
+            logger.info("Start cron job baiduInfoService.getFromNetAndStore=====");
+            baiduInfoService.getFromNetAndStore();
+            logger.info("End cron job baiduInfoService.getFromNetAndStore=====");
+
+            logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
+            baiduInfoService.calculateIndicatorsAvg();
+            logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+    }
+
 
 
     //  real time query, every 15min
