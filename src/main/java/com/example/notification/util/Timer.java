@@ -64,7 +64,7 @@ public class Timer {
 //        }
 //    }
 
-    @Scheduled(cron = "0 10 15 * * *")
+    @Scheduled(cron = "0 10 15 * * ?")
     public void generateReportWhenMarketClose() {
         try {
             logger.info("Start cron job generateReportEveryMarketDay=====");
@@ -81,11 +81,12 @@ public class Timer {
         }
     }
 
-    @Scheduled(cron = "0 20 15 * * *")
+    @Scheduled(cron = "0 20 15 * * ?")
     public void generateBaiduInfo() {
         try {
             logger.info("Start cron job baiduInfoService.getFromNetAndStore=====");
-            baiduInfoService.getFromNetAndStore();
+            baiduInfoService.getFromNetAndStoreDay();
+            baiduInfoService.getFromNetAndStoreWeek();
             logger.info("End cron job baiduInfoService.getFromNetAndStore=====");
 
             logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");

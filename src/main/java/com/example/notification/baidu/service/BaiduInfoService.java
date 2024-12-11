@@ -70,9 +70,9 @@ public class BaiduInfoService {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
-    public Object getStockJsonData(String stockId) {
+    public Object getStockJsonDataDay(String stockId) {
         ArrayList<String[]> result = new ArrayList<>();
-        logger.info("enter BaiduInfoService getStockJsonData stockId =============" + stockId);
+        logger.info("enter BaiduInfoService getStockJsonDataDay stockId =============" + stockId);
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
@@ -93,6 +93,31 @@ public class BaiduInfoService {
         }
         return result;
     }
+
+    public Object getStockJsonDataWeek(String stockId) {
+        ArrayList<String[]> result = new ArrayList<>();
+        logger.info("enter BaiduInfoService getStockJsonDataWeek stockId =============" + stockId);
+        if (stockId.contains("_")) {
+            stockId = stockId.split("_")[0];
+        }
+
+        Integer rangeSize = getRangeSize();
+
+        List<BdIndicatorWeeklyVO> voList = bdIndicatorWeeklyDao.findByIndexStockIdOrderByDay(stockId, rangeSize).stream().sorted(Comparator.comparing(BdIndicatorWeeklyVO::getDay)).toList();
+        //as baidu restrict to query
+        // return db data
+        for (BdIndicatorWeeklyVO vo : voList) {
+            String[] strings = new String[7];
+            strings[0] = Utils.getFormat(vo.getDay());
+            strings[1] = vo.getOpeningPrice().toString();
+            strings[2] = vo.getClosingPrice().toString();
+            strings[3] = vo.getIntradayHigh().toString();
+            strings[4] = vo.getIntradayLow().toString();
+            result.add(strings);
+        }
+        return result;
+    }
+
 
     public void calculateIndicatorsAvg() {
         logger.debug("enter BaiduInfoService calculateIndicatorsAvg =============");
@@ -178,70 +203,9 @@ public class BaiduInfoService {
         return null;
     }
 
-    public Object stockWeekJsonData(String stockId) {
-        ArrayList<String[]> result = new ArrayList<>();
-        logger.info("enter BaiduInfoService stockWeekJsonData stockId =============" + stockId);
-        if (stockId.contains("_")) {
-            stockId = stockId.split("_")[0];
-        }
-
-        Integer rangeSize = getRangeSize();
-        List<WeekPriceVO> sh510300 = weeklyPriceDao.findByIndexStockIdOrderByDay("sh510300", rangeSize);
-        Date day = sh510300.get(sh510300.size() - 1).getDay();
-        String formattedDate = day.toLocalDate().format(formatter);
-
-        ArrayList<String> mainKlineIds = kLineMarketClosedService.getMainKlineIds();
-        List<IndicatorDayVO> kLineList = restRequest.queryBaiduIndustriesKline(stockId, "week", formattedDate);
-        List<BdIndicatorWeeklyVO> voList = bdIndicatorWeeklyDao.findByIndexStockIdOrderByDay(stockId, rangeSize);
-        if (kLineList.isEmpty()) {
-            //as baidu restrict to query
-            // return db data
-            for (BdIndicatorWeeklyVO vo : voList) {
-                String[] strings = new String[7];
-                strings[0] = Utils.getFormat(vo.getDay());
-                strings[1] = vo.getOpeningPrice().toString();
-                strings[2] = vo.getClosingPrice().toString();
-                strings[3] = vo.getIntradayHigh().toString();
-                strings[4] = vo.getIntradayLow().toString();
-                result.add(strings);
-            }
-            return result;
-        }
-        // save new in db
-        Set<String> dayLinesInDbSet = new HashSet<>();
-        for (BdIndicatorWeeklyVO vo : voList) {
-            dayLinesInDbSet.add(Utils.getFormat_YYYY_MM_DD(vo.getDay()));
-        }
-        for (int i = kLineList.size() - 1; i >= 0; i--) {
-            IndicatorDayVO dayVO = kLineList.get(i);
-            if (dayLinesInDbSet.contains(dayVO.getDay())) {
-                break;
-            }
-            BdIndicatorWeeklyVO newVo = new BdIndicatorWeeklyVO();
-            newVo.setStockId(stockId);
-            newVo.setDay(new Date(dayVO.getTimestamp()));
-            newVo.setOpeningPrice(BigDecimal.valueOf(dayVO.getOpen()));
-            newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
-            newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
-            newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
-            bdIndicatorWeeklyDao.save(newVo);
-        }
-        //return
-        for (IndicatorDayVO vo : kLineList) {
-            String[] strings = new String[7];
-            strings[0] = vo.getDay();
-            strings[1] = vo.getOpen().toString();
-            strings[2] = vo.getClose().toString();
-            strings[3] = vo.getHigh().toString();
-            strings[4] = vo.getLow().toString();
-            result.add(strings);
-        }
-        return result;
-    }
-
-    public void getFromNetAndStore() {
+    public void getFromNetAndStoreDay() {
         List<String> ids = bdIndicatorDao.findIds();
-        logger.info("========getFromNetAndStore ========ids.size ={}====={}", ids.size(), ids);
+        logger.info("========getFromNetAndStoreDay ========ids.size ={}====={}", ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
         for (String stockId : ids) {
             tasks.add(() -> {
@@ -273,12 +237,12 @@ public class BaiduInfoService {
                     newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
                     bdIndicatorDailyDao.save(newVo);
                 }
-                logger.info("========getFromNetAndStore =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);
+                logger.info("========getFromNetAndStoreDay =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);
                 return null;
             });
         }
         try {
-            logger.info("========getFromNetAndStore ========start to invokeAll =tasks.size ={}", tasks.size());
+            logger.info("========getFromNetAndStoreDay ========start to invokeAll =tasks.size ={}", tasks.size());
             List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
             for (Future<Void> future : futures) {
                 try {
@@ -291,6 +255,59 @@ public class BaiduInfoService {
             Thread.currentThread().interrupt();
             logger.error("Task execution interrupted", e);
         }
+    }
 
+    public void getFromNetAndStoreWeek() {
+        List<String> ids = bdIndicatorDao.findIds();
+        logger.info("========getFromNetAndStoreWeek ========ids.size ={}====={}", ids.size(), ids);
+        List<Callable<Void>> tasks = new ArrayList<>();
+        for (String stockId : ids) {
+            tasks.add(() -> {
+                Set<String> exsitingDaySet = new HashSet<>();
+                List<BdIndicatorWeeklyVO> allByStockId = bdIndicatorWeeklyDao.findAllByStockId(stockId);
+
+                for (BdIndicatorWeeklyVO dailyVO : allByStockId) {
+                    exsitingDaySet.add(dailyVO.getDay().toString());
+                }
+                if (exsitingDaySet.contains(Date.valueOf(LocalDate.now()).toString())) {
+                    return null;
+                }
+//                Thread.sleep(new Random().nextInt(2000));
+                List<IndicatorDayVO> fromNetList = restRequest.queryBaiduIndustriesKline(stockId, "week", "2018-01-01");
+                // save new in db
+                int loopNum = 0;
+                for (IndicatorDayVO dayVO : fromNetList) {
+                    if (exsitingDaySet.contains(dayVO.getDay())) {
+                        continue;
+                    }
+                    loopNum++;
+                    Date dateFromNet = Date.valueOf(dayVO.getDay());
+                    BdIndicatorWeeklyVO newVo = new BdIndicatorWeeklyVO();
+                    newVo.setStockId(stockId);
+                    newVo.setDay(dateFromNet);
+                    newVo.setOpeningPrice(BigDecimal.valueOf(dayVO.getOpen()));
+                    newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
+                    newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
+                    newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
+                    bdIndicatorWeeklyDao.save(newVo);
+                }
+                logger.info("========getFromNetAndStoreWeek =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);
+                return null;
+            });
+        }
+        try {
+            logger.info("========getFromNetAndStoreWeek ========start to invokeAll =tasks.size ={}", tasks.size());
+            List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+            for (Future<Void> future : futures) {
+                try {
+                    future.get();
+                } catch (ExecutionException e) {
+                    logger.error("Error executing task", e.getCause());
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Task execution interrupted", e);
+        }
     }
 }

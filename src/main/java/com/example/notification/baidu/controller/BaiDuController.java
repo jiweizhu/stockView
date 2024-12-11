@@ -61,14 +61,14 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/stock/{stockId}"})
     @ResponseBody
     public ResponseEntity stockDataById(@PathVariable String stockId) {
-        Object body = baiduInfoService.getStockJsonData(stockId);
+        Object body = baiduInfoService.getStockJsonDataDay(stockId);
         return ResponseEntity.ofNullable(body);
     }
 
     @RequestMapping(value = {"/bd/wk/stock/{stockId}"})
     @ResponseBody
     public ResponseEntity stockWeekDataById(@PathVariable String stockId) {
-        Object body = baiduInfoService.stockWeekJsonData(stockId);
+        Object body = baiduInfoService.getStockJsonDataWeek(stockId);
         return ResponseEntity.ofNullable(body);
     }
 
@@ -106,7 +106,8 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/getFromNetAndStore"})
     @ResponseBody
     public ResponseEntity getFromNetAndStore() {
-        baiduInfoService.getFromNetAndStore();
+        baiduInfoService.getFromNetAndStoreDay();
+        baiduInfoService.getFromNetAndStoreWeek();
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
 
