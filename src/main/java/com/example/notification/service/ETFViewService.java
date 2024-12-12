@@ -222,6 +222,11 @@ public class ETFViewService {
 
         if (num.contains("targetList")) {
             Set<String> stockSet = FileUtil.readTargetFileStocks(Controller.getTargetFile());
+
+            //todo
+            //here to judge if baidu indicator stockIds to show
+
+
             List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
             List<StockNameVO> upwardStocks = new ArrayList<>();
             List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
@@ -337,7 +342,12 @@ public class ETFViewService {
             } else {
                 tdHtml.append(stockId + "#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             }
-            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("</b></a>")
+            String stockIds = stock.getStockIds();
+            int belongStockNum = 0;
+            if (StringUtils.hasLength(stockIds)) {
+                belongStockNum = stockIds.split(",").length;
+            }
+            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("(").append(belongStockNum).append(")</b></a>")
                     .append("(" + stock.getUpwardDaysFive()).append("|")
                     .append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>")
                     .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
