@@ -9,6 +9,7 @@ import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -309,5 +310,27 @@ public class BaiduInfoService {
             Thread.currentThread().interrupt();
             logger.error("Task execution interrupted", e);
         }
+    }
+
+    public void updateIndicatorBelongStocks() {
+        // iterate indicators to get stockids from net
+        List<BdIndicatorVO> indicatorIds = bdIndicatorDao.findAll();
+        indicatorIds.forEach(vo -> {
+            //update to bd_indicator stock_ids
+            JsonNode jsonNode = restRequest.queryBaiduIndustryStocks(vo.getStockId());
+            if (jsonNode != null && jsonNode.isArray()) {
+                StringBuilder stockIdsLine = new StringBuilder();
+                int loopCount = 0;
+                for (JsonNode node : jsonNode) {
+                    String market = node.get("exchange").asText().toLowerCase();
+                    String code = node.get("code").asText();
+                    stockIdsLine.append(market).append(code).append(",");
+                    loopCount++;
+                }
+                logger.info("==== Indicator {} get ==={}=== stockIds", vo.getStockName(), loopCount);
+                vo.setStockIds(stockIdsLine.toString());
+                bdIndicatorDao.save(vo);
+            }
+        });
     }
 }

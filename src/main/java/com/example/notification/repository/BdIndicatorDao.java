@@ -14,6 +14,9 @@ public interface BdIndicatorDao extends JpaRepository<BdIndicatorVO, String>, Jp
     @Query(value = "SELECT indicator_id FROM bd_indicator ", nativeQuery = true)
     List<String> findIds();
 
+    @Query(value = "SELECT stock_ids FROM bd_indicator where indicator_id = ?1 ", nativeQuery = true)
+    String findStockIdsByIndicatorId(String indicatorId);
+
     @Query(value = "SELECT * FROM bd_indicator s where s.upward_days_five >=0 order by s.upward_days_five, s.gain_percent_five desc, s.upward_days_ten desc ", nativeQuery = true)
     List<BdIndicatorVO> findupwardDaysIndicator();
 

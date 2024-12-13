@@ -40,19 +40,10 @@ public class BaiDuController {
             indicatorVO.setName(vo.getName());
             indicatorVO.setRaiseCount(vo.getRiseCount());
             indicatorVO.setFallCount(vo.getFallCount());
-            IndicatorVO.Ratio ratio = vo.getRatio();
-            double dayGain = Double.parseDouble(ratio.getValue().replace("%", ""));
 //            if (ratio.getStatus().equals("down")) {
 //                dayGain = Double.parseDouble(ratio.getValue().replace("%", ""));
 //            }
-            indicatorVO.setDayGain(dayGain);
             indicatorVO.setZeroCount(vo.getMemberCount() - vo.getFallCount() - vo.getRiseCount());
-            List<IndicatorVO.Stock> riseFirst = vo.getRise_first();
-            StringBuilder stocks = new StringBuilder();
-            riseFirst.forEach(stockVo -> {
-                stocks.append(stockVo.getName()).append(",");
-            });
-            indicatorVO.setStocks(stocks.toString());
             retList.add(indicatorVO);
         });
         return retList;
@@ -109,6 +100,15 @@ public class BaiDuController {
         baiduInfoService.getFromNetAndStoreDay();
         baiduInfoService.getFromNetAndStoreWeek();
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
+    }
+
+
+    // update config data
+    @RequestMapping(value = {"/bd/updateIndicatorBelongStocks"})
+    @ResponseBody
+    public ResponseEntity updateIndicatorBelongStocks() {
+        baiduInfoService.updateIndicatorBelongStocks();
+        return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
 

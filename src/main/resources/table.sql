@@ -18,7 +18,7 @@ flip_upward_days_ten INT,
 flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
-stock_ids VARCHAR(1000),
+stock_ids TEXT,
 last_updated_time time
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -77,7 +77,7 @@ flip_upward_days_ten INT,
 flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
-stock_ids VARCHAR(1000),
+stock_ids TEXT,
 last_updated_time time
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -180,7 +180,7 @@ flip_day_ten DATE,
 flip_end_day_ten DATE,
 last_updated_time time,
 
-stock_ids VARCHAR(200),
+stock_ids TEXT,
 belong_etf VARCHAR(12),
 
 customer_range VARCHAR(50), -- 20240601_20240615_20240620

@@ -2,6 +2,7 @@ package com.example.notification.service;
 
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
+import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
@@ -33,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.example.notification.constant.Constants.*;
@@ -47,6 +49,9 @@ public class ETFViewService {
 
     @Autowired
     private StockDailyDao stockDailyDao;
+
+    @Autowired
+    private BdIndicatorDao bdIndicatorDao;
 
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
@@ -168,9 +173,9 @@ public class ETFViewService {
             industryEtfsTable = industryEtfsView(industryEtfs);
         }
 
-        Boolean returnFiveSort = true;
+        Boolean returnSortOfFiveDay = true;
         if (num.split("_").length > 1) {
-            returnFiveSort = false;
+            returnSortOfFiveDay = false;
         }
         if (num.contains("wholeEtfsView")) {
             List<StockNameVO> upWardIndustryEtfs = new ArrayList<>();
@@ -185,7 +190,7 @@ public class ETFViewService {
                 }
             });
             upWardIndustryEtfs.addAll(downWardIndustryEtfs);
-            industryEtfsTable = dayLineStocksFlowView(upWardIndustryEtfs, returnFiveSort);
+            industryEtfsTable = dayLineStocksFlowView(upWardIndustryEtfs, returnSortOfFiveDay);
         }
         if (num.contains("300mainBoard")) {
             Set<String> threeHundredSet = new HashSet<>();
@@ -217,41 +222,48 @@ public class ETFViewService {
             fiveDayExceedTenDay.addAll(upwardStocks);
             fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
 
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnFiveSort);
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnSortOfFiveDay);
         }
 
         if (num.contains("targetList")) {
-            Set<String> stockSet = FileUtil.readTargetFileStocks(Controller.getTargetFile());
-
-            //todo
-            //here to judge if baidu indicator stockIds to show
-
-
+            String targetFile = Controller.getTargetFile();
+            Set<String> stockIdSet;
             List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
             List<StockNameVO> upwardStocks = new ArrayList<>();
             List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
-            commonStockList.forEach(vo -> {
-                if (stockSet.contains(vo.getStockId())) {
-                    //check if 5day excced 10 day!!
-                    List<StockDailyVO> lastTwoDayPrice = stockDailyDao.findLastTwoDayPriceByStockId(vo.getStockId());
-                    StockDailyVO yesterdayVo = lastTwoDayPrice.get(1);
-                    StockDailyVO todayVo = lastTwoDayPrice.get(0);
-                    if (yesterdayVo.getDayAvgFive().compareTo(yesterdayVo.getDayAvgTen()) <= 0 && todayVo.getDayAvgFive().compareTo(todayVo.getDayAvgTen()) >= 0) {
-                        fiveDayExceedTenDay.add(vo);
-                        fiveDayExceedTen_num++;
-                    }
-                    if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
-                        upwardStocks.add(vo);
-                    } else {
-                        downWardIndustryEtfs.add(vo);
-                    }
-                }
-            });
-            fiveDayExceedTenDay.addAll(upwardStocks);
-            fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
-            Controller.setTargetFileSize(String.valueOf(fiveDayExceedTenDay.size()));
+            if (targetFile.contains("bd")) {
+                //here to judge if baidu indicator stockIds to show
+                stockIdSet = Arrays.stream(bdIndicatorDao.findStockIdsByIndicatorId(targetFile.substring(3)).split(",")).collect(Collectors.toSet());
+                stockIdSet.forEach(id -> {
+                    Optional<StockNameVO> byId = stockDao.findById(id);
+                    byId.ifPresent(vo -> fiveDayExceedTenDay.add(byId.get()));
+                });
 
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnFiveSort);
+            } else {
+                stockIdSet = FileUtil.readTargetFileStocks(targetFile);
+                commonStockList.forEach(vo -> {
+                    if (stockIdSet.contains(vo.getStockId())) {
+                        //check if 5day excced 10 day!!
+                        List<StockDailyVO> lastTwoDayPrice = stockDailyDao.findLastTwoDayPriceByStockId(vo.getStockId());
+                        StockDailyVO yesterdayVo = lastTwoDayPrice.get(1);
+                        StockDailyVO todayVo = lastTwoDayPrice.get(0);
+                        if (yesterdayVo.getDayAvgFive().compareTo(yesterdayVo.getDayAvgTen()) <= 0 && todayVo.getDayAvgFive().compareTo(todayVo.getDayAvgTen()) >= 0) {
+                            fiveDayExceedTenDay.add(vo);
+                            fiveDayExceedTen_num++;
+                        }
+                        if (vo.getUpwardDaysFive() >= 0 || vo.getUpwardDaysTen() >= 0) {
+                            upwardStocks.add(vo);
+                        } else {
+                            downWardIndustryEtfs.add(vo);
+                        }
+                    }
+                });
+                fiveDayExceedTenDay.addAll(upwardStocks);
+                fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
+            }
+
+            Controller.setTargetFileSize(String.valueOf(fiveDayExceedTenDay.size()));
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnSortOfFiveDay);
         }
 
         if (num.equals("main")) {
@@ -312,6 +324,7 @@ public class ETFViewService {
 
     public String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
         constructMap();
+        String serverIp = Utils.getServerIp();
         for (int i = 0; i < industryEtfs.size(); i++) {
             StringBuilder tdHtml = new StringBuilder();
             StockNameVO stock = industryEtfs.get(i);
@@ -336,11 +349,14 @@ public class ETFViewService {
                 tenBackGroudColor = "#00FF00";
             }
 
+
             tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");
             if (stockId.startsWith("sh") || stockId.startsWith("sz")) {
                 tdHtml.append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stockId.substring(2)).append("\">");
             } else {
-                tdHtml.append(stockId + "#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+                // here stockId is bdIndictorId
+                tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#")
+                        .append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             }
             String stockIds = stock.getStockIds();
             int belongStockNum = 0;

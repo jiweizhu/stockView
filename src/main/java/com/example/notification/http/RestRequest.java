@@ -32,6 +32,10 @@ public class RestRequest {
     static String weeklyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,week,,,daysToQuery,qfq";
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
+
+    //https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=340700&query=340700&pn=0&rn=500
+    static String BdIndictor_StockIds_URL = "https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=$code&query=$code&pn=0&rn=500";
+
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30
     private static final String BaiduIndustry_KLine_Url = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=$code&market_type=ab&ktype=$ktype&start_time=$startTime";
 
@@ -93,7 +97,7 @@ public class RestRequest {
                 }
             }
         } catch (Exception e) {
-            logger.info("Fail to queryBaiduIndustriesKline ============ Please have a check:{}" , url,  e);
+            logger.info("Fail to queryBaiduIndustriesKline ============ Please have a check:{}", url, e);
         }
         logger.info("Exit queryBaiduIndustriesKline ============ code=={}, kType={}, startDay={}, return blockList size = {},", code, kType, startDay, blockList.size());
         return blockList;
@@ -199,5 +203,23 @@ public class RestRequest {
         }
         logger.debug("dailyQueryResponseVO = " + queryFromTencentResponseVO);
         return queryFromTencentResponseVO;
+    }
+
+    public JsonNode queryBaiduIndustryStocks(String indicatorId) {
+        logger.info("Enter queryBaiduIndustryStocks === indicatorId= {}", indicatorId);
+        try {
+            String queryUrl = BdIndictor_StockIds_URL.replace("$code", indicatorId);
+            String ret = restTemplate.getForObject(queryUrl, String.class);
+            JsonNode rootNode = objectMapper.readTree(ret);
+            JsonNode listNode = rootNode.at("/Result/0/DisplayData/resultData/tplData/result/list");
+            if (listNode == null) {
+                logger.info("=====Error==to get stockIds from Net====indicatorId =={}", indicatorId);
+                return null;
+            }
+            return listNode;
+        } catch (Exception e) {
+            logger.info("=====Error======Exception======", e);
+        }
+        return null;
     }
 }

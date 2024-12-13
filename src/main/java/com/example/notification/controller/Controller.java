@@ -1,10 +1,12 @@
 package com.example.notification.controller;
 
 import com.example.notification.constant.Constants;
+import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
 import com.example.notification.util.EmailUtil;
+import com.example.notification.vo.BdIndicatorVO;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
@@ -39,6 +41,9 @@ public class Controller {
     @Autowired
     private ETFViewService etfViewService;
 
+    @Autowired
+    private BdIndicatorDao bdIndicatorDao;
+
 
     @RequestMapping(value = {"/listStockFiles"})
     @ResponseBody
@@ -69,8 +74,13 @@ public class Controller {
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})
     public ModelAndView listTargetFileStocks(@PathVariable String target) throws Exception {
-        targetFile = stockFolder + "/" + target;
-        logger.info("========= listTargetFileStocks ==========="+targetFile);
+        if (target.contains("bd")) {
+            // return bd indicator stocks
+            targetFile = target;
+        } else {
+            targetFile = stockFolder + "/" + target;
+        }
+        logger.info("========= listTargetFileStocks ===========" + targetFile);
         setTargetFile(targetFile);
         return new ModelAndView("redirect:/stocksDayView.html");
     }
@@ -78,12 +88,18 @@ public class Controller {
     @RequestMapping(value = {"/getPageTitle"})
     public String getPageTitle() {
 
-        if (getTargetFile() == null) {
+        String targetFileValue = getTargetFile();
+        if (targetFileValue == null) {
             return "No Title";
+        } else if (targetFileValue.startsWith("bd")) {
+            BdIndicatorVO bdIndicatorVO = bdIndicatorDao.findById(targetFileValue.substring(3)).get();
+            int length = bdIndicatorVO.getStockIds().split(",").length;
+            String stockName = bdIndicatorVO.getStockName();
+            return stockName + "|" + length;
         } else {
             StringBuilder stringBuilder = new StringBuilder("(").append(getTargetFileSize()).append(")");
-            int lastIndexOf = getTargetFile().lastIndexOf("/");
-            stringBuilder.append(getTargetFile().substring(lastIndexOf, getTargetFile().length() - 1).replace(".xls|.txt", ""));
+            int lastIndexOf = targetFileValue.lastIndexOf("/");
+            stringBuilder.append(targetFileValue.substring(lastIndexOf, targetFileValue.length() - 1).replace(".xls|.txt", ""));
             return stringBuilder.toString();
         }
     }
