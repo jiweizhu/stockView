@@ -20,9 +20,15 @@ public class Constants {
 
     public static Integer rangeSize = 250;
 
+    //grey   #C0C0C0 民企300
+    //yellow #FFFF00 国企200
+    //green #00FF00 央企100
     public static int YangQi = 100;
+    public static String YangQi_Color = "#FF8888";
     public static int GuoQi = 200;
+    public static String GuoQi_Color  = "#FF9900";
     public static int MinQi = 300;
+    public static String MinQi_Color  = "#C0C0C0";
 
     public static Integer getRangeSize() {
         return rangeSize;

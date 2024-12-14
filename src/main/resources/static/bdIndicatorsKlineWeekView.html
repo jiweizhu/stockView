@@ -99,7 +99,7 @@
 
 var data_300;
 async function get300Data() {
- data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());
+ data_300 = await fetch(`http://${serverIp}:8888/stock/weekly/sh510300`).then(response => response.json());
 }
 
 function toggleColumn() {
