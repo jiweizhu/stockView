@@ -327,7 +327,6 @@ public class BaiduInfoService {
                     stockIdsLine.append(market).append(code).append(",");
                     loopCount++;
                 }
-                logger.info("==== Indicator {} get ==={}=== stockIds", vo.getStockName(), loopCount);
                 vo.setStockIds(stockIdsLine.toString());
                 bdIndicatorDao.save(vo);
             }

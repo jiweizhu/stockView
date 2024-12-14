@@ -230,6 +230,14 @@ public class Controller {
         return result;
     }
 
+    @RequestMapping(value = {"/manuallyUpdate"})
+    @ResponseBody
+    public String manuallyUpdate() {
+        logger.info("Enter method manuallyUpdate ====");
+        String result = kLineMarketClosedService.manuallyUpdateStock();
+        return result;
+    }
+
     @RequestMapping(value = {"/generateReportEveryDay"})
     @ResponseBody
     public String generateReportEveryDay() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, JsonProcessingException, InterruptedException {

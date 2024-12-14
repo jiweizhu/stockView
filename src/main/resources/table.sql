@@ -165,6 +165,7 @@ PRIMARY KEY(stock_id, day)
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,
 stock_name VARCHAR(20),
+capital_type INT,
 upward_days_five INT,
 gain_percent_five DECIMAL(10,2),
 flip_upward_days_five INT,

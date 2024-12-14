@@ -23,6 +23,9 @@ public class StockNameVO {
     @Column(name = "stockName")
     private String stockName;
 
+    @Column(name = "capital_type")
+    private Integer capitalType;
+
     @Column(name = "stock_ids")
     private String stockIds;
 

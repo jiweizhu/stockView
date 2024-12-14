@@ -20,6 +20,10 @@ public class Constants {
 
     public static Integer rangeSize = 250;
 
+    public static int YangQi = 100;
+    public static int GuoQi = 200;
+    public static int MinQi = 300;
+
     public static Integer getRangeSize() {
         return rangeSize;
     }

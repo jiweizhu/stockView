@@ -81,6 +81,17 @@ public class KLineMarketClosedService {
         return addNewInTable(newImportStock);
     }
 
+    public String manuallyUpdateStock() {
+        readImportFileStocks();
+        for (String stockid : importStockFileList) {
+            stockid = stockid.toLowerCase();
+            StockNameVO vo = stockDao.findById(stockid).get();
+            vo.setCapitalType(Constants.getRangeSize());
+            stockDao.save(vo);
+        }
+        return "Successfully!";
+    }
+
     public String addNewInTable(List<String> newImportStock) throws JsonProcessingException {
         ArrayList<StockNameVO> newToAdd = new ArrayList<>();
         ArrayList<String> wrongInputStockId = new ArrayList<>();
@@ -160,7 +171,7 @@ public class KLineMarketClosedService {
                 importedFileLine.add(line);
                 String stock_id;
                 if (line.toLowerCase().startsWith("s") && !line.startsWith("#")) {
-                    //split by 
+                    //split by ',', means multi stocks in one line
                     String[] commaSplit = line.split(",");
                     if (commaSplit.length > 1) {
                         for (String comma_split_str : commaSplit) {
