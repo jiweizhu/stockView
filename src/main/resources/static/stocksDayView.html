@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const dates = rawData.map(item => item[0]);
         const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-        const data_300_tmp = data_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+        const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
 
         const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));
         const data_min = Math.min(...data.flat());

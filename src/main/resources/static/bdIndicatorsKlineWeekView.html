@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
+    <title>bdIndicators Week View</title>
     <link href="themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="themes/icon.css" rel="stylesheet" type="text/css">
     <link href="themes/demo.css" rel="stylesheet" type="text/css">
@@ -88,19 +88,18 @@
     }
 
  loadTableData();
- loadIndexTableData();
- setTimeout(function() {
- get300Data();
-     getDivs();
-<!--     $('.hide-column').hide();-->
+<!-- loadIndexTableData();-->
 
- }, 3000);
- });
+setTimeout(function() {
+ getDivs();
+}, 2000);
+});
 
 var data_300;
 async function get300Data() {
  data_300 = await fetch(`http://${serverIp}:8888/stock/weekly/sh510300`).then(response => response.json());
 }
+get300Data();
 
 function toggleColumn() {
   $('.hide-column').toggle();
@@ -145,7 +144,8 @@ function toggleColumn() {
     }
     const dates = rawData.map(item => item[0]);
     const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const data_300_tmp = data_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    const tmp_300 = data_300.slice(0, rawData.length).reverse();
+    const data_300_tmp = tmp_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
 
     // Normalize data
     const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));

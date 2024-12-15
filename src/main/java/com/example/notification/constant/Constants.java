@@ -18,7 +18,7 @@ public class Constants {
     public static String TOTAL = "total";
     public static String ROWS = "rows";
 
-    public static Integer rangeSize = 250;
+    public static Integer rangeSize = 500;
 
     //grey   #C0C0C0 民企300
     //yellow #FFFF00 国企200

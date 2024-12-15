@@ -363,7 +363,16 @@ public class ETFViewService {
             if (StringUtils.hasLength(stockIds)) {
                 belongStockNum = stockIds.split(",").length;
             }
-            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]).append("(").append(belongStockNum).append(")</b></a>").append("(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
+            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]);
+            if (!stock.getStockId().startsWith("s")) {
+                tdHtml.append("(").append(belongStockNum).append(")");
+            }
+            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")")
+                    .append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")")
+                    .append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">")
+                    .append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
+                    .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")
+                    .append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
             if (stocksFlowMap.get(upwardDaysNum) == null) {
                 if (upwardDaysNum < -3) {
                     stocksFlowMap.get(-3).add(tdHtml.toString());

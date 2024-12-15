@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <title>ShangHai Index, 2015 - Apache ECharts Demo</title>
+    <title>bdIndicators Day View</title>
     <link href="themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="themes/icon.css" rel="stylesheet" type="text/css">
     <link href="themes/demo.css" rel="stylesheet" type="text/css">
@@ -145,7 +145,7 @@ function toggleColumn() {
     }
     const dates = rawData.map(item => item[0]);
     const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const data_300_tmp = data_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
 
     // Normalize data
     const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));
