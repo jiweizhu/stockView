@@ -95,7 +95,7 @@ public class Controller {
             BdIndicatorVO bdIndicatorVO = bdIndicatorDao.findById(targetFileValue.substring(3)).get();
             int length = bdIndicatorVO.getStockIds().split(",").length;
             String stockName = bdIndicatorVO.getStockName();
-            return length + "|" + stockName;
+            return length + "|" + stockName + "_" + bdIndicatorVO.getStockId();
         } else {
             StringBuilder stringBuilder = new StringBuilder("(").append(getTargetFileSize()).append(")");
             int lastIndexOf = targetFileValue.lastIndexOf("/");

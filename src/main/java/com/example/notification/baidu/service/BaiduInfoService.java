@@ -195,7 +195,7 @@ public class BaiduInfoService {
             BeanUtils.copyProperties(vo, target);
             industryEtfs.add(target);
         });
-        String html = etfViewService.dayLineStocksFlowView(industryEtfs, true);
+        String html = etfViewService.dayLineStocksFlowView(industryEtfs, false);
         return html;
     }
 
@@ -317,7 +317,7 @@ public class BaiduInfoService {
         List<BdIndicatorVO> indicatorIds = bdIndicatorDao.findAll();
         indicatorIds.forEach(vo -> {
             //update to bd_indicator stock_ids
-            JsonNode jsonNode = restRequest.queryBaiduIndustryStocks(vo.getStockId());
+            JsonNode jsonNode = restRequest.queryBaiduIndustryOwnedStocks(vo.getStockId());
             if (jsonNode != null && jsonNode.isArray()) {
                 StringBuilder stockIdsLine = new StringBuilder();
                 int loopCount = 0;

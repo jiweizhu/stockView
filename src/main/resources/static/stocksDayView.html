@@ -20,18 +20,18 @@
           padding: 0;
         }
         .chart-container {
-            width: 300px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
         .range-container {
-            width: 250px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
         }
         .index-container {
-            width: 300px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
@@ -54,21 +54,22 @@
 <button id="toggle_range">toggle day/week</button>
 <table border="1" id="mainTable">
 </table>
-<a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
+<a href="#" class="easyui-linkbutton" id="toggle_indicator">toggle_indicator</a>
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-    let isWeekly = false; // 标识当前是日数据还是周数据
+    let isWeekly = false;
+    //sh510300 default is hushen300
+    var showingIndicator = 'sh510300';
 
-    // 设置页面标题为指定 URL 返回的数据
     async function setTitleFromServer() {
         try {
-            // 请求获取数据
             const response = await fetch(`http://${serverIp}:8888/getPageTitle`);
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
-            const titleText = await response.text(); // 假设返回的数据是纯文本
+            const titleText = await response.text();
             document.title = titleText; // 设置为页面标题
+            showingIndicator = titleText.split("_")[1]
         } catch (error) {
             console.error('Error fetching title data:', error);
             document.title = '默认标题'; // 如果请求失败，设置一个默认标题
@@ -76,57 +77,81 @@
     }
 
 document.addEventListener('DOMContentLoaded', function () {
-        function loadTableData() {
-            fetch(`http://${serverIp}:8888/etfs/targetList`)
-                .then(response => response.text())
-                .then(data => {
-                    const dataContainer = document.getElementById('myTable');
-                    dataContainer.innerHTML = data;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
+    const serverUrl = `http://${serverIp}:8888/etfs`;
+
+    // 通用 fetch 函数
+    async function fetchData(endpoint, containerId) {
+        try {
+            const response = await fetch(endpoint);
+            const data = await response.text();
+            document.getElementById(containerId).innerHTML = data;
+        } catch (error) {
+            console.error(`Error fetching ${endpoint}:`, error);
         }
-        function loadIndexTableData() {
-            fetch(`http://${serverIp}:8888/etfs/main`)
-                .then(response => response.text())
-                .then(data => {
-                    const dataContainer = document.getElementById('mainTable');
-                    dataContainer.innerHTML = data;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
-
-        loadTableData();
-        loadIndexTableData();
-
-        setTimeout(function () {
-            get300Data();
-            getDivs();
-            $('.hide-column').hide();
-            setTitleFromServer();
-        }, 1000);
-
-        // 绑定 toggle_range 按钮事件
-        document.getElementById('toggle_range').addEventListener('click', function () {
-            isWeekly = !isWeekly; // 切换日/周数据
-            console.log(`Switched to ${isWeekly ? 'weekly' : 'daily'} mode`);
-            get300Data();
-<!--            sleep(300);-->
-            getDivs(); // 重新加载图表
-        });
-    });
-
-    var data_300;
-    async function get300Data() {
-        const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}`+'sh510300';
-        data_300 = await fetch(url).then(response => response.json());
     }
 
-    function toggleColumn() {
-        $('.hide-column').toggle();
+    // 加载表格数据
+    function loadAllTables() {
+        fetchData(`${serverUrl}/targetList`, 'myTable');
+        fetchData(`${serverUrl}/main`, 'mainTable');
+    }
+
+    // 执行延时任务的函数
+    function executeWithDelay(callback, delay = 2000) {
+        setTimeout(callback, delay);
+    }
+
+    // 初始化页面数据
+    async function initializeData() {
+        loadAllTables();
+        executeWithDelay(() => {
+            get300Data();
+            executeWithDelay(getDivs); // 执行 getDivs 两秒后
+            $('.hide-column').hide();
+            setTitleFromServer();
+        });
+    }
+
+    // 按钮事件绑定
+    function bindEvents() {
+        let isWeekly = false;
+        const sh510300 = 'sh510300';
+        let toggle = true;
+
+        // 切换周/月范围按钮
+        document.getElementById('toggle_range').addEventListener('click', () => {
+            isWeekly = !isWeekly;
+            refresh300Data();
+        });
+
+        // 切换指标按钮
+        document.getElementById('toggle_indicator').addEventListener('click', () => {
+            const stockId = toggle ? showingIndicator : sh510300;
+            toggle = !toggle;
+            refresh300Data(stockId);
+        });
+
+        // 刷新 300 数据及相关操作
+        function refresh300Data(stockId = 'sh510300') {
+            get300Data(stockId);
+            executeWithDelay(getDivs);
+        }
+    }
+
+    // 页面加载初始化
+    initializeData();
+    bindEvents();
+});
+
+    var data_300;
+    async function get300Data(stockId) {
+        let url;
+        if (stockId === 'sh510300') {
+            url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}${stockId}`;
+        } else {
+            url = `http://${serverIp}:8888/bd/${isWeekly ? 'wk/' : ''}stock/${stockId}`;
+        }
+        data_300 = await fetch(url).then(response => response.json());
     }
 
     async function getDivs() {
@@ -146,125 +171,162 @@ document.addEventListener('DOMContentLoaded', function () {
         const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}` + span.id.replace('span_', '');
         const rawData = await fetch(url).then(response => response.json());
 
-        function calculateMA(dayCount, data) {
-            var result = [];
-            for (var i = 0, len = data.length; i < len; i++) {
-                if (i < dayCount) {
-                    result.push('-');
-                    continue;
-                }
-                var sum = 0;
-                for (var j = 0; j < dayCount; j++) {
-                    sum += +data[i - j][1];
-                }
-                result.push(sum / dayCount);
+       function calculateMA(dayCount, data) {
+        var result = [];
+        for (var i = 0, len = data.length; i < len; i++) {
+            if (i < dayCount) {
+                result.push('-');
+                continue;
             }
-            return result;
+            var sum = 0;
+            for (var j = 0; j < dayCount; j++) {
+                sum += +data[i - j][1];
+            }
+            result.push(sum / dayCount);
         }
-
-        const dates = rawData.map(item => item[0]);
-        const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-        const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
-
-        const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));
-        const data_min = Math.min(...data.flat());
-        const data_max = Math.max(...data.flat());
-        const data_300_min = Math.min(...data_300_tmp.flat());
-        const data_300_max = Math.max(...data_300_tmp.flat());
-        const normalized_data = normalize(data, data_min, data_max);
-        const normalized_data_300 = normalize(data_300_tmp, data_300_min, data_300_max);
-        const line_data_300 = normalized_data_300.map(item => item[1]);
-
-        const option = {
-            legend: { data: ['MA5', 'MA10', '300日K'], inactiveColor: '#777' },
-            tooltip: { trigger: 'axis', axisPointer: { animation: false, type: 'cross', lineStyle: { color: '#376df4', width: 2, opacity: 1 } } },
-            xAxis: { type: 'category', data: dates, axisLine: { lineStyle: { color: '#8392A5' } } },
-            yAxis: {
-                scale: true,
-                axisLine: { lineStyle: { color: '#8392A5' } },
-                splitLine: { show: false },
-                axisLabel: { formatter: value => (value * (data_max - data_min) + data_min).toFixed(2) }
-            },
-            grid: { bottom: 80 },
-            dataZoom: [
-                { textStyle: { color: '#8392A5' }, handleIcon: 'path://M10.7,11.9...', dataBackground: { areaStyle: { color: '#8392A5' }, lineStyle: { opacity: 0.8, color: '#8392A5' } }, brushSelect: true },
-                { type: 'inside' }
-            ],
-            series: [
-                { type: 'candlestick', name: '日K', data: normalized_data, itemStyle: { color: '#FD1050', color0: '#0CF49B', borderColor: '#FD1050', borderColor0: '#0CF49B' } },
-                { name: 'MA5', type: 'line', data: calculateMA(5, normalized_data), smooth: true, showSymbol: false, lineStyle: { width: 1 } },
-                { name: 'MA10', type: 'line', data: calculateMA(10, normalized_data), smooth: true, showSymbol: false, lineStyle: { width: 1 } },
-                { type: 'line', name: '300日K', data: line_data_300, smooth: true, showSymbol: false, lineStyle: { width: 0.5, color: '#EE9A00' } }
-            ]
-        };
-
-        if (option && typeof option === 'object') {
-            myChart.setOption(option);
-        }
-
-        window.addEventListener('resize', () => myChart.resize());
+        return result;
     }
-</script>
-<table border="1" id="myTable"></table>
-<script>
-    async function createChart(span) {
-        const chartData = await fetchData(span.id);
 
-        Highcharts.chart(span.id, {
-            title: {
-                text: 'Dynamic Chart Title',
-                align: 'left'
-            },
-            subtitle: {
-                text: 'Dynamic Chart Subtitle',
-                align: 'left'
-            },
-            yAxis: {
-                title: {
-                    text: 'Price'
+    const dates = rawData.map(item => item[0]);
+    const stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    const line_data_300 = data_300_tmp.map(item => item[1]); // 使用真实的开盘价作为示例
+
+    const stock_min = Math.min(...stockData.flat());
+    const stock_max = Math.max(...stockData.flat());
+    const data_300_min = Math.min(...data_300_tmp.flat());
+    const data_300_max = Math.max(...data_300_tmp.flat());
+
+    const yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
+
+    const option = {
+        legend: {
+            data: ['MA5', 'MA10', '300日K', 'stock'],
+            inactiveColor: '#777'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                animation: false,
+                type: 'cross',
+                lineStyle: {
+                    color: '#376df4',
+                    width: 2,
+                    opacity: 1
                 }
             },
-            xAxis: {
-                accessibility: {
-                    rangeDescription: 'Range: 2010 to 2020'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            series: chartData.series,
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
+            formatter: params => {
+                return params.map(p => `${p.seriesName}: ${p.data}`).join('<br>');
+            }
+        },
+        xAxis: {
+            type: 'category',
+            data: dates,
+            axisLine: { lineStyle: { color: '#8392A5' } }
+        },
+       yAxis: [
+    {
+        type: 'value',
+        scale: true,
+        name: 'Stock',
+        position: 'left',
+        min: Math.min(...stockData.flat()), // 真实最小值
+        max: Math.max(...stockData.flat()), // 真实最大值
+        axisLine: { lineStyle: { color: '#8392A5' } },
+        splitLine: { show: false }
+    },
+    {
+        type: 'value',
+        scale: true,
+        name: '300 Index',
+        position: 'right',
+        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
+        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+        axisLine: { lineStyle: { color: '#EE9A00' } },
+        splitLine: { show: false }
+    }
+],
+        grid: {
+            bottom: 80
+        },
+        dataZoom: [
+            {
+                textStyle: {
+                    color: '#8392A5'
+                },
+                handleIcon:
+                    'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                dataBackground: {
+                    areaStyle: {
+                        color: '#8392A5'
                     },
-                    chartOptions: {
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        }
+                    lineStyle: {
+                        opacity: 0.8,
+                        color: '#8392A5'
                     }
-                }]
+                },
+                brushSelect: true
+            },
+            {
+                type: 'inside'
             }
-        });
+        ],
+        series: [
+            {
+                type: 'candlestick',
+                name: 'Stock',
+                data: stockData,
+                yAxisIndex: 0,
+                itemStyle: {
+                    color: '#FD1050',
+                    color0: '#0CF49B',
+                    borderColor: '#FD1050',
+                    borderColor0: '#0CF49B'
+                }
+            },
+            {
+                name: 'MA5',
+                type: 'line',
+                data: calculateMA(5, stockData),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 1
+                },
+                yAxisIndex: 0
+            },
+            {
+                name: 'MA10',
+                type: 'line',
+                data: calculateMA(10, stockData),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 1
+                },
+                yAxisIndex: 0
+            },
+            {
+                type: 'line',
+                name: '300日K',
+                data: line_data_300,
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 0.5,
+                    color: '#EE9A00'
+                },
+                yAxisIndex: 1
+            }
+        ]
+    };
+
+    if (option && typeof option === 'object') {
+        myChart.setOption(option);
     }
 
-    async function initializeIntraCharts() {
-    const spans = document.querySelectorAll('div[id^="multi_"]');
-        for (const span of spans) {
-            await createChart(span);
-        }
-    }
+    window.addEventListener('resize', () => myChart.resize());
+}
 </script>
 </body>
 </html>

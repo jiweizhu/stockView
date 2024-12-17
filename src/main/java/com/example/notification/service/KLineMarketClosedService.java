@@ -35,6 +35,8 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -586,9 +588,17 @@ public class KLineMarketClosedService {
     public Object delete_HistoryData() {
         // also delete today's daily price as sometimes i need to know the real price while the market opening.
         String dayStr = formatter_yyyy_mm_day.format((new Date(System.currentTimeMillis())));
+        String preFiveDay = formatter_yyyy_mm_day.format((new Date(LocalDate.now().minusDays(5).toEpochDay())));
         entityManager.createNativeQuery("delete from daily_price where day = '" + dayStr + "'").executeUpdate();
 
+
+        LocalDate today = LocalDate.now();
+        LocalDate fiveDaysAgo = today.minusDays(5);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = fiveDaysAgo.format(formatter);
+
         entityManager.createNativeQuery("delete from daily_price where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
+        entityManager.createNativeQuery("delete from bd_indicator_wk_price where day > '" + formattedDate + "'").executeUpdate();
 
         entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null ;").executeUpdate();
 

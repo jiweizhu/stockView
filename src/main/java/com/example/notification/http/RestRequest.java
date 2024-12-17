@@ -33,15 +33,20 @@ public class RestRequest {
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
 
+
+    //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=399300&market_type=ab&ktype=week
+    private static String BdIndictor_StockId_URL = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=$code&market_type=ab&ktype=$type";
+
+    // For baidu indicators start
     //https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=340700&query=340700&pn=0&rn=500
-    static String BdIndictor_StockIds_URL = "https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=$code&query=$code&pn=0&rn=500";
+    private static String BdIndictor_OwnedStockIds_URL = "https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=$code&query=$code&pn=0&rn=500";
 
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30
     private static final String BaiduIndustry_KLine_Url = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=$code&market_type=ab&ktype=$ktype&start_time=$startTime";
 
     //  "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30";
     private static final String Baidu_IndustryIndicators_Url = "https://finance.pae.baidu.com/vapi/v2/blocks?pn=0&rn=150&market=ab&typeCode=HY&finClientType=pc";
-
+    // For baidu indicators end
 
     //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930693&startDate=20241008
     private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
@@ -205,10 +210,10 @@ public class RestRequest {
         return queryFromTencentResponseVO;
     }
 
-    public JsonNode queryBaiduIndustryStocks(String indicatorId) {
+    public JsonNode queryBaiduIndustryOwnedStocks(String indicatorId) {
         logger.info("Enter queryBaiduIndustryStocks === indicatorId= {}", indicatorId);
         try {
-            String queryUrl = BdIndictor_StockIds_URL.replace("$code", indicatorId);
+            String queryUrl = BdIndictor_OwnedStockIds_URL.replace("$code", indicatorId);
             String ret = restTemplate.getForObject(queryUrl, String.class);
             JsonNode rootNode = objectMapper.readTree(ret);
             JsonNode listNode = rootNode.at("/Result/0/DisplayData/resultData/tplData/result/list");
