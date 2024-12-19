@@ -6,3 +6,8 @@ https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance
 
 
 https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=399300&query=399300&pn=0&rn=500
+
+
+https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&query=410100&code=410100&market_type=ab&newFormat=1&name=%E7%94%B5%E5%8A%9B&ktype=week&end_time=2013-08-02&count=107&finClientType=pc
+https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&query=480300&code=480300&market_type=ab&newFormat=1&ktype=week&end_time=2022-01-14&count=107&finClientType=pc
+https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&query=480300&code=480300&market_type=ab&newFormat=1&ktype=week&end_time=2013-08-02&count=107&finClientType=pc

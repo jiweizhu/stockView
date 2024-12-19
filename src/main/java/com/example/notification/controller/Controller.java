@@ -51,8 +51,8 @@ public class Controller {
         return kLineService.listStockFiles(stockFolder);
     }
 
-
-    private static String targetFile;
+    //370400#医药商业 for debug locally
+    private static String targetFile="bd_370400";
 
     public static String getTargetFileSize() {
         return targetFileSize;

@@ -179,27 +179,27 @@ async function createETFChart(span) {
             axisLine: { lineStyle: { color: '#8392A5' } }
         },
        yAxis: [
-    {
-        type: 'value',
-        scale: true,
-        name: 'Stock',
-        position: 'left',
-        min: Math.min(...stockData.flat()), // 真实最小值
-        max: Math.max(...stockData.flat()), // 真实最大值
-        axisLine: { lineStyle: { color: '#8392A5' } },
-        splitLine: { show: false }
-    },
-    {
-        type: 'value',
-        scale: true,
-        name: '300 Index',
-        position: 'right',
-        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
-        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
-        axisLine: { lineStyle: { color: '#EE9A00' } },
-        splitLine: { show: false }
-    }
-],
+            {
+                type: 'value',
+                scale: true,
+                name: 'Stock',
+                position: 'left',
+                min: Math.min(...stockData.flat()), // 真实最小值
+                max: Math.max(...stockData.flat()), // 真实最大值
+                axisLine: { lineStyle: { color: '#8392A5' } },
+                splitLine: { show: false }
+            },
+            {
+                type: 'value',
+                scale: true,
+                name: '300 Index',
+                position: 'right',
+                min: Math.min(...data_300_tmp.flat()), // 300真实最小值
+                max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+                axisLine: { lineStyle: { color: '#EE9A00' } },
+                splitLine: { show: false }
+            }
+        ],
         grid: {
             bottom: 80
         },
