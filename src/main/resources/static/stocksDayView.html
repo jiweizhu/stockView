@@ -66,8 +66,8 @@
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
     let isWeekly = false;
-    //sh510300 default is hushen300
-    var showingIndicator = 'sh510300';
+    //default is 370400, 医药商业
+    var showingIndicator = '370400';
 
     async function setTitleFromServer() {
         try {
@@ -114,7 +114,8 @@ document.addEventListener('DOMContentLoaded', function () {
         setTitleFromServer();
         loadAllTables();
         executeWithDelay(() => {
-            get300Data(showingIndicator);
+            getIndicatorData(showingIndicator);
+            get300Data('sh510300');
             executeWithDelay(getDivs); // 执行 getDivs 两秒后
         });
     }
@@ -131,17 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
             refresh300Data();
         });
 
-        const toggleIndicatorButton = document.getElementById('toggle_indicator');
-            toggleIndicatorButton.addEventListener('click', () => {
-            const stockId = toggle ? showingIndicator : sh510300;
-            toggle = !toggle;
-            refresh300Data(stockId);
-            toggleIndicatorButton.textContent = toggle ? '300 showing' : 'clicked_indicator';
-        });
-
         // 刷新 300 数据及相关操作
         function refresh300Data(stockId = 'sh510300') {
-            get300Data(stockId);
+            get300Data('sh510300');
             executeWithDelay(getDivs);
         }
     }
@@ -162,6 +155,12 @@ document.addEventListener('DOMContentLoaded', function () {
         data_300 = await fetch(url).then(response => response.json());
     }
 
+    var data_indicator;
+    async function getIndicatorData(stockId) {
+        let url = `http://${serverIp}:8888/bd/${isWeekly ? 'wk/' : ''}stock/${stockId}`;
+        data_indicator = await fetch(url).then(response => response.json());
+    }
+
     async function getDivs() {
         const spans = document.querySelectorAll('div[id^="span_"]');
         spans.forEach(span => {
@@ -169,10 +168,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-
 async function createETFChart(span) {
 
-    // 根据 isWeekly 构建 URL
     const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}` + span.id.replace('span_', '');
     const rawData = await fetch(url).then(response => response.json());
 
@@ -181,10 +178,16 @@ async function createETFChart(span) {
     const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
     const line_data_300 = data_300_tmp.map(item => item[1]); // 使用真实的开盘价作为示例
 
+    const data_indicator_tmp = data_indicator.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    const line_data_indicator = data_indicator_tmp.map(item => item[1]);
+
     const stock_min = Math.min(...stockData.flat());
     const stock_max = Math.max(...stockData.flat());
     const data_300_min = Math.min(...data_300_tmp.flat());
     const data_300_max = Math.max(...data_300_tmp.flat());
+
+    const data_indicator_min = Math.min(...data_indicator_tmp.flat());
+    const data_indicator_max = Math.max(...data_indicator_tmp.flat());
 
     const yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
 
@@ -211,37 +214,60 @@ async function createETFChart(span) {
     }
 
 
-    // 初始状态，标记 300日K 是否显示
-let is300Displayed = true;
+    // 初始数据和配置
+    const originalYAxis300 = {
+        type: 'value',
+        scale: true,
+        name: '300 Index',
+        position: 'right',
+        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
+        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+        axisLine: { lineStyle: { color: '#EE9A00' } },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        axisTick: { show: false }
+    };
 
-// 初始数据和配置
-const originalYAxis300 = {
-    type: 'value',
-    scale: true,
-    name: '300 Index',
-    position: 'right',
-    min: Math.min(...data_300_tmp.flat()), // 300真实最小值
-    max: Math.max(...data_300_tmp.flat()), // 300真实最大值
-    axisLine: { lineStyle: { color: '#EE9A00' } },
-    splitLine: { show: false }
-};
+     const originalYAxisIndicator = {
+        type: 'value',
+        scale: true,
+        name: 'indicator',
+        position: 'right',
+        min: Math.min(...data_indicator_tmp.flat()),
+        max: Math.max(...data_indicator_tmp.flat()),
+        axisLine: { lineStyle: { color: '#EE9A00' } },
+        splitLine: { show: false }
+    };
 
-const originalSeries300 = {
-    type: 'line',
-    name: '300日K',
-    data: line_data_300,
-    smooth: true,
-    showSymbol: false,
-    lineStyle: {
-        width: 0.5,
-        color: '#EE9A00'
-    },
-    yAxisIndex: 1
-};
+    const originalSeries300 = {
+        type: 'line',
+        name: '300日K',
+        data: line_data_300,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+            width: 0.5,
+            color: 'black'
+        },
+        yAxisIndex: 2
+    };
+
+    const originalSeriesIndicator = {
+        type: 'line',
+        name: 'indicator',
+        data: line_data_indicator,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+            width: 0.5,
+            color: '#EE9A00'
+        },
+        yAxisIndex: 1
+    };
 
     const option = {
         legend: {
-            data: ['MA5', 'MA10', '300日K', 'stock'],
+            data: ['MA5', 'MA10', 'stock','indicator'],
             inactiveColor: '#777'
         },
        yAxis: [
@@ -255,7 +281,7 @@ const originalSeries300 = {
                 axisLine: { lineStyle: { color: '#8392A5' } },
                 splitLine: { show: false }
             },
-            originalYAxis300
+            originalYAxisIndicator
         ],
         series: [
             {
@@ -292,7 +318,7 @@ const originalSeries300 = {
                 },
                 yAxisIndex: 0
             },
-            originalSeries300
+            originalSeriesIndicator
         ],
          tooltip: {
             trigger: 'axis',
@@ -347,33 +373,53 @@ const originalSeries300 = {
 
     window.addEventListener('resize', () => myChart.resize());
 
-   // 渲染初始图表
-myChart.setOption(option);
+    // 渲染初始图表
+    myChart.setOption(option);
 
-// 按钮点击事件处理
-document.getElementById('toggle_300').addEventListener('click', () => {
-    if (is300Displayed) {
-        // 移除 300日K 配置
-        option.legend.data = option.legend.data.filter(item => item !== '300日K');
-        option.yAxis = option.yAxis.filter(axis => axis.name !== '300 Index');
-        option.series = option.series.filter(series => series.name !== '300日K');
-    } else {
-        // 添加 300日K 配置
-        option.legend.data.push('300日K');
-        option.yAxis.push(originalYAxis300);
-        option.series.push(originalSeries300);
-    }
+     // 初始状态，标记 300日K 是否显示
+    let is300Displayed = false;
+    let isIndicatorDisplayed = true;
+
+    // 按钮点击事件处理
+    document.getElementById('toggle_300').addEventListener('click', () => {
+        if (is300Displayed) {
+            // 移除 300日K 配置
+<!--            option.legend.data = option.legend.data.filter(item => item !== '300日K');-->
+            option.yAxis = option.yAxis.filter(axis => axis.name !== '300 Index');
+            option.series = option.series.filter(series => series.name !== '300日K');
+        } else {
+<!--            option.legend.data.push('300日K');-->
+            option.yAxis.push(originalYAxis300);
+            option.series.push(originalSeries300);
+        }
 
     // 切换状态
     is300Displayed = !is300Displayed;
 
     // 更新图表
-    myChart.setOption(option, true);})
+    myChart.setOption(option, true);
+      window.addEventListener('resize', () => myChart.resize());
+    })
+
+    document.getElementById('toggle_indicator').addEventListener('click', () => {
+        if (isIndicatorDisplayed) {
+            option.legend.data = option.legend.data.filter(item => item !== 'indicator');
+            option.yAxis = option.yAxis.filter(axis => axis.name !== 'indicator');
+            option.series = option.series.filter(series => series.name !== 'indicator');
+        } else {
+            option.legend.data.push('indicator');
+            option.yAxis.push(originalYAxisIndicator);
+            option.series.push(originalSeriesIndicator);
+        }
+    isIndicatorDisplayed = !isIndicatorDisplayed;
+    myChart.setOption(option, true);
+      window.addEventListener('resize', () => myChart.resize());
+    })
 }
 </script>
 <button id="toggle_range">toggle day/week</button>
 <button class="toggleButton" id="toggle_indicator">toggle_indicator</button>
-<button id="toggle_300" class="toggleButton">Toggle 300日K</button>
+<button class="toggleButton" id="toggle_300" >Toggle 300日K</button>
 <table border="1" id="myTable"></table>
 </body>
 </html>
