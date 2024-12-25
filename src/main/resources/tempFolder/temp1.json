@@ -1,0 +1,104 @@
+{
+  "body": [
+    {
+      "name": "\u79d1\u5927\u8baf\u98de",
+      "code": "002230",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "11.15%",
+      "proportionRatio": "-2.55%"
+    },
+    {
+      "name": "\u91d1\u5c71\u529e\u516c",
+      "code": "688111",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "8.30%",
+      "proportionRatio": "-0.75%"
+    },
+    {
+      "name": "\u540c\u82b1\u987a",
+      "code": "300033",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "5.64%",
+      "proportionRatio": "1.79%"
+    },
+    {
+      "name": "\u6052\u751f\u7535\u5b50",
+      "code": "600570",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "4.67%",
+      "proportionRatio": "0.05%"
+    },
+    {
+      "name": "\u4e09\u516d\u96f6",
+      "code": "601360",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "4.28%",
+      "proportionRatio": "-0.46%"
+    },
+    {
+      "name": "\u6da6\u548c\u8f6f\u4ef6",
+      "code": "300339",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "4.05%",
+      "proportionRatio": "1.20%"
+    },
+    {
+      "name": "\u5b9d\u4fe1\u8f6f\u4ef6",
+      "code": "600845",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "3.87%",
+      "proportionRatio": "-0.89%"
+    },
+    {
+      "name": "\u4e2d\u56fd\u8f6f\u4ef6",
+      "code": "600536",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "3.44%",
+      "proportionRatio": "0.33%"
+    },
+    {
+      "name": "\u7528\u53cb\u7f51\u7edc",
+      "code": "600588",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "3.20%",
+      "proportionRatio": "-0.34%"
+    },
+    {
+      "name": "\u56db\u7ef4\u56fe\u65b0",
+      "code": "002405",
+      "market": "ab",
+      "exchange": "",
+      "price": "--",
+      "priceRatio": "",
+      "positionProportion": "3.03%",
+      "proportionRatio": "0.48%"
+    }
+  ]
+}
