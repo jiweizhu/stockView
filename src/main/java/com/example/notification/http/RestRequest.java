@@ -33,13 +33,16 @@ public class RestRequest {
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
 
-
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=399300&market_type=ab&ktype=week
     private static String BdIndictor_StockId_URL = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=$code&market_type=ab&ktype=$type";
 
     // For baidu indicators start
     //https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=340700&query=340700&pn=0&rn=500
     private static String BdIndictor_OwnedStockIds_URL = "https://gushitong.baidu.com/opendata?resource_id=5352&group=block_stocks&finance_type=block&market=ab&marketType=ab&pc_web=1&finClientType=pc&code=$code&query=$code&pn=0&rn=500";
+
+    // https://gushitong.baidu.com/opendata?query=561560&resource_id=5803&finClientType=pc
+    private static String Bd_ETFINFO_URL = "https://gushitong.baidu.com/opendata?query=$code&resource_id=5803&finClientType=pc";
+
 
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30
     private static final String BaiduIndustry_KLine_Url = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=$code&market_type=ab&ktype=$ktype&start_time=$startTime";
@@ -222,6 +225,25 @@ public class RestRequest {
                 return null;
             }
             return listNode;
+        } catch (Exception e) {
+            logger.info("=====Error======Exception======", e);
+        }
+        return null;
+    }
+
+    public JsonNode queryEtfInfoFromBd(String etfId) {
+        logger.info("Enter queryEtfInfoFromBd === ETF id = {}", etfId);
+        try {
+            String queryUrl = Bd_ETFINFO_URL.replace("$code", etfId.substring(2));
+            String ret = restTemplate.getForObject(queryUrl, String.class);
+            JsonNode rootNode = objectMapper.readTree(ret);
+
+            JsonNode bodyNode = rootNode.at("/Result/0/DisplayData/resultData/tplData/result/content/tabs/0/content/heavyStock/body");
+            if (bodyNode.isArray()) {
+               return bodyNode;
+            }
+            logger.info("=====Warning ======queryEtfInfoFromBd==not found ETF info from Baidu==etfId={}", etfId);
+            return null;
         } catch (Exception e) {
             logger.info("=====Error======Exception======", e);
         }

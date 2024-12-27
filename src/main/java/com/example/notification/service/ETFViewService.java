@@ -2,6 +2,7 @@ package com.example.notification.service;
 
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
+import com.example.notification.http.RestRequest;
 import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDailyDao;
@@ -14,6 +15,7 @@ import com.example.notification.vo.StockDailyVO;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +59,7 @@ public class ETFViewService {
     private KLineMarketClosedService kLineMarketClosedService;
 
     @Autowired
-    private KLineService kLineService;
+    private RestRequest restRequest;
 
     @Autowired
     private HoldingService holdingService;
@@ -229,7 +231,7 @@ public class ETFViewService {
             List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
             List<StockNameVO> upwardStocks = new ArrayList<>();
             List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
-            if (targetFile.contains("bd")) {
+            if (targetFile.contains(CONSTANT_BD)) {
                 //here to judge if baidu indicator stockIds to show
                 stockIdSet = Arrays.stream(bdIndicatorDao.findStockIdsByIndicatorId(targetFile.substring(3)).split(",")).collect(Collectors.toSet());
                 stockIdSet.forEach(id -> {
@@ -237,6 +239,12 @@ public class ETFViewService {
                     byId.ifPresent(vo -> fiveDayExceedTenDay.add(byId.get()));
                 });
 
+            } else if (targetFile.contains(CONSTANT_ETF)) {
+                stockIdSet = Arrays.stream(stockDao.findStockIdsByEtfId(targetFile.substring(4)).split(",")).collect(Collectors.toSet());
+                stockIdSet.forEach(id -> {
+                    Optional<StockNameVO> byId = stockDao.findById(id);
+                    byId.ifPresent(vo -> fiveDayExceedTenDay.add(byId.get()));
+                });
             } else {
                 stockIdSet = FileUtil.readTargetFileStocks(targetFile);
                 commonStockList.forEach(vo -> {
@@ -318,8 +326,14 @@ public class ETFViewService {
         constructMap();
         String serverIp = Utils.getServerIp();
         for (int i = 0; i < industryEtfs.size(); i++) {
+
             StringBuilder tdHtml = new StringBuilder();
             StockNameVO stock = industryEtfs.get(i);
+
+            boolean isETF = false;
+            if (stock.getStockName().contains("ETF")) {
+                isETF = true;
+            }
 
             String stockId = stock.getStockId();
             String id_name = stockId + "_" + stock.getStockName();
@@ -352,8 +366,16 @@ public class ETFViewService {
 
 
             tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");
-            if (stockId.startsWith("sh") || stockId.startsWith("sz")) {
-                tdHtml.append("<a href=\"https://gushitong.baidu.com/stock/ab-").append(stockId.substring(2)).append("\">");
+            if (stock.getStockId().startsWith("sh") || stockId.startsWith("sz")) {
+                String urlPrefix = "<a href=\"https://gushitong.baidu.com/stock/ab-";
+                if (isETF) {
+                    urlPrefix = "<a href=\"https://gushitong.baidu.com/fund/ab-";
+                    // format is sh1596110#电力ETF
+                    tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("etf_").append(stockId).append("\">").append(stockId).append("</a>#")
+                            .append(urlPrefix).append(stockId.substring(2)).append("\">");
+                } else {
+                    tdHtml.append(urlPrefix).append(stockId.substring(2)).append("\">");
+                }
             } else {
                 // here stockId is bdIndictorId
                 tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
@@ -364,7 +386,7 @@ public class ETFViewService {
                 belongStockNum = stockIds.split(",").length;
             }
             tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]);
-            if (!stock.getStockId().startsWith("s")) {
+            if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 tdHtml.append("(").append(belongStockNum).append(")");
             }
             tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")")
@@ -1121,5 +1143,31 @@ public class ETFViewService {
             rets.add(etfFlowVO);
         }
         return rets;
+    }
+
+    public void updateBelongStockIds() {
+        stockDao.findEtfIds().forEach(stockNameVO -> {
+            JsonNode jsonNode = restRequest.queryEtfInfoFromBd(stockNameVO.getStockId());
+            if (jsonNode != null) {
+                StringBuilder stockIds = new StringBuilder();
+                for (JsonNode item : jsonNode) {
+                    String tmpCode = item.get("code").textValue();
+                    List<StockNameVO> stockList = stockDao.findByStockIdLike("%" + tmpCode);
+                    if (!CollectionUtils.isEmpty(stockList) && stockList.size() == 1) {
+                        String stockId = stockList.get(0).getStockId();
+                        stockIds.append(stockId).append(",");
+                    } else {
+                        logger.info("=====updateBelongStockIds==Found more than two ==Stocks={}", stockList);
+                        return;
+                    }
+                }
+                String ret = stockIds.toString();
+                if (ret.length() > 1) {
+                    stockNameVO.setStockIds(ret);
+                    stockDao.save(stockNameVO);
+                    logger.info("=====updateBelongStockIds==save stock_ids from Baidu==etfName={}", stockNameVO.getStockName());
+                }
+            }
+        });
     }
 }

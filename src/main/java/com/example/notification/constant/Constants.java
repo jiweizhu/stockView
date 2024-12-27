@@ -17,6 +17,8 @@ public class Constants {
 
     public static String TOTAL = "total";
     public static String ROWS = "rows";
+    public static String CONSTANT_BD = "bd";
+    public static String CONSTANT_ETF = "etf";
 
     public static Integer rangeSize = 700;
 

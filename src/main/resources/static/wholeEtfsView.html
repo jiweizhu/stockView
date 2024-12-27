@@ -20,18 +20,18 @@
           padding: 0;
         }
         .chart-container {
-            width: 300px;
+            width: 350px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
         .range-container {
-            width: 250px;
+            width: 350px;
             height: 280px;
             margin-bottom: 2px;
         }
         .index-container {
-            width: 300px;
+            width: 350px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
@@ -95,8 +95,8 @@ async function get300Data() {
 
 loadTableData();
 loadIndexTableData();
+get300Data();
 setTimeout(function() {
-   get300Data();
    getDivs();
    $('.hide-column').hide();
 }, 1000);
@@ -191,7 +191,10 @@ setTimeout(function() {
         }
       },
       grid: {
-        bottom: 80
+          left: '10%',  // 图表左边距
+        right: '5%',  // 图表右边距，减少留白
+        bottom: 75,
+        top: 30
       },
       dataZoom: [
         {

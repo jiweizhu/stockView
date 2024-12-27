@@ -69,20 +69,6 @@
     //default is 370400, 医药商业
     var showingIndicator = '370400';
 
-    async function setTitleFromServer() {
-        try {
-            const response = await fetch(`http://${serverIp}:8888/getPageTitle`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const titleText = await response.text();
-            document.title = titleText; // 设置为页面标题
-            showingIndicator = titleText.split("_")[1]
-        } catch (error) {
-            console.error('Error fetching title data:', error);
-            document.title = '默认标题'; // 如果请求失败，设置一个默认标题
-        }
-    }
 
 document.addEventListener('DOMContentLoaded', function () {
     const serverUrl = `http://${serverIp}:8888/etfs`;
@@ -109,15 +95,41 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(callback, delay);
     }
 
-    // 初始化页面数据
+
+     async function setTitleFromServer() {
+        try {
+            const response = await fetch(`http://${serverIp}:8888/getPageTitle`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const titleText = await response.text();
+            document.title = titleText;
+            const showingIndicator = titleText.split("_")[1];
+            return showingIndicator;
+        } catch (error) {
+            console.error('Error fetching title data:', error);
+            document.title = 'No Title Found';
+            return null;
+        }
+    }
     async function initializeData() {
-        setTitleFromServer();
+     try {
+        const tmpIndicator = await setTitleFromServer();
+
+        if (!tmpIndicator) {
+            console.warn('Failed to fetch showingIndicator, initialization aborted.');
+            return;
+        }
+
         loadAllTables();
+        getIndicatorData(tmpIndicator);
         executeWithDelay(() => {
-            getIndicatorData(showingIndicator);
             get300Data('sh510300');
-            executeWithDelay(getDivs); // 执行 getDivs 两秒后
+            executeWithDelay(getDivs);
         });
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
     }
 
     // 按钮事件绑定
@@ -157,12 +169,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var data_indicator;
     async function getIndicatorData(stockId) {
-        let url = `http://${serverIp}:8888/bd/${isWeekly ? 'wk/' : ''}stock/${stockId}`;
+        let url;
+        if (stockId.startsWith('s')) {
+            url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}${stockId}`;
+        } else {
+            url = `http://${serverIp}:8888/bd/${isWeekly ? 'wk/' : ''}stock/${stockId}`;
+        }
         data_indicator = await fetch(url).then(response => response.json());
     }
 
     async function getDivs() {
-        const spans = document.querySelectorAll('div[id^="span_"]');
+        let spans = document.querySelectorAll('div[id^="span_"]');
         spans.forEach(span => {
             createETFChart(span);
         });
@@ -171,25 +188,84 @@ document.addEventListener('DOMContentLoaded', function () {
 async function createETFChart(span) {
 
     const url = `http://${serverIp}:8888/stock/${isWeekly ? 'weekly/' : ''}` + span.id.replace('span_', '');
-    const rawData = await fetch(url).then(response => response.json());
+    let rawData = await fetch(url).then(response => response.json());
 
-    const dates = rawData.map(item => item[0]);
-    const stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const line_data_300 = data_300_tmp.map(item => item[1]); // 使用真实的开盘价作为示例
+    let dates = rawData.map(item => item[0]);
+    let stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let line_data_300 = data_300_tmp.map(item => item[1]); // 使用真实的开盘价作为示例
+    let offLen = (data_indicator.length - rawData.length );
+    let data_indicator_tmp = data_indicator.slice( offLen , data_indicator.length ).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let line_data_indicator = data_indicator_tmp.map(item => item[1]);
 
-    const data_indicator_tmp = data_indicator.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const line_data_indicator = data_indicator_tmp.map(item => item[1]);
+    let stock_min = Math.min(...stockData.flat());
+    let stock_max = Math.max(...stockData.flat());
+    let data_300_min = Math.min(...data_300_tmp.flat());
+    let data_300_max = Math.max(...data_300_tmp.flat());
 
+    let data_indicator_min = Math.min(...data_indicator_tmp.flat());
+    let data_indicator_max = Math.max(...data_indicator_tmp.flat());
+
+    // 定义一个全局变量，用于存储初始的完整数据
+const rawDataOriginal = [...rawData]; // 初始完整原始数据
+const datesOriginal = [...dates];
+const stockDataOriginal = [...stockData];
+const data_300_tmpOriginal = [...data_300_tmp];
+const line_data_300Original = [...line_data_300];
+const data_indicator_tmpOriginal = [...data_indicator_tmp];
+const line_data_indicatorOriginal = [...line_data_indicator];
+
+function filterRecentDays(dayCount) {
+    // 确保从原始数据中截取，而不是在已被截取的数据上再次截取
+    rawData = rawDataOriginal.slice(-dayCount);
+    dates = datesOriginal.slice(-dayCount);
+    stockData = stockDataOriginal.slice(-dayCount);
+    data_300_tmp = data_300_tmpOriginal.slice(-dayCount);
+    line_data_300 = line_data_300Original.slice(-dayCount);
+    data_indicator_tmp = data_indicator_tmpOriginal.slice(-dayCount);
+    line_data_indicator = line_data_indicatorOriginal.slice(-dayCount);
+
+    // 重新计算 Y 轴的最小值和最大值
     const stock_min = Math.min(...stockData.flat());
     const stock_max = Math.max(...stockData.flat());
+
     const data_300_min = Math.min(...data_300_tmp.flat());
     const data_300_max = Math.max(...data_300_tmp.flat());
 
     const data_indicator_min = Math.min(...data_indicator_tmp.flat());
     const data_indicator_max = Math.max(...data_indicator_tmp.flat());
 
-    const yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
+    // 更新图表的 Y 轴配置
+    option.yAxis[0].min = stock_min;
+    option.yAxis[0].max = stock_max;
+
+    if (option.yAxis[1]) {
+        option.yAxis[1].min = data_indicator_min;
+        option.yAxis[1].max = data_indicator_max;
+    }
+
+    if (option.yAxis.length > 2 && option.yAxis[2]) {
+        option.yAxis[2].min = data_300_min;
+        option.yAxis[2].max = data_300_max;
+    }
+
+    // 更新图表数据和配置
+    option.series[0].data = stockData; // 更新 K 线数据
+    option.series[1].data = calculateMA(5, stockData); // 更新 MA5 数据
+    option.series[2].data = calculateMA(10, stockData); // 更新 MA10 数据
+    if (is300Displayed) {
+        option.series.find(series => series.name === '300日K').data = line_data_300; // 更新 300 日K
+    }
+    if (isIndicatorDisplayed) {
+        option.series.find(series => series.name === 'indicator').data = line_data_indicator; // 更新 indicator
+    }
+
+    myChart.setOption(option, true); // 更新图表
+    window.addEventListener('resize', () => myChart.resize());
+}
+
+
+    let yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
 
         var myChart = echarts.init(span, null, {
             renderer: 'canvas',
@@ -214,7 +290,6 @@ async function createETFChart(span) {
     }
 
 
-    // 初始数据和配置
     const originalYAxis300 = {
         type: 'value',
         scale: true,
@@ -373,12 +448,38 @@ async function createETFChart(span) {
 
     window.addEventListener('resize', () => myChart.resize());
 
-    // 渲染初始图表
     myChart.setOption(option);
 
-     // 初始状态，标记 300日K 是否显示
     let is300Displayed = false;
     let isIndicatorDisplayed = true;
+
+
+    function filterDaysData(){
+        option.xAxis.data = dates;
+        option.series[0].data = stockData;
+        option.series[1].data = calculateMA(5, stockData);
+        option.series[2].data = calculateMA(10, stockData);
+        option.series[3].data = line_data_indicator;
+        if (is300Displayed) {
+            option.series[4].data = line_data_300;
+        }
+
+        myChart.setOption(option, true);
+        window.addEventListener('resize', () => myChart.resize());
+    }
+
+    document.getElementById('toggle_700').addEventListener('click', () => {
+        filterRecentDays(700);
+        filterDaysData();
+    });
+    document.getElementById('toggle_500').addEventListener('click', () => {
+        filterRecentDays(500);
+        filterDaysData();
+    });
+    document.getElementById('toggle_200').addEventListener('click', () => {
+        filterRecentDays(200);
+        filterDaysData();
+    });
 
     // 按钮点击事件处理
     document.getElementById('toggle_300').addEventListener('click', () => {
@@ -393,10 +494,8 @@ async function createETFChart(span) {
             option.series.push(originalSeries300);
         }
 
-    // 切换状态
     is300Displayed = !is300Displayed;
 
-    // 更新图表
     myChart.setOption(option, true);
       window.addEventListener('resize', () => myChart.resize());
     })
@@ -419,7 +518,10 @@ async function createETFChart(span) {
 </script>
 <button id="toggle_range">toggle day/week</button>
 <button class="toggleButton" id="toggle_indicator">toggle_indicator</button>
-<button class="toggleButton" id="toggle_300" >Toggle 300日K</button>
+<button class="toggleButton" id="toggle_300" >Toggle 300K</button>
+<button class="toggleButton" id="toggle_700" >Last 700</button>
+<button class="toggleButton" id="toggle_500" >Last 500</button>
+<button class="toggleButton" id="toggle_200" >Last 200</button>
 <table border="1" id="myTable"></table>
 </body>
 </html>

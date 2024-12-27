@@ -236,6 +236,9 @@ public class BaiduInfoService {
                     newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
                     newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
                     newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
+                    newVo.setDayAvgFive(BigDecimal.valueOf(dayVO.getMa5avgprice()));
+                    newVo.setDayAvgTen(BigDecimal.valueOf(dayVO.getMa10avgprice()));
+                    newVo.setDayAvgTwenty(BigDecimal.valueOf(dayVO.getMa20avgprice()));
                     bdIndicatorDailyDao.save(newVo);
                 }
                 logger.info("========getFromNetAndStoreDay =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);

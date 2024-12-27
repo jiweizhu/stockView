@@ -173,4 +173,12 @@ public class ETFController {
     }
 
 
+    //manually update api
+    @RequestMapping(value = {"/etf/updateBelongStockIds"})
+    @ResponseBody
+    public Object updateBelongStockIds() {
+         etfViewService.updateBelongStockIds();
+        return "Successfully";
+    }
+
 }

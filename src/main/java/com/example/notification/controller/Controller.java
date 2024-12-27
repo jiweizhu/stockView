@@ -2,6 +2,7 @@ package com.example.notification.controller;
 
 import com.example.notification.constant.Constants;
 import com.example.notification.repository.BdIndicatorDao;
+import com.example.notification.repository.StockDao;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
@@ -22,6 +23,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+
+import static com.example.notification.constant.Constants.CONSTANT_BD;
+import static com.example.notification.constant.Constants.CONSTANT_ETF;
 
 @RestController
 public class Controller {
@@ -44,6 +48,9 @@ public class Controller {
     @Autowired
     private BdIndicatorDao bdIndicatorDao;
 
+    @Autowired
+    private StockDao stockDao;
+
 
     @RequestMapping(value = {"/listStockFiles"})
     @ResponseBody
@@ -52,7 +59,7 @@ public class Controller {
     }
 
     //370400#医药商业 for debug locally
-    private static String targetFile="bd_370400";
+    private static String targetFile = "bd_370400";
 
     public static String getTargetFileSize() {
         return targetFileSize;
@@ -74,8 +81,8 @@ public class Controller {
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})
     public ModelAndView listTargetFileStocks(@PathVariable String target) throws Exception {
-        if (target.contains("bd")) {
-            // return bd indicator stocks
+        if (target.contains(CONSTANT_BD) || target.contains(CONSTANT_ETF)) {
+            // return bd indicator or ETF stocks
             targetFile = target;
         } else {
             targetFile = stockFolder + "/" + target;
@@ -91,11 +98,16 @@ public class Controller {
         String targetFileValue = getTargetFile();
         if (targetFileValue == null) {
             return "No Title";
-        } else if (targetFileValue.startsWith("bd")) {
+        } else if (targetFileValue.startsWith(CONSTANT_BD)) {
             BdIndicatorVO bdIndicatorVO = bdIndicatorDao.findById(targetFileValue.substring(3)).get();
             int length = bdIndicatorVO.getStockIds().split(",").length;
             String stockName = bdIndicatorVO.getStockName();
             return length + "|" + stockName + "_" + bdIndicatorVO.getStockId();
+        } else if (targetFileValue.startsWith(CONSTANT_ETF)) {
+            StockNameVO stockNameVO = stockDao.findById(targetFileValue.substring(4)).get();
+            int length = stockNameVO.getStockIds().split(",").length;
+            String stockName = stockNameVO.getStockName();
+            return length + "|" + stockName + "_" + stockNameVO.getStockId();
         } else {
             StringBuilder stringBuilder = new StringBuilder("(").append(getTargetFileSize()).append(")");
             int lastIndexOf = targetFileValue.lastIndexOf("/");
@@ -176,6 +188,7 @@ public class Controller {
             body = etfViewService.findAllEtfSortView_new(num);
         } else if (num.contains("targetList")) {
             //get target file xls to list stocks
+            // and bd_indicator/etf belong stocks
             body = etfViewService.findAllEtfSortView_new(num);
         } else if (num.contains("300mainBoard")) {
             body = etfViewService.findAllEtfSortView_new(num);
