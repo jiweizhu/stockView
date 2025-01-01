@@ -98,16 +98,16 @@ public class BaiDuController {
     @ResponseBody
     public ResponseEntity getFromNetAndStore() {
         baiduInfoService.getFromNetAndStoreDay();
-        baiduInfoService.getFromNetAndStoreWeek();
+        baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
 
 
-    // update config data
+    // manually update config data
     @RequestMapping(value = {"/bd/updateIndicatorBelongStocks"})
     @ResponseBody
     public ResponseEntity updateIndicatorBelongStocks() {
-        baiduInfoService.updateIndicatorBelongStocks();
+        baiduInfoService.getFromNetAndStoreWeek(true);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

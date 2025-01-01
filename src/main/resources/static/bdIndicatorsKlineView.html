@@ -48,6 +48,16 @@
           text-align: left;
           padding: 10px;
         }
+        .toggleButton {
+            background-color: grey; /* 设置按钮背景颜色 */
+            color: black; /* 按钮文字颜色 */
+            padding: 10px 15px; /* 内边距 */
+            border: none; /* 去掉边框 */
+            border-radius: 5px; /* 圆角 */
+            cursor: pointer; /* 鼠标悬浮样式 */
+            text-align: center; /* 居中 */
+            text-decoration: none; /* 去掉下划线 */
+        }
     </style>
 </head>
 <body>
@@ -56,6 +66,11 @@
 <table border="1" id="mainTable">
 </table>
 <a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
+<button class="toggleButton" id="toggle_indicator">toggle_indicator</button>
+<button class="toggleButton" id="toggle_300" >Toggle 300K</button>
+<button class="toggleButton" id="toggle_700" >Last 700</button>
+<button class="toggleButton" id="toggle_500" >Last 500</button>
+<button class="toggleButton" id="toggle_200" >Last 200</button>
 <table border="1" id="myTable"></table>
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
@@ -282,66 +297,6 @@ async function createETFChart(span) {
     window.addEventListener('resize', () => myChart.resize());
 }
 
-</script>
-<script>
-    async function createChart(span) {
-        const chartData = await fetchData(span.id);
-
-        Highcharts.chart(span.id, {
-            title: {
-                text: 'Dynamic Chart Title',
-                align: 'left'
-            },
-            subtitle: {
-                text: 'Dynamic Chart Subtitle',
-                align: 'left'
-            },
-            yAxis: {
-                title: {
-                    text: 'Price'
-                }
-            },
-            xAxis: {
-                accessibility: {
-                    rangeDescription: 'Range: 2010 to 2020'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            series: chartData.series,
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        }
-                    }
-                }]
-            }
-        });
-    }
-
-    async function initializeIntraCharts() {
-    const spans = document.querySelectorAll('div[id^="multi_"]');
-        for (const span of spans) {
-            await createChart(span);
-        }
-    }
 </script>
 </body>
 </html>

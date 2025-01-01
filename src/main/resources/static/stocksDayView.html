@@ -114,11 +114,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     async function initializeData() {
      try {
-        const tmpIndicator = await setTitleFromServer();
+        let tmpIndicator = await setTitleFromServer();
 
         if (!tmpIndicator) {
-            console.warn('Failed to fetch showingIndicator, initialization aborted.');
-            return;
+            tmpIndicator = 'sh510300';
         }
 
         loadAllTables();

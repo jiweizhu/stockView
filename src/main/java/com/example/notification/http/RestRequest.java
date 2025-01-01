@@ -43,6 +43,9 @@ public class RestRequest {
     // https://gushitong.baidu.com/opendata?query=561560&resource_id=5803&finClientType=pc
     private static String Bd_ETFINFO_URL = "https://gushitong.baidu.com/opendata?query=$code&resource_id=5803&finClientType=pc";
 
+    //for sh000300
+    //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=000300&market_type=ab&ktype=week&start_time=2024-07-30
+    private static final String BaiduIndustry_Quotation_Url = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=000300&market_type=ab&ktype=week&start_time=$startTime";
 
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=110200&market_type=ab&ktype=week&start_time=2024-07-30
     private static final String BaiduIndustry_KLine_Url = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=$code&market_type=ab&ktype=$ktype&start_time=$startTime";
@@ -83,8 +86,10 @@ public class RestRequest {
     }
 
     public List<IndicatorDayVO> queryBaiduIndustriesKline(String code, String kType, String startDay) {
-        String code1 = code.replace("sh", "").replace("sz", "");
-        String url = BaiduIndustry_KLine_Url.replace("$code", code1).replace("$ktype", kType).replace("$startTime", startDay);
+        String url = BaiduIndustry_KLine_Url.replace("$code", code).replace("$ktype", kType).replace("$startTime", startDay);
+        if(code.equals("sh000300")){
+            url=  BaiduIndustry_Quotation_Url.replace("$startTime", startDay);
+        }
         List blockList = new ArrayList();
         try {
             //========test data start ============

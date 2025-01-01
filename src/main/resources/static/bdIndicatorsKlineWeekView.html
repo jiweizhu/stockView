@@ -97,7 +97,7 @@ setTimeout(function() {
 
 var data_300;
 async function get300Data() {
- data_300 = await fetch(`http://${serverIp}:8888/stock/weekly/sh510300`).then(response => response.json());
+ data_300 = await fetch(`http://${serverIp}:8888/bd/wk/stock/sh000300`).then(response => response.json());
 }
 get300Data();
 
@@ -144,7 +144,7 @@ function toggleColumn() {
     }
     const dates = rawData.map(item => item[0]);
     const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const tmp_300 = data_300.slice(0, rawData.length).reverse();
+    const tmp_300 = data_300.slice(0, rawData.length);
     const data_300_tmp = tmp_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
 
     // Normalize data

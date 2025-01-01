@@ -261,11 +261,20 @@ public class BaiduInfoService {
         }
     }
 
-    public void getFromNetAndStoreWeek() {
+    public void getFromNetAndStoreWeek(boolean isInitData) {
         List<String> ids = bdIndicatorDao.findIds();
+        ids.add("sh000300");
         logger.info("========getFromNetAndStoreWeek ========ids.size ={}====={}", ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+        LocalDate fiveDaysAgo = today.minusDays(10);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String tenDaysBefore = fiveDaysAgo.format(formatter);
+        if (isInitData) {
+            tenDaysBefore = "2013-08-01";
+        }
         for (String stockId : ids) {
+            String finalTenDaysBefore = tenDaysBefore;
             tasks.add(() -> {
                 Set<String> exsitingDaySet = new HashSet<>();
                 List<BdIndicatorWeeklyVO> allByStockId = bdIndicatorWeeklyDao.findAllByStockId(stockId);
@@ -273,11 +282,11 @@ public class BaiduInfoService {
                 for (BdIndicatorWeeklyVO dailyVO : allByStockId) {
                     exsitingDaySet.add(dailyVO.getDay().toString());
                 }
+
                 if (exsitingDaySet.contains(Date.valueOf(LocalDate.now()).toString())) {
                     return null;
                 }
-//                Thread.sleep(new Random().nextInt(2000));
-                List<IndicatorDayVO> fromNetList = restRequest.queryBaiduIndustriesKline(stockId, "week", "2018-01-01");
+                List<IndicatorDayVO> fromNetList = restRequest.queryBaiduIndustriesKline(stockId, "week", finalTenDaysBefore);
                 // save new in db
                 int loopNum = 0;
                 for (IndicatorDayVO dayVO : fromNetList) {

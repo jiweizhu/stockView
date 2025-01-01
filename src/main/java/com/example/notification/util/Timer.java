@@ -86,11 +86,11 @@ public class Timer {
         try {
             logger.info("Start cron job baiduInfoService.getFromNetAndStore=====");
             baiduInfoService.getFromNetAndStoreDay();
-            baiduInfoService.getFromNetAndStoreWeek();
+            baiduInfoService.getFromNetAndStoreWeek(false);
             logger.info("End cron job baiduInfoService.getFromNetAndStore=====");
 
             logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
-            baiduInfoService.calculateIndicatorsAvg();
+//            baiduInfoService.calculateIndicatorsAvg();
             logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
