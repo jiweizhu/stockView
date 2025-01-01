@@ -20,18 +20,18 @@
           padding: 0;
         }
         .chart-container {
-            width: 300px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
         .range-container {
-            width: 250px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
         }
         .index-container {
-            width: 300px;
+            width: 400px;
             height: 280px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
@@ -48,6 +48,16 @@
           text-align: left;
           padding: 10px;
         }
+        .toggleButton {
+            background-color: grey; /* 设置按钮背景颜色 */
+            color: black; /* 按钮文字颜色 */
+            padding: 10px 15px; /* 内边距 */
+            border: none; /* 去掉边框 */
+            border-radius: 5px; /* 圆角 */
+            cursor: pointer; /* 鼠标悬浮样式 */
+            text-align: center; /* 居中 */
+            text-decoration: none; /* 去掉下划线 */
+        }
     </style>
 </head>
 <body>
@@ -56,6 +66,10 @@
 <table border="1" id="mainTable">
 </table>
 <a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
+<button class="toggleButton" id="toggle_300" >Toggle 300K</button>
+<button class="toggleButton" id="toggle_700" >Last 700</button>
+<button class="toggleButton" id="toggle_500" >Last 500</button>
+<button class="toggleButton" id="toggle_200" >Last 200</button>
 <table border="1" id="myTable"></table>
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
@@ -89,244 +103,268 @@
 
  loadTableData();
 <!-- loadIndexTableData();-->
-
-setTimeout(function() {
- getDivs();
-}, 2000);
-});
-
 var data_300;
 async function get300Data() {
  data_300 = await fetch(`http://${serverIp}:8888/bd/wk/stock/sh000300`).then(response => response.json());
 }
-get300Data();
+async function fetchAndProcessData() {
+    await get300Data();
+    await getDivs();
+}
 
 function toggleColumn() {
   $('.hide-column').toggle();
 }
 
-    async function getDivs() {
-       const spans = document.querySelectorAll('div[id^="span_"]');
+async function getDivs() {
+   const spans = document.querySelectorAll('div[id^="span_"]');
     spans.forEach(span => {
-       createETFChart(span);
+       createETFChart(span, data_300);
     });
+}
 
-    const weeks = document.querySelectorAll('div[id^="week_"]');
-            weeks.forEach(span => {
-               createWeekChart(span);
-        });
-    }
+fetchAndProcessData();
+
+});
 
 
-    async function createETFChart(span) {
+async function createETFChart(span, data_300) {
+    let rawData = await fetch(`http://${serverIp}:8888/bd/wk/stock/`+span.id.replace('span_', '')).then(response => response.json());
 
-    var myChart = echarts.init(span, null, {
-      renderer: 'canvas',
-      useDirtyRect: false
-    });
+    let dates = rawData.map(item => item[0]);
+    let stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let line_data_300 = data_300_tmp.map(item => item[1]);
 
-    const rawData = await fetch(`http://${serverIp}:8888/bd/wk/stock/`+span.id.replace('span_', '')).then(response => response.json());
+    let stock_min = Math.min(...stockData.flat());
+    let stock_max = Math.max(...stockData.flat());
+    let data_300_min = Math.min(...data_300_tmp.flat());
+    let data_300_max = Math.max(...data_300_tmp.flat());
 
-    function calculateMA(dayCount, data) {
-      var result = [];
-      for (var i = 0, len = data.length; i < len; i++) {
-        if (i < dayCount) {
-          result.push('-');
-          continue;
-        }
-        var sum = 0;
-        for (var j = 0; j < dayCount; j++) {
-          sum += +data[i - j][1];
-        }
-        result.push(sum / dayCount);
-      }
-      return result;
-    }
-    const dates = rawData.map(item => item[0]);
-    const data = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const tmp_300 = data_300.slice(0, rawData.length);
-    const data_300_tmp = tmp_300.map(item => [+item[1], +item[2], +item[4], +item[3]]);
 
-    // Normalize data
-    const normalize = (data, min, max) => data.map(item => item.map(value => (value - min) / (max - min)));
+const rawDataOriginal = [...rawData];
+const datesOriginal = [...dates];
+const stockDataOriginal = [...stockData];
+const data_300_tmpOriginal = [...data_300_tmp];
+const line_data_300Original = [...line_data_300];
+let is300Displayed = true;
 
-    const data_min = Math.min(...data.flat());
-    const data_max = Math.max(...data.flat());
+function filterRecentDays(dayCount) {
+    rawData = rawDataOriginal.slice(-dayCount);
+    dates = datesOriginal.slice(-dayCount);
+    stockData = stockDataOriginal.slice(-dayCount);
+    data_300_tmp = data_300_tmpOriginal.slice(-dayCount);
+    line_data_300 = line_data_300Original.slice(-dayCount);
+
+    const stock_min = Math.min(...stockData.flat());
+    const stock_max = Math.max(...stockData.flat());
 
     const data_300_min = Math.min(...data_300_tmp.flat());
     const data_300_max = Math.max(...data_300_tmp.flat());
 
-    const normalized_data = normalize(data, data_min, data_max);
-    const normalized_data_300 = normalize(data_300_tmp, data_300_min, data_300_max);
-    const line_data_300 = normalized_data_300.map(item => item[1]);
+    option.yAxis[0].min = stock_min;
+    option.yAxis[0].max = stock_max;
 
-    option = {
-      legend: {
-        data: ['MA5', 'MA10', '300日K'],
-        inactiveColor: '#777'
-      },
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          animation: false,
-          type: 'cross',
-          lineStyle: {
-            color: '#376df4',
-            width: 2,
-            opacity: 1
-          }
-        }
-      },
-      xAxis: {
-        type: 'category',
-        data: dates,
-        axisLine: { lineStyle: { color: '#8392A5' } }
-      },
-      yAxis: {
-        scale: true,
-        axisLine: { lineStyle: { color: '#8392A5' } },
-        splitLine: { show: false },
-        axisLabel: {
-          formatter: value => (value * (data_max - data_min) + data_min).toFixed(2)
-        }
-      },
-      grid: {
-        bottom: 80
-      },
-      dataZoom: [
-        {
-          textStyle: {
-            color: '#8392A5'
-          },
-          handleIcon:
-            'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-          dataBackground: {
-            areaStyle: {
-              color: '#8392A5'
-            },
-            lineStyle: {
-              opacity: 0.8,
-              color: '#8392A5'
+    if (option.yAxis.length > 2 && option.yAxis[2]) {
+        option.yAxis[1].min = data_300_min;
+        option.yAxis[1].max = data_300_max;
+    }
+
+    option.series[0].data = stockData;
+    option.series[1].data = calculateMA(5, stockData);
+    option.series[2].data = calculateMA(10, stockData);
+    if (is300Displayed) {
+        option.series.find(series => series.name === '300日K').data = line_data_300; // 更新 300 日K
+    }
+
+    myChart.setOption(option, true);
+    window.addEventListener('resize', () => myChart.resize());
+}
+
+    let yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
+
+        var myChart = echarts.init(span, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+
+
+       function calculateMA(dayCount, data) {
+        var result = [];
+        for (var i = 0, len = data.length; i < len; i++) {
+            if (i < dayCount) {
+                result.push('-');
+                continue;
             }
-          },
-          brushSelect: true
-        },
-        {
-          type: 'inside'
+            var sum = 0;
+            for (var j = 0; j < dayCount; j++) {
+                sum += +data[i - j][1];
+            }
+            result.push(sum / dayCount);
         }
-      ],
-      series: [
-        {
-          type: 'candlestick',
-          name: '日K',
-          data: normalized_data,
-          itemStyle: {
-            color: '#FD1050',
-            color0: '#0CF49B',
-            borderColor: '#FD1050',
-            borderColor0: '#0CF49B'
-          }
-        },
-        {
-          name: 'MA5',
-          type: 'line',
-          data: calculateMA(5, normalized_data),
-          smooth: true,
-          showSymbol: false,
-          lineStyle: {
-            width: 1
-          }
-        },
-        {
-          name: 'MA10',
-          type: 'line',
-          data: calculateMA(10, normalized_data),
-          smooth: true,
-          showSymbol: false,
-          lineStyle: {
-            width: 1
-          }
-        },
-        {
-            type: 'line',
-            name: '300日K',
-            data: line_data_300,
-              smooth: true,
-          showSymbol: false,
-          lineStyle: {
+        return result;
+    }
+
+
+    const originalYAxis300 = {
+        type: 'value',
+        scale: true,
+        name: '300 Index',
+        position: 'right',
+        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
+        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+        axisLine: { lineStyle: { color: '#EE9A00' } },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        axisTick: { show: false }
+    };
+
+    const originalSeries300 = {
+        type: 'line',
+        name: '300日K',
+        data: line_data_300,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
             width: 0.5,
-             color: '#EE9A00'
-          }
-          }
-      ]
+            color: '#EE9A00'
+        },
+        yAxisIndex: 1
+    };
+
+
+    const option = {
+        legend: {
+            data: ['MA5', 'MA10', 'stock','300日K'],
+            inactiveColor: '#777'
+        },
+       yAxis: [
+            {
+                type: 'value',
+                scale: true,
+                name: 'Stock',
+                position: 'left',
+                min: Math.min(...stockData.flat()), // 真实最小值
+                max: Math.max(...stockData.flat()), // 真实最大值
+                axisLine: { lineStyle: { color: '#8392A5' } },
+                splitLine: { show: false }
+            },
+            originalYAxis300
+        ],
+        series: [
+            {
+                type: 'candlestick',
+                name: 'Stock',
+                data: stockData,
+                yAxisIndex: 0,
+                itemStyle: {
+                    color: '#FD1050',
+                    color0: '#0CF49B',
+                    borderColor: '#FD1050',
+                    borderColor0: '#0CF49B'
+                }
+            },
+            {
+                name: 'MA5',
+                type: 'line',
+                data: calculateMA(5, stockData),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 1
+                },
+                yAxisIndex: 0
+            },
+            {
+                name: 'MA10',
+                type: 'line',
+                data: calculateMA(10, stockData),
+                smooth: true,
+                showSymbol: false,
+                lineStyle: {
+                    width: 1
+                },
+                yAxisIndex: 0
+            },
+            originalSeries300
+        ],
+         tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                animation: false,
+                type: 'cross',
+                lineStyle: {
+                    color: '#376df4',
+                    width: 2,
+                    opacity: 1
+                }
+            },
+            formatter: params => {
+                return params.map(p => `${p.seriesName}: ${p.data}`).join('<br>');
+            }
+        },
+        xAxis: {
+            type: 'category',
+            data: dates,
+            axisLine: { lineStyle: { color: '#8392A5' } }
+        },
+        grid: {
+            bottom: 80
+        },
+        dataZoom: [
+            {
+                textStyle: {
+                    color: '#8392A5'
+                },
+                handleIcon:
+                    'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                dataBackground: {
+                    areaStyle: {
+                        color: '#8392A5'
+                    },
+                    lineStyle: {
+                        opacity: 0.8,
+                        color: '#8392A5'
+                    }
+                },
+                brushSelect: true
+            },
+            {
+                type: 'inside'
+            }
+        ],
     };
 
     if (option && typeof option === 'object') {
-      myChart.setOption(option);
+        myChart.setOption(option);
     }
 
-    window.addEventListener('resize',() => myChart.resize());
+    window.addEventListener('resize', () => myChart.resize(), { passive: true });
+
+    function filterDaysData(){
+        option.xAxis.data = dates;
+        option.series[0].data = stockData;
+        option.series[1].data = calculateMA(5, stockData);
+        option.series[2].data = calculateMA(10, stockData);
+        option.series[3].data = line_data_300;
+
+        myChart.setOption(option, true);
+        window.addEventListener('resize', () => myChart.resize(), { passive: true });
+    }
+
+    document.getElementById('toggle_700').addEventListener('click', () => {
+        filterRecentDays(700);
+        filterDaysData();
+    });
+    document.getElementById('toggle_500').addEventListener('click', () => {
+        filterRecentDays(500);
+        filterDaysData();
+    });
+    document.getElementById('toggle_200').addEventListener('click', () => {
+        filterRecentDays(200);
+        filterDaysData();
+    });
 }
-</script>
-<script>
-    async function createChart(span) {
-        const chartData = await fetchData(span.id);
-
-        Highcharts.chart(span.id, {
-            title: {
-                text: 'Dynamic Chart Title',
-                align: 'left'
-            },
-            subtitle: {
-                text: 'Dynamic Chart Subtitle',
-                align: 'left'
-            },
-            yAxis: {
-                title: {
-                    text: 'Price'
-                }
-            },
-            xAxis: {
-                accessibility: {
-                    rangeDescription: 'Range: 2010 to 2020'
-                }
-            },
-            legend: {
-                layout: 'vertical',
-                align: 'right',
-                verticalAlign: 'middle',
-                enabled: false
-            },
-            plotOptions: {
-                series: {
-                    compare: 'percent',
-                    showInNavigator: true
-                }
-            },
-            series: chartData.series,
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        legend: {
-                            layout: 'horizontal',
-                            align: 'center',
-                            verticalAlign: 'bottom'
-                        }
-                    }
-                }]
-            }
-        });
-    }
-
-    async function initializeIntraCharts() {
-    const spans = document.querySelectorAll('div[id^="multi_"]');
-        for (const span of spans) {
-            await createChart(span);
-        }
-    }
 </script>
 </body>
 </html>

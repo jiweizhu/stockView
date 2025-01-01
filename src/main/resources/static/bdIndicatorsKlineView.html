@@ -66,17 +66,16 @@
 <table border="1" id="mainTable">
 </table>
 <a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
-<button class="toggleButton" id="toggle_indicator">toggle_indicator</button>
 <button class="toggleButton" id="toggle_300" >Toggle 300K</button>
 <button class="toggleButton" id="toggle_700" >Last 700</button>
 <button class="toggleButton" id="toggle_500" >Last 500</button>
 <button class="toggleButton" id="toggle_200" >Last 200</button>
 <table border="1" id="myTable"></table>
 <script>
-    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-    document.getElementById('getDivs').addEventListener('click', getDivs);
+const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+document.getElementById('getDivs').addEventListener('click', getDivs);
 
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
           fetch(`http://${serverIp}:8888/bd/indicatorsView`)
              .then(response => response.text())
@@ -103,44 +102,94 @@
     }
 
  loadTableData();
- loadIndexTableData();
-
-setTimeout(function() {
- getDivs();
-}, 2000);
-});
-
+<!-- loadIndexTableData();-->
 var data_300;
 async function get300Data() {
- data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());
+    data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());;
 }
-get300Data();
+async function fetchAndProcessData() {
+    await get300Data();
+    await getDivs();
+}
 
 function toggleColumn() {
   $('.hide-column').toggle();
 }
 
-    async function getDivs() {
-       const spans = document.querySelectorAll('div[id^="span_"]');
+async function getDivs() {
+    const spans = document.querySelectorAll('div[id^="span_"]');
     spans.forEach(span => {
-       createETFChart(span);
+       createETFChart(span, data_300);
     });
+}
 
-    const weeks = document.querySelectorAll('div[id^="week_"]');
-            weeks.forEach(span => {
-               createWeekChart(span);
-        });
+fetchAndProcessData();
+
+});
+
+
+async function createETFChart(span, data_300) {
+    let rawData = await fetch(`http://${serverIp}:8888/bd/stock/` + span.id.replace('span_', '')).then(response => response.json());
+
+    let dates = rawData.map(item => item[0]);
+    let stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
+    let line_data_300 = data_300_tmp.map(item => item[1]);
+
+    let stock_min = Math.min(...stockData.flat());
+    let stock_max = Math.max(...stockData.flat());
+    let data_300_min = Math.min(...data_300_tmp.flat());
+    let data_300_max = Math.max(...data_300_tmp.flat());
+
+
+const rawDataOriginal = [...rawData];
+const datesOriginal = [...dates];
+const stockDataOriginal = [...stockData];
+const data_300_tmpOriginal = [...data_300_tmp];
+const line_data_300Original = [...line_data_300];
+let is300Displayed = true;
+
+function filterRecentDays(dayCount) {
+    rawData = rawDataOriginal.slice(-dayCount);
+    dates = datesOriginal.slice(-dayCount);
+    stockData = stockDataOriginal.slice(-dayCount);
+    data_300_tmp = data_300_tmpOriginal.slice(-dayCount);
+    line_data_300 = line_data_300Original.slice(-dayCount);
+
+    const stock_min = Math.min(...stockData.flat());
+    const stock_max = Math.max(...stockData.flat());
+
+    const data_300_min = Math.min(...data_300_tmp.flat());
+    const data_300_max = Math.max(...data_300_tmp.flat());
+
+    option.yAxis[0].min = stock_min;
+    option.yAxis[0].max = stock_max;
+
+    if (option.yAxis.length > 2 && option.yAxis[2]) {
+        option.yAxis[1].min = data_300_min;
+        option.yAxis[1].max = data_300_max;
     }
 
-async function createETFChart(span) {
-    var myChart = echarts.init(span, null, {
-        renderer: 'canvas',
-        useDirtyRect: false
-    });
+    option.series[0].data = stockData;
+    option.series[1].data = calculateMA(5, stockData);
+    option.series[2].data = calculateMA(10, stockData);
+    if (is300Displayed) {
+        option.series.find(series => series.name === '300日K').data = line_data_300; // 更新 300 日K
+    }
 
-    const rawData = await fetch(`http://${serverIp}:8888/bd/stock/` + span.id.replace('span_', '')).then(response => response.json());
+    myChart.setOption(option, true);
+    window.addEventListener('resize', () => myChart.resize());
+}
 
-    function calculateMA(dayCount, data) {
+    let yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
+
+        var myChart = echarts.init(span, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+
+
+       function calculateMA(dayCount, data) {
         var result = [];
         for (var i = 0, len = data.length; i < len; i++) {
             if (i < dayCount) {
@@ -156,42 +205,38 @@ async function createETFChart(span) {
         return result;
     }
 
-    const dates = rawData.map(item => item[0]);
-    const stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    const line_data_300 = data_300_tmp.map(item => item[1]); // 使用真实的开盘价作为示例
 
-    const stock_min = Math.min(...stockData.flat());
-    const stock_max = Math.max(...stockData.flat());
-    const data_300_min = Math.min(...data_300_tmp.flat());
-    const data_300_max = Math.max(...data_300_tmp.flat());
+    const originalYAxis300 = {
+        type: 'value',
+        scale: true,
+        name: '300 Index',
+        position: 'right',
+        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
+        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+        axisLine: { lineStyle: { color: '#EE9A00' } },
+        axisLabel: { show: false },
+        splitLine: { show: false },
+        axisTick: { show: false }
+    };
 
-    const yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
+    const originalSeries300 = {
+        type: 'line',
+        name: '300日K',
+        data: line_data_300,
+        smooth: true,
+        showSymbol: false,
+        lineStyle: {
+            width: 0.5,
+            color: '#EE9A00'
+        },
+        yAxisIndex: 1
+    };
+
 
     const option = {
         legend: {
-            data: ['MA5', 'MA10', '300日K', 'stock'],
+            data: ['MA5', 'MA10', 'stock','300日K'],
             inactiveColor: '#777'
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                animation: false,
-                type: 'cross',
-                lineStyle: {
-                    color: '#376df4',
-                    width: 2,
-                    opacity: 1
-                }
-            },
-            formatter: params => {
-                return params.map(p => `${p.seriesName}: ${p.data}`).join('<br>');
-            }
-        },
-        xAxis: {
-            type: 'category',
-            data: dates,
-            axisLine: { lineStyle: { color: '#8392A5' } }
         },
        yAxis: [
             {
@@ -204,41 +249,7 @@ async function createETFChart(span) {
                 axisLine: { lineStyle: { color: '#8392A5' } },
                 splitLine: { show: false }
             },
-            {
-                type: 'value',
-                scale: true,
-                name: '300 Index',
-                position: 'right',
-                min: Math.min(...data_300_tmp.flat()), // 300真实最小值
-                max: Math.max(...data_300_tmp.flat()), // 300真实最大值
-                axisLine: { lineStyle: { color: '#EE9A00' } },
-                splitLine: { show: false }
-            }
-        ],
-        grid: {
-            bottom: 80
-        },
-        dataZoom: [
-            {
-                textStyle: {
-                    color: '#8392A5'
-                },
-                handleIcon:
-                    'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-                dataBackground: {
-                    areaStyle: {
-                        color: '#8392A5'
-                    },
-                    lineStyle: {
-                        opacity: 0.8,
-                        color: '#8392A5'
-                    }
-                },
-                brushSelect: true
-            },
-            {
-                type: 'inside'
-            }
+            originalYAxis300
         ],
         series: [
             {
@@ -275,28 +286,85 @@ async function createETFChart(span) {
                 },
                 yAxisIndex: 0
             },
-            {
-                type: 'line',
-                name: '300日K',
-                data: line_data_300,
-                smooth: true,
-                showSymbol: false,
+            originalSeries300
+        ],
+         tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                animation: false,
+                type: 'cross',
                 lineStyle: {
-                    width: 0.5,
-                    color: '#EE9A00'
-                },
-                yAxisIndex: 1
+                    color: '#376df4',
+                    width: 2,
+                    opacity: 1
+                }
+            },
+            formatter: params => {
+                return params.map(p => `${p.seriesName}: ${p.data}`).join('<br>');
             }
-        ]
+        },
+        xAxis: {
+            type: 'category',
+            data: dates,
+            axisLine: { lineStyle: { color: '#8392A5' } }
+        },
+        grid: {
+            bottom: 80
+        },
+        dataZoom: [
+            {
+                textStyle: {
+                    color: '#8392A5'
+                },
+                handleIcon:
+                    'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                dataBackground: {
+                    areaStyle: {
+                        color: '#8392A5'
+                    },
+                    lineStyle: {
+                        opacity: 0.8,
+                        color: '#8392A5'
+                    }
+                },
+                brushSelect: true
+            },
+            {
+                type: 'inside'
+            }
+        ],
     };
 
     if (option && typeof option === 'object') {
         myChart.setOption(option);
     }
 
-    window.addEventListener('resize', () => myChart.resize());
-}
+    window.addEventListener('resize', () => myChart.resize(), { passive: true });
 
+    function filterDaysData(){
+        option.xAxis.data = dates;
+        option.series[0].data = stockData;
+        option.series[1].data = calculateMA(5, stockData);
+        option.series[2].data = calculateMA(10, stockData);
+        option.series[3].data = line_data_300;
+
+        myChart.setOption(option, true);
+        window.addEventListener('resize', () => myChart.resize(), { passive: true });
+    }
+
+    document.getElementById('toggle_700').addEventListener('click', () => {
+        filterRecentDays(700);
+        filterDaysData();
+    });
+    document.getElementById('toggle_500').addEventListener('click', () => {
+        filterRecentDays(500);
+        filterDaysData();
+    });
+    document.getElementById('toggle_200').addEventListener('click', () => {
+        filterRecentDays(200);
+        filterDaysData();
+    });
+}
 </script>
 </body>
 </html>
