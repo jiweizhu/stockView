@@ -107,23 +107,22 @@ var data_300;
 async function get300Data() {
     data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());;
 }
-async function fetchAndProcessData() {
-    await get300Data();
-    await getDivs();
-}
+get300Data();
 
 function toggleColumn() {
   $('.hide-column').toggle();
 }
 
 async function getDivs() {
-    const spans = document.querySelectorAll('div[id^="span_"]');
+   const spans = document.querySelectorAll('div[id^="span_"]');
     spans.forEach(span => {
        createETFChart(span, data_300);
     });
 }
 
-fetchAndProcessData();
+setTimeout(function() {
+      getDivs()
+}, 1500);
 
 });
 

@@ -107,10 +107,7 @@ var data_300;
 async function get300Data() {
  data_300 = await fetch(`http://${serverIp}:8888/bd/wk/stock/sh000300`).then(response => response.json());
 }
-async function fetchAndProcessData() {
-    await get300Data();
-    await getDivs();
-}
+get300Data();
 
 function toggleColumn() {
   $('.hide-column').toggle();
@@ -123,7 +120,9 @@ async function getDivs() {
     });
 }
 
-fetchAndProcessData();
+setTimeout(function() {
+      getDivs()
+}, 1500);
 
 });
 
