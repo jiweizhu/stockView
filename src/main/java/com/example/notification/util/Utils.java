@@ -106,6 +106,13 @@ public class Utils {
         return formattedDate;
     }
 
+    public static String getFormattedDaysBefore(int daysBofore) {
+        LocalDate today = LocalDate.now();
+        LocalDate ret = today.minusDays(100);
+        String formattedDate = ret.format(formatter);
+        return formattedDate;
+    }
+
     public static String getTodayDate() {
         LocalDate today = LocalDate.now();
         String formattedDate = today.format(formatter);

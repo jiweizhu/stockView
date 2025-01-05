@@ -89,26 +89,34 @@ public class BaiDuController {
         List<String> stringList = Constants.getImportFileList(bd_import_file);
         stringList.forEach(vo -> {
             String[] split = vo.split("_");
-            bdIndicatorDao.save(new BdIndicatorVO(split[0],split[1]));
+            bdIndicatorDao.save(new BdIndicatorVO(split[0], split[1]));
         });
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 
-    @RequestMapping(value = {"/bd/getFromNetAndStore"})
+    @RequestMapping(value = {"/bd/init/getFromNetAndStore"})
     @ResponseBody
     public ResponseEntity getFromNetAndStore() {
-        baiduInfoService.getFromNetAndStoreDay();
+        baiduInfoService.getFromNetAndStoreDay(100);
         baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
 
 
     // manually update config data
-    @RequestMapping(value = {"/bd/updateIndicatorBelongStocks"})
+    @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateIndicatorBelongStocks() {
         baiduInfoService.getFromNetAndStoreWeek(true);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
+    }
+
+    //test api
+    @RequestMapping(value = {"/bd/calculateIndicatorsAvg"})
+    @ResponseBody
+    public ResponseEntity calculateIndicatorsAvg() {
+        baiduInfoService.calculateIndicatorsAvg();
+        return ResponseEntity.ofNullable(ResponseEntity.ok());
     }
 
 

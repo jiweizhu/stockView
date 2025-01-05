@@ -229,8 +229,6 @@ public class ETFViewService {
             String targetFile = Controller.getTargetFile();
             Set<String> stockIdSet;
             List<StockNameVO> fiveDayExceedTenDay = new ArrayList<>();
-            List<StockNameVO> upwardStocks = new ArrayList<>();
-            List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
             if (targetFile.contains(CONSTANT_BD)) {
                 //here to judge if baidu indicator stockIds to show
                 stockIdSet = Arrays.stream(bdIndicatorDao.findStockIdsByIndicatorId(targetFile.substring(3)).split(",")).collect(Collectors.toSet());
@@ -247,6 +245,8 @@ public class ETFViewService {
                 });
             } else {
                 stockIdSet = FileUtil.readTargetFileStocks(targetFile);
+                List<StockNameVO> upwardStocks = new ArrayList<>();
+                List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
                 commonStockList.forEach(vo -> {
                     if (stockIdSet.contains(vo.getStockId())) {
                         //check if 5day excced 10 day!!
@@ -323,6 +323,10 @@ public class ETFViewService {
     }
 
     public String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+        //sort 10day avg desc
+        industryEtfs = industryEtfs.stream().sorted(Comparator.comparing(StockNameVO::getUpwardDaysTen)).toList();
+
+        //process
         constructMap();
         String serverIp = Utils.getServerIp();
         for (int i = 0; i < industryEtfs.size(); i++) {
@@ -405,7 +409,6 @@ public class ETFViewService {
                 stocksFlowMap.get(upwardDaysNum).add(tdHtml.toString());
             }
         }
-
 
         //sort 国企 in the top
         stocksFlowMap.keySet().forEach(key -> {

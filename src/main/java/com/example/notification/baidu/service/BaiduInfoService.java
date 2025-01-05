@@ -68,7 +68,7 @@ public class BaiduInfoService {
         return list;
     }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 
     public Object getStockJsonDataDay(String stockId) {
@@ -123,19 +123,20 @@ public class BaiduInfoService {
     public void calculateIndicatorsAvg() {
         logger.debug("enter BaiduInfoService calculateIndicatorsAvg =============");
         List<BdIndicatorVO> ids = bdIndicatorDao.findAll();
-        LocalDate today = LocalDate.now();
-        LocalDate date = today.minusDays(100);
-        String formattedDate = date.format(formatter);
+        // debug start
+//        ids = new ArrayList<>();
+//        ids.add(new BdIndicatorVO("750200"));
+        //debug end
         List<Callable<Void>> tasks = new ArrayList<>();
+
         ids.forEach(id -> {
             tasks.add(() -> {
-                //get from baidu net, 200 days
-                List<IndicatorDayVO> dayLine = restRequest.queryBaiduIndustriesKline(id.getStockId(), "day", formattedDate);
-                logger.info("Finish queryBaiduIndustriesKline======" + id.getStockId() + "========" + dayLine.size());
-                //calculate avg
-                setUpwardDaysFive(id, dayLine);
-                setUpwardDaysTen(id, dayLine);
+                //calculate avg of day
+                List<BdIndicatorDailyVO> dayLine = bdIndicatorDailyDao.findLastDaysByNumAndId(id.getStockId(), 120);
+                setUpwardDaysAndGainOfFive(id, dayLine);
+                setUpwardDaysAndGainOfTen(id, dayLine);
                 bdIndicatorDao.save(id);
+                logger.info("Finish update ==" + id.getStockId() + "===Avg data=====");
                 return null;
             });
         });
@@ -156,18 +157,88 @@ public class BaiduInfoService {
 
     }
 
-    private static void setUpwardDaysFive(BdIndicatorVO id, List<IndicatorDayVO> dayLine) {
-        int upwardDaysFive = 0;
-        for (int i = dayLine.size() - 1; i > 5; i--) {
-            if (dayLine.get(i).getMa5avgprice() >= dayLine.get(i - 1).getMa5avgprice()) {
-                if (upwardDaysFive < 0) break;
-                upwardDaysFive++;
+    private static void setUpwardDaysAndGainOfFive(BdIndicatorVO id, List<BdIndicatorDailyVO> dayLine) {
+        int upwardDays = 0;
+        int i1 = dayLine.size() - 1;
+        for (int i = 0; i < i1; i++) {
+            if (dayLine.get(i).getDayAvgFive().compareTo(dayLine.get(i + 1).getDayAvgFive()) > 0) {
+                if (upwardDays < 0) break;
+                upwardDays++;
             } else {
-                if (upwardDaysFive > 0) break;
-                upwardDaysFive--;
+                if (upwardDays > 0) break;
+                upwardDays--;
             }
         }
-        id.setUpwardDaysFive(upwardDaysFive);
+        id.setUpwardDaysFive(upwardDays);
+        // setGainPercentFive
+        BigDecimal dayAvgFive = dayLine.get(0).getDayAvgFive();
+        int abs = Math.abs(upwardDays);
+        BigDecimal denominator = dayLine.get(abs).getDayAvgFive();
+        BigDecimal gainPercentFive = Utils.calculateDayGainPercentage(dayAvgFive, denominator);
+        id.setGainPercentFive(gainPercentFive);
+        id.setFlipDayFive(dayLine.get(abs).getDay());
+
+        // flip day avg
+        int flipDays = 0;
+        for (int i = abs; i < i1; i++) {
+            if (dayLine.get(i).getDayAvgFive().compareTo(dayLine.get(i + 1).getDayAvgFive()) > 0) {
+                if (flipDays < 0) break;
+                flipDays++;
+            } else {
+                if (flipDays > 0) break;
+                flipDays--;
+            }
+        }
+
+        id.setFlipUpwardDaysFive(flipDays);
+        BigDecimal flipDayAvgFive = dayLine.get(abs).getDayAvgFive();
+        int flipAbs = Math.abs(upwardDays)+Math.abs(flipDays);
+        BigDecimal filpDenominator = dayLine.get(flipAbs).getDayAvgFive();
+        BigDecimal flipGainPercentFive = Utils.calculateDayGainPercentage(flipDayAvgFive, filpDenominator);
+        id.setFlipGainPercentFive(flipGainPercentFive);
+        id.setFlipEndDayFive(dayLine.get(flipAbs).getDay());
+    }
+
+    private static void setUpwardDaysAndGainOfTen(BdIndicatorVO id, List<BdIndicatorDailyVO> dayLine) {
+        int upwardDays = 0;
+        int i1 = dayLine.size() - 1;
+        for (int i = 0; i < i1; i++) {
+            if (dayLine.get(i).getDayAvgTen().compareTo(dayLine.get(i + 1).getDayAvgTen()) > 0) {
+                if (upwardDays < 0) break;
+                upwardDays++;
+            } else {
+                if (upwardDays > 0) break;
+                upwardDays--;
+            }
+        }
+        id.setUpwardDaysTen(upwardDays);
+        // setGainPercentTen
+        BigDecimal dayAvgTen = dayLine.get(0).getDayAvgTen();
+        int abs = Math.abs(upwardDays);
+        BigDecimal denominator = dayLine.get(abs).getDayAvgTen();
+        BigDecimal gainPercentTen = Utils.calculateDayGainPercentage(dayAvgTen, denominator);
+        id.setGainPercentTen(gainPercentTen);
+        id.setFlipDayTen(dayLine.get(abs).getDay());
+
+        // flip day avg
+        int flipDays = 0;
+        for (int i = abs; i < i1; i++) {
+            if (dayLine.get(i).getDayAvgTen().compareTo(dayLine.get(i + 1).getDayAvgTen()) > 0) {
+                if (flipDays < 0) break;
+                flipDays++;
+            } else {
+                if (flipDays > 0) break;
+                flipDays--;
+            }
+        }
+
+        id.setFlipUpwardDaysTen(flipDays);
+        BigDecimal flipDayAvg = dayLine.get(abs).getDayAvgTen();
+        int flipAbs = Math.abs(upwardDays)+Math.abs(flipDays);
+        BigDecimal filpDenominator = dayLine.get(flipAbs).getDayAvgTen();
+        BigDecimal flipGainPercentFive = Utils.calculateDayGainPercentage(flipDayAvg, filpDenominator);
+        id.setFlipGainPercentTen(flipGainPercentFive);
+        id.setFlipEndDayTen(dayLine.get(flipAbs).getDay());
     }
 
     private static void setUpwardDaysTen(BdIndicatorVO id, List<IndicatorDayVO> dayLine) {
@@ -204,9 +275,14 @@ public class BaiduInfoService {
         return null;
     }
 
-    public void getFromNetAndStoreDay() {
+    public void getFromNetAndStoreDay(int daysBofore) {
         List<String> ids = bdIndicatorDao.findIds();
-        logger.info("========getFromNetAndStoreDay ========ids.size ={}====={}", ids.size(), ids);
+        //local debug
+//        ids = new ArrayList<>();
+//        ids.add("750200");
+        //local debug
+        String formattedDaysBefore = Utils.getFormattedDaysBefore(daysBofore);
+        logger.info("========getFromNetAndStoreDay =====formattedDaysBefore={}==ids.size ={}====={}", formattedDaysBefore, ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
         for (String stockId : ids) {
             tasks.add(() -> {
@@ -220,11 +296,11 @@ public class BaiduInfoService {
                     return null;
                 }
 //                Thread.sleep(new Random().nextInt(2000));
-                List<IndicatorDayVO> fromNetList = restRequest.queryBaiduIndustriesKline(stockId, "day", "2019-01-01");
+                List<IndicatorDayVO> fromNetList = restRequest.queryBaiduIndustriesKline(stockId, "day", formattedDaysBefore);
                 // save new in db
                 int loopNum = 0;
                 for (IndicatorDayVO dayVO : fromNetList) {
-                    if (exsitingDaySet.contains(dayVO.getDay())) {
+                    if (exsitingDaySet.contains(dayVO.getDay()) || dayVO.getMa20avgprice() == null) {
                         continue;
                     }
                     loopNum++;
@@ -290,7 +366,7 @@ public class BaiduInfoService {
                 // save new in db
                 int loopNum = 0;
                 for (IndicatorDayVO dayVO : fromNetList) {
-                    if (exsitingDaySet.contains(dayVO.getDay())) {
+                    if (exsitingDaySet.contains(dayVO.getDay()) || dayVO.getMa20avgprice() == null) {
                         continue;
                     }
                     loopNum++;
@@ -302,6 +378,9 @@ public class BaiduInfoService {
                     newVo.setClosingPrice(BigDecimal.valueOf(dayVO.getClose()));
                     newVo.setIntradayHigh(BigDecimal.valueOf(dayVO.getHigh()));
                     newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
+                    newVo.setDayAvgFive(BigDecimal.valueOf(dayVO.getMa5avgprice()));
+                    newVo.setDayAvgTen(BigDecimal.valueOf(dayVO.getMa10avgprice()));
+                    newVo.setDayAvgTwenty(BigDecimal.valueOf(dayVO.getMa20avgprice()));
                     bdIndicatorWeeklyDao.save(newVo);
                 }
                 logger.info("========getFromNetAndStoreWeek =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);
