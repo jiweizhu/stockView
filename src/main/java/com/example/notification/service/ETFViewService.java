@@ -222,7 +222,7 @@ public class ETFViewService {
             fiveDayExceedTenDay.addAll(upwardStocks);
             fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
 
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnSortOfFiveDay);
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, true);
         }
 
         if (num.contains("targetList")) {
@@ -269,7 +269,7 @@ public class ETFViewService {
             }
 
             Controller.setTargetFileSize(String.valueOf(fiveDayExceedTenDay.size()));
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, returnSortOfFiveDay);
+            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, true);
         }
 
         if (num.equals("main")) {
@@ -324,7 +324,7 @@ public class ETFViewService {
 
     public String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
         //sort 10day avg desc
-        industryEtfs = industryEtfs.stream().sorted(Comparator.comparing(StockNameVO::getUpwardDaysTen)).toList();
+        industryEtfs = industryEtfs.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentTen)).toList();
 
         //process
         constructMap();

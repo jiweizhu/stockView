@@ -266,7 +266,7 @@ public class BaiduInfoService {
             BeanUtils.copyProperties(vo, target);
             industryEtfs.add(target);
         });
-        String html = etfViewService.dayLineStocksFlowView(industryEtfs, false);
+        String html = etfViewService.dayLineStocksFlowView(industryEtfs, true);
         return html;
     }
 

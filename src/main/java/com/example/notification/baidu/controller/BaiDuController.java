@@ -97,7 +97,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/init/getFromNetAndStore"})
     @ResponseBody
     public ResponseEntity getFromNetAndStore() {
-        baiduInfoService.getFromNetAndStoreDay(100);
+        baiduInfoService.getFromNetAndStoreDay(950);
         baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
@@ -116,7 +116,7 @@ public class BaiDuController {
     @ResponseBody
     public ResponseEntity calculateIndicatorsAvg() {
         baiduInfoService.calculateIndicatorsAvg();
-        return ResponseEntity.ofNullable(ResponseEntity.ok());
+        return ResponseEntity.ok("SuccessFully done! ");
     }
 
 

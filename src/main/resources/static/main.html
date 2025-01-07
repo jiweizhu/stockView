@@ -5,8 +5,18 @@
     <title>主入口</title>
 </head>
 <body>
-
-
+<style>
+.toggleButton {
+background-color: grey; /* 设置按钮背景颜色 */
+color: black; /* 按钮文字颜色 */
+padding: 10px 15px; /* 内边距 */
+border: none; /* 去掉边框 */
+border-radius: 5px; /* 圆角 */
+cursor: pointer; /* 鼠标悬浮样式 */
+text-align: center; /* 居中 */
+text-decoration: none; /* 去掉下划线 */
+}
+</style>
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
@@ -35,6 +45,9 @@
 
 <div id="container"></div>
 <h3>View Data</h3>
+<button class="toggleButton" id="sortByFiveOrTenDay" >sortByFiveOrTenDay</button>
+<button class="toggleButton" id="sortByGainFiveOrTenDay" >Gain Sort(Five Ten)</button>
+
 <h2>===================baidu=============</h2>
 <a href=""><font size="5">http://124.71.19.6:8888/range/500</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicators.html"><font size="5">bdIndicators</font></a><br>
