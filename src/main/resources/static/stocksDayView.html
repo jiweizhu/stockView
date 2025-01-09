@@ -64,11 +64,10 @@
 <table border="1" id="mainTable">
 </table>
 <script>
-    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-    let isWeekly = false;
-    //default is 370400, 医药商业
-    var showingIndicator = '370400';
-
+const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+let isWeekly = false;
+//default is 370400, 医药商业
+var showingIndicator = '370400';
 
 document.addEventListener('DOMContentLoaded', function () {
     const serverUrl = `http://${serverIp}:8888/etfs`;
@@ -133,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // 按钮事件绑定
     function bindEvents() {
-        let isWeekly = false;
+
         const sh510300 = 'sh510300';
         let toggle = true;
 
