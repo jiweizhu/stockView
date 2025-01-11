@@ -2,6 +2,18 @@ SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS
 
 Create schema stock;
 
+CREATE TABLE range_sort_id (
+day_start DATE primary key,
+day_end DATE,
+description VARCHAR(20)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE range_sort_gain (
+indicator_id VARCHAR(12),
+range_id VARCHAR(12),
+range_gain DECIMAL(10,2),
+PRIMARY KEY(indicator_id,range_day)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE  cn_indicator(
 index_code VARCHAR(12) primary key,
@@ -180,16 +192,15 @@ flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
 last_updated_time time,
-
-stock_ids TEXT,
 belong_etf VARCHAR(12),
+stock_ids TEXT,
 
 customer_range VARCHAR(50), -- 20240601_20240615_20240620
 customer_range_gain_pre DECIMAL(10,2),
 customer_range_gain_post DECIMAL(10,2)
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
+alter table stock add column favorite INT;
 
 SELECT
     TABLE_SCHEMA AS '数据库名',

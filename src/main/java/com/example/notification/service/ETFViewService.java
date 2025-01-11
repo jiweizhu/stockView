@@ -192,7 +192,7 @@ public class ETFViewService {
                 }
             });
             upWardIndustryEtfs.addAll(downWardIndustryEtfs);
-            industryEtfsTable = dayLineStocksFlowView(upWardIndustryEtfs, returnSortOfFiveDay);
+            industryEtfsTable = buildHtml(upWardIndustryEtfs, returnSortOfFiveDay);
         }
         if (num.contains("300mainBoard")) {
             Set<String> threeHundredSet = new HashSet<>();
@@ -222,7 +222,7 @@ public class ETFViewService {
             fiveDayExceedTenDay.addAll(upwardStocks);
             fiveDayExceedTenDay.addAll(downWardIndustryEtfs);
 
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, true);
+            industryEtfsTable = buildHtml(fiveDayExceedTenDay, true);
         }
 
         if (num.contains("targetList")) {
@@ -269,7 +269,7 @@ public class ETFViewService {
             }
 
             Controller.setTargetFileSize(String.valueOf(fiveDayExceedTenDay.size()));
-            industryEtfsTable = dayLineStocksFlowView(fiveDayExceedTenDay, true);
+            industryEtfsTable = buildHtml(fiveDayExceedTenDay, true);
         }
 
         if (num.equals("main")) {
@@ -322,13 +322,22 @@ public class ETFViewService {
         stocksFlowIndexList.add(5);
     }
 
-    public String dayLineStocksFlowView(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+    public String buildHtml(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
         //sort 10day avg desc
         industryEtfs = industryEtfs.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentTen)).toList();
 
         //process
         constructMap();
         String serverIp = Utils.getServerIp();
+
+        boolean isRangeSort = false;
+        if (StringUtils.hasLength(Constants.getRangeSortDay())) {
+            isRangeSort = true;
+        }
+
+        int flowMapSize = stocksFlowMap.size();
+        List<Integer> stockFlowMapKeyList = stocksFlowMap.keySet().stream().toList();
+
         for (int i = 0; i < industryEtfs.size(); i++) {
 
             StringBuilder tdHtml = new StringBuilder();
@@ -341,9 +350,7 @@ public class ETFViewService {
 
             String stockId = stock.getStockId();
             String id_name = stockId + "_" + stock.getStockName();
-            //grey   #C0C0C0 民企
-            //yellow #FFFF00 国企
-            //green #00FF00 央企
+
             String fiveBackGroudColor = "#C0C0C0";
             String tenBackGroudColor = "#C0C0C0";
 
@@ -352,18 +359,16 @@ public class ETFViewService {
             if (!returnFiveSort) {
                 upwardDaysNum = stock.getUpwardDaysTen();
             }
+
             if (capitalType != null && capitalType == YangQi) {
-                //green 央企
+                //pink 央企
                 fiveBackGroudColor = YangQi_Color;
             }
             if (capitalType != null && capitalType == GuoQi) {
-                //green 国企
+                //yellow 国企
                 fiveBackGroudColor = GuoQi_Color;
             }
 
-            if (i < fiveDayExceedTen_num) {
-                fiveBackGroudColor = " pink";
-            }
             if (stock.getUpwardDaysTen() >= 0) {
                 tenBackGroudColor = "#00FF00";
             }
@@ -399,36 +404,46 @@ public class ETFViewService {
                     .append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
                     .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")
                     .append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
-            if (stocksFlowMap.get(upwardDaysNum) == null) {
-                if (upwardDaysNum < -3) {
-                    stocksFlowMap.get(-3).add(tdHtml.toString());
-                } else {
-                    stocksFlowMap.get(5).add(tdHtml.toString());
-                }
+
+
+            if (isRangeSort) {
+                //do stocksFlowMap iteration
+                int columnNum = i % 5;
+                stocksFlowMap.get(stockFlowMapKeyList.get(columnNum)).add(tdHtml.toString());
             } else {
-                stocksFlowMap.get(upwardDaysNum).add(tdHtml.toString());
+                if (stocksFlowMap.get(upwardDaysNum) == null) {
+                    if (upwardDaysNum < -3) {
+                        stocksFlowMap.get(-3).add(tdHtml.toString());
+                    } else {
+                        stocksFlowMap.get(5).add(tdHtml.toString());
+                    }
+                } else {
+                    stocksFlowMap.get(upwardDaysNum).add(tdHtml.toString());
+                }
             }
         }
+        if (!isRangeSort) {
+            //sort 国企 in the top
+            //if it is range_sort, no need to run
+            stocksFlowMap.keySet().forEach(key -> {
+                List<String> yangQi = new ArrayList<>();
+                List<String> guoQi = new ArrayList<>();
+                List<String> minQi = new ArrayList<>();
+                stocksFlowMap.get(key).forEach(line -> {
+                    if (line.contains(YangQi_Color)) {
+                        yangQi.add(line);
+                    } else if (line.contains(GuoQi_Color)) {
+                        guoQi.add(line);
+                    } else {
+                        minQi.add(line);
+                    }
+                });
+                yangQi.addAll(guoQi);
+                yangQi.addAll(minQi);
+                stocksFlowMap.put(key, yangQi);
 
-        //sort 国企 in the top
-        stocksFlowMap.keySet().forEach(key -> {
-            List<String> yangQi = new ArrayList<>();
-            List<String> guoQi = new ArrayList<>();
-            List<String> minQi = new ArrayList<>();
-            stocksFlowMap.get(key).forEach(line -> {
-                if (line.contains(YangQi_Color)) {
-                    yangQi.add(line);
-                } else if (line.contains(GuoQi_Color)) {
-                    guoQi.add(line);
-                } else {
-                    minQi.add(line);
-                }
             });
-            yangQi.addAll(guoQi);
-            yangQi.addAll(minQi);
-            stocksFlowMap.put(key, yangQi);
-
-        });
+        }
 
         //calculate max number in column
         List<Integer> intList = new ArrayList<>();

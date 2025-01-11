@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             const titleText = await response.text();
             document.title = titleText;
-            const showingIndicator = titleText.split("_")[1];
+            showingIndicator = titleText.split("_")[1];
             return showingIndicator;
         } catch (error) {
             console.error('Error fetching title data:', error);
@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // 刷新 300 数据及相关操作
         function refresh300Data(stockId = 'sh510300') {
             get300Data('sh510300');
+            getIndicatorData(showingIndicator);
             executeWithDelay(getDivs);
         }
     }

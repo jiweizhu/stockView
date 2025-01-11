@@ -10,6 +10,7 @@ import com.example.notification.util.EmailUtil;
 import com.example.notification.vo.BdIndicatorVO;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 
-import static com.example.notification.constant.Constants.CONSTANT_BD;
-import static com.example.notification.constant.Constants.CONSTANT_ETF;
+import static com.example.notification.constant.Constants.*;
 
 @RestController
 public class Controller {
@@ -59,24 +59,24 @@ public class Controller {
     }
 
     //370400#医药商业 for debug locally
+    @Getter
     private static String targetFile = "bd_370400";
-
-    public static String getTargetFileSize() {
-        return targetFileSize;
-    }
-
     public static void setTargetFileSize(String targetFileSize) {
         Controller.targetFileSize = targetFileSize;
     }
 
+    @Getter
     private static String targetFileSize;
-
-    public static String getTargetFile() {
-        return targetFile;
-    }
-
     public static void setTargetFile(String targetFile) {
         Controller.targetFile = targetFile;
+    }
+
+    @RequestMapping(value = {"/rangeSort/{range}"})
+    @ResponseBody
+    public ResponseEntity rangeSort(@PathVariable String range) {
+        logger.info("Enter method rangeSort========range={}", range);
+        setRangeSortDay(range);
+        return ResponseEntity.ofNullable("Successfully");
     }
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})

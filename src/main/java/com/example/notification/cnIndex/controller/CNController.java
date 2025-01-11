@@ -49,7 +49,7 @@ public class CNController {
             target.setStockName(vo.getIndexNameCn());
             industryEtfs.add(target);
         });
-        String html = etfViewService.dayLineStocksFlowView(industryEtfs, true);
+        String html = etfViewService.buildHtml(industryEtfs, true);
         return html;
     }
 
