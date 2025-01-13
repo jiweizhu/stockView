@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>EasyUI DataGrid 横竖翻转</title>
+    <title>Baidu indicators real time sorting</title>
     <link href="https://www.jeasyui.com/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="https://www.jeasyui.com/easyui/themes/icon.css" rel="stylesheet" type="text/css">
     <link href="themes/demo.css" rel="stylesheet" type="text/css">
@@ -10,87 +10,94 @@
     <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
     <script src="js/jquery.edatagrid.js" type="text/javascript"></script>
     <script src="js/datagrid-detailview.js" type="text/javascript"></script>
-</head>
-<body>
-<table id="datagrid" class="easyui-datagrid" style="width:600px;height:400px;"></table>
-<button id="rotate" style="margin-top:10px;">横竖翻转</button>
-<script>
-    $(function () {
-    // 初始数据
-    const originalData = {
-        total: 5,
-        rows: [
-            { field1: "张三", field2: "男", field3: "25", field4: "程序员" },
-            { field1: "李四", field2: "女", field3: "28", field4: "设计师" },
-            { field1: "王五", field2: "男", field3: "22", field4: "产品经理" }
-        ]
-    };
-
-    const columns = [
-        { field: 'field1', title: '姓名', width: 100 },
-        { field: 'field2', title: '性别', width: 100 },
-        { field: 'field3', title: '年龄', width: 100 },
-        { field: 'field4', title: '职业', width: 100 }
-    ];
-
-    // 初始化 DataGrid
-    $('#datagrid').datagrid({
-        columns: [columns],
-        data: originalData.rows,
-        fitColumns: true,
-        pagination: false,
-        singleSelect: true
-    });
-
-    // 横竖翻转逻辑
-    $('#rotate').on('click', function () {
-        const isFlipped = $('#datagrid').data('flipped');
-        if (isFlipped) {
-            resetGrid(); // 恢复默认表格
-        } else {
-            transposeGrid(); // 横竖翻转表格
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+    <script src="https://registry.npmmirror.com/echarts/5.5.0/files/dist/echarts.min.js"></script>
+    <style>
+        body {
+          background-color: #FFFFCC;
         }
-        $('#datagrid').data('flipped', !isFlipped);
+      .datagrid-cell {
+      white-space: normal;
+      }
+    </style>
+</head>
+
+<body>
+<h2>Basic CRUD Application</h2>
+<div class="easyui-panel" style="width:300px;padding:10px;" title="Ajax Form">
+    <form action="/stock/addNew" id="ff" method="post">
+        <table>
+            <tr>
+                <td>Name:</td>
+                <td><input class="f1 easyui-textbox" name="stockId"></input></td>
+                <td><input type="submit" value="Submit"></input></td>
+            </tr>
+        </table>
+    </form>
+</div>
+<button id="toggleButton">Toggle Row</button>
+<script>
+
+    function strSorter(a, b) {
+        return a == b ? 0 : (a > b ? 1 : -1);
+    }
+
+    function numSorter(a,b){
+        a = parseFloat(a);
+        b = parseFloat(b);
+        return a==b?0:(a>b?1:-1);
+    }
+</script>
+<table class="easyui-datagrid" ctrlSelect="true"
+       id="dg" idField="stockId" pageSize="50"
+       pagination="false" rownumbers="true" singleSelect="true" style="width:300px;height:250px"
+       title="Range Sort" toolbar="#toolbar">
+    <thead>
+    <tr>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="rangeId" width="120" >rangeId</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayStart" width="120" >dayStart</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayEnd" width="120" >dayEnd</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="description" width="120" >description</th>
+    </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-add"
+       onclick="javascript:$('#dg').edatagrid('addRow')"
+       plain="true">New</a>
+    <a class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-remove"
+       onclick="javascript:$('#dg').edatagrid('destroyRow')"
+       plain="true">Destroy</a>
+    <a class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-save"
+       onclick="javascript:$('#dg').edatagrid('saveRow')"
+       plain="true">Save</a>
+    <a class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-undo"
+       onclick="javascript:$('#dg').edatagrid('cancelRow')"
+       plain="true">Cancel</a>
+</div>
+
+<script type="text/javascript">
+    var refreshInterval;
+    var nextRefreshTime;
+
+    $(function(){
+        $('#dg').edatagrid({
+            url: '/bd/rangeSort/view',
+            remoteSort: false,
+            onSave: function(index, row) {
+                        $('#dg').edatagrid('reload');
+                    },
+            view: detailview,
+            autoUpdateDetail: true,
+            sortName: 'rangeId',
+            sortOrder: 'asc',
+            detailFormatter: function(rowIndex, rowData){}
+    })
     });
 
-    // 横竖翻转表格
-    function transposeGrid() {
-        const transposedColumns = [{ field: 'field', title: '字段名', width: 100 }];
-        const transposedRows = [];
-
-        // 将列转成行
-        columns.forEach(col => {
-            const newRow = { field: col.title };
-            originalData.rows.forEach((row, index) => {
-                const newField = `col${index + 1}`;
-                transposedColumns.push({ field: newField, title: `记录${index + 1}`, width: 100 });
-                newRow[newField] = row[col.field];
-            });
-            transposedRows.push(newRow);
-        });
-
-        // 重载表格
-        $('#datagrid').datagrid({
-            columns: [transposedColumns],
-            data: transposedRows,
-            fitColumns: true,
-            pagination: false,
-            singleSelect: true
-        });
-    }
-
-    // 恢复原始表格
-    function resetGrid() {
-        $('#datagrid').datagrid({
-            columns: [columns],
-            data: originalData.rows,
-            fitColumns: true,
-            pagination: false,
-            singleSelect: true
-        });
-    }
-});
 </script>
-<script src="transpose-grid.js"></script>
 </body>
 </html>

@@ -3,22 +3,18 @@ package com.example.notification.service;
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
 import com.example.notification.http.RestRequest;
-import com.example.notification.repository.BdIndicatorDao;
-import com.example.notification.repository.IntraDayPriceDao;
-import com.example.notification.repository.StockDailyDao;
-import com.example.notification.repository.StockDao;
+import com.example.notification.repository.*;
 import com.example.notification.responseVo.EtfFlowVO;
 import com.example.notification.util.FileUtil;
 import com.example.notification.util.Utils;
-import com.example.notification.vo.IntradayPriceVO;
-import com.example.notification.vo.StockDailyVO;
-import com.example.notification.vo.StockNameVO;
+import com.example.notification.vo.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -67,6 +63,11 @@ public class ETFViewService {
     @Autowired
     private IntraDayPriceDao intraDayPriceDao;
 
+    @Autowired
+    private RangeSortIdDao rangeSortIdDao;
+
+    @Autowired
+    private RangeSortGainDao rangeSortGainDao;
 
     public void generateReportEveryDay() throws JsonProcessingException, InterruptedException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         //check if today market day open
@@ -237,6 +238,14 @@ public class ETFViewService {
                     byId.ifPresent(vo -> fiveDayExceedTenDay.add(byId.get()));
                 });
 
+            } else if (targetFile.contains(CONSTANT_RANGE_SORT)) {
+                List<BdIndicatorVO> list = bdIndicatorDao.findupwardDaysIndicator();
+                list.addAll(bdIndicatorDao.findDownwardDaysIndicator());
+                list.forEach(vo -> {
+                    StockNameVO target = new StockNameVO();
+                    BeanUtils.copyProperties(vo, target);
+                    fiveDayExceedTenDay.add(target);
+                });
             } else if (targetFile.contains(CONSTANT_ETF)) {
                 stockIdSet = Arrays.stream(stockDao.findStockIdsByEtfId(targetFile.substring(4)).split(",")).collect(Collectors.toSet());
                 stockIdSet.forEach(id -> {
@@ -244,6 +253,7 @@ public class ETFViewService {
                     byId.ifPresent(vo -> fiveDayExceedTenDay.add(byId.get()));
                 });
             } else {
+                //read excel file
                 stockIdSet = FileUtil.readTargetFileStocks(targetFile);
                 List<StockNameVO> upwardStocks = new ArrayList<>();
                 List<StockNameVO> downWardIndustryEtfs = new ArrayList<>();
@@ -330,18 +340,31 @@ public class ETFViewService {
         constructMap();
         String serverIp = Utils.getServerIp();
 
+        HashMap<String, StockNameVO> etsMapForRangeSort = new HashMap<>();
+        HashMap<String, Double> etsMapForRangeSortGain = new HashMap<>();
+        industryEtfs.forEach(vo -> {
+            etsMapForRangeSort.put(vo.getStockId(), vo);
+        });
+
         boolean isRangeSort = false;
         if (StringUtils.hasLength(Constants.getRangeSortDay())) {
             isRangeSort = true;
+            //sort by range gain
+
+            List<StockNameVO> sortedList = new ArrayList<>();
+            String rangeSortDay = getRangeSortDay();
+            List<RangeSortGainVO> findAllByRangeId = rangeSortGainDao.findAllByRangeId(rangeSortDay);
+            findAllByRangeId.forEach(rangeVo -> {
+                etsMapForRangeSortGain.put(rangeVo.getStockId(), rangeVo.getRangeGain());
+                sortedList.add(etsMapForRangeSort.get(rangeVo.getStockId()));
+            });
+            industryEtfs = sortedList;
         }
 
-        int flowMapSize = stocksFlowMap.size();
-        List<Integer> stockFlowMapKeyList = stocksFlowMap.keySet().stream().toList();
-
-        for (int i = 0; i < industryEtfs.size(); i++) {
+        for (int index = 0; index < industryEtfs.size(); index++) {
 
             StringBuilder tdHtml = new StringBuilder();
-            StockNameVO stock = industryEtfs.get(i);
+            StockNameVO stock = industryEtfs.get(index);
 
             boolean isETF = false;
             if (stock.getStockName().contains("ETF")) {
@@ -380,8 +403,7 @@ public class ETFViewService {
                 if (isETF) {
                     urlPrefix = "<a href=\"https://gushitong.baidu.com/fund/ab-";
                     // format is sh1596110#电力ETF
-                    tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("etf_").append(stockId).append("\">").append(stockId).append("</a>#")
-                            .append(urlPrefix).append(stockId.substring(2)).append("\">");
+                    tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("etf_").append(stockId).append("\">").append(stockId).append("</a>#").append(urlPrefix).append(stockId.substring(2)).append("\">");
                 } else {
                     tdHtml.append(urlPrefix).append(stockId.substring(2)).append("\">");
                 }
@@ -398,18 +420,19 @@ public class ETFViewService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 tdHtml.append("(").append(belongStockNum).append(")");
             }
-            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")")
-                    .append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")")
-                    .append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">")
-                    .append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
-                    .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")")
-                    .append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
+            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
+            // add rangeSort gain
+            if (isRangeSort) {
+                tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
+            }
+
+            tdHtml.append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
 
 
             if (isRangeSort) {
                 //do stocksFlowMap iteration
-                int columnNum = i % 5;
-                stocksFlowMap.get(stockFlowMapKeyList.get(columnNum)).add(tdHtml.toString());
+                int columnNum = index % 5;
+                stocksFlowMap.get(columnNum + 1).add(tdHtml.toString());
             } else {
                 if (stocksFlowMap.get(upwardDaysNum) == null) {
                     if (upwardDaysNum < -3) {
@@ -455,10 +478,16 @@ public class ETFViewService {
         //build html
         StringBuilder retHtml = new StringBuilder();
         retHtml.append("<tr>");
+
         for (Integer integer : stocksFlowIndexList) {
             List<String> tdList = stocksFlowMap.get(integer);
             int size = tdList.size();
-            retHtml.append("<td>").append(size).append("</td>");
+            retHtml.append("<td>").append(size);
+            if (isRangeSort && size != 0) {
+                RangeSortIDVO rangeSortIDVO = rangeSortIdDao.findById(getRangeSortDay()).get();
+                retHtml.append("|RangeSort ").append(rangeSortIDVO.getDayStart()).append(" to ").append(rangeSortIDVO.getDayEnd());
+            }
+            retHtml.append("</td>");
         }
 
         retHtml.append("</tr>");
@@ -477,6 +506,7 @@ public class ETFViewService {
             trString.append("</tr>");
             retHtml.append(trString);
         }
+        setRangeSortDay(null);
         return retHtml.toString();
     }
 

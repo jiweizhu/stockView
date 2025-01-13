@@ -73,10 +73,11 @@ public class Controller {
 
     @RequestMapping(value = {"/rangeSort/{range}"})
     @ResponseBody
-    public ResponseEntity rangeSort(@PathVariable String range) {
+    public ModelAndView rangeSort(@PathVariable String range) {
         logger.info("Enter method rangeSort========range={}", range);
         setRangeSortDay(range);
-        return ResponseEntity.ofNullable("Successfully");
+        setTargetFile(CONSTANT_RANGE_SORT);
+        return new ModelAndView("redirect:/stocksDayView.html");
     }
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})
@@ -108,6 +109,8 @@ public class Controller {
             int length = stockNameVO.getStockIds().split(",").length;
             String stockName = stockNameVO.getStockName();
             return length + "|" + stockName + "_" + stockNameVO.getStockId();
+        } else if (targetFileValue.startsWith(CONSTANT_RANGE_SORT)) {
+            return "Range Sort";
         } else {
             StringBuilder stringBuilder = new StringBuilder("(").append(getTargetFileSize()).append(")");
             int lastIndexOf = targetFileValue.lastIndexOf("/");

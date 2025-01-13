@@ -19,6 +19,7 @@ public class Constants {
     public static String TOTAL = "total";
     public static String ROWS = "rows";
     public static String CONSTANT_BD = "bd";
+    public static String CONSTANT_RANGE_SORT = "range_sort";
     public static String CONSTANT_ETF = "etf";
 
     //green   #00FF00
@@ -28,23 +29,25 @@ public class Constants {
     //朱红色(pink) #FF8888 央企100
 
     public static int GuoQi = 200;
-    public static String GuoQi_Color  = "#FF9900";
+    public static String GuoQi_Color = "#FF9900";
     //yellow #FF9900 国企200
 
     public static int MinQi = 300;
-    public static String MinQi_Color  = "#C0C0C0";
+    public static String MinQi_Color = "#C0C0C0";
     //grey   #C0C0C0 民企300
 
     // favorite stock
     public static int FAVORITE_STOCK = 100;
 
     public static Integer rangeSize = 700;
+
     public static Integer getRangeSize() {
         return rangeSize;
     }
 
     @Getter
     private static String rangeSortDay;
+
     public static void setRangeSortDay(String rangeSortDay) {
         Constants.rangeSortDay = rangeSortDay;
     }

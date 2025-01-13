@@ -1,13 +1,16 @@
 package com.example.notification.baidu.controller;
 
 import com.example.notification.baidu.respVo.IndicatorRespVO;
+import com.example.notification.baidu.respVo.RangeSortRespVO;
 import com.example.notification.baidu.service.BaiduInfoService;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.constant.Constants;
 import com.example.notification.repository.BdIndicatorDao;
+import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +32,22 @@ public class BaiDuController {
 
     @Autowired
     private BdIndicatorDao bdIndicatorDao;
+
+    @RequestMapping(value = {"/bd/rangeSort/view"})
+    @ResponseBody
+    public Object rangeSortQuery() {
+        logger.info("======Enter method rangeSortQuery========");
+        List<RangeSortRespVO> retList = new ArrayList<>();
+        baiduInfoService.rangeSortQuery().forEach(vo -> {
+            RangeSortRespVO respVO = new RangeSortRespVO();
+            BeanUtils.copyProperties(vo, respVO);
+            String rangeId = respVO.getRangeId();
+            rangeId = "<a href=http://" + Utils.getServerIp() + ":8888/rangeSort/" + rangeId + " >" + rangeId + "</a>";
+            respVO.setRangeId(rangeId);
+            retList.add(respVO);
+        });
+        return retList;
+    }
 
     @RequestMapping(value = {"/bd/real"})
     @ResponseBody
@@ -112,10 +131,10 @@ public class BaiDuController {
     }
 
     //test api
-    @RequestMapping(value = {"/bd/calculateIndicatorsAvg"})
+    @RequestMapping(value = {"/bd/calculateRangeSort"})
     @ResponseBody
-    public ResponseEntity calculateIndicatorsAvg() {
-        baiduInfoService.calculateIndicatorsAvg();
+    public ResponseEntity calculateRangeSort() {
+        baiduInfoService.calculateRangeSort();
         return ResponseEntity.ok("SuccessFully done! ");
     }
 

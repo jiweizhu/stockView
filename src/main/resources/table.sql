@@ -3,17 +3,23 @@ SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS
 Create schema stock;
 
 CREATE TABLE range_sort_id (
-day_start DATE primary key,
+range_id VARCHAR(20) primary key,
+day_start DATE,
 day_end DATE,
 description VARCHAR(20)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+insert into range_sort_id (range_id, day_start, day_end, description) values ('aaa','20220701','20221028', '300 descreased 21%');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('bbb','20221031','20230131', '300 increased 17.38%');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('ccc','20230721','20240202', '300 decreased 16.5%');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('ddd','20240202','20240311', '300 increased 10.7%');
 
 CREATE TABLE range_sort_gain (
-indicator_id VARCHAR(12),
 range_id VARCHAR(12),
+stock_id VARCHAR(12),
 range_gain DECIMAL(10,2),
-PRIMARY KEY(indicator_id,range_day)
+PRIMARY KEY(range_id,stock_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE  cn_indicator(
 index_code VARCHAR(12) primary key,

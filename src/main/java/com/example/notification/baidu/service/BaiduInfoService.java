@@ -62,6 +62,28 @@ public class BaiduInfoService {
     @Autowired
     private BdIndicatorWeeklyDao bdIndicatorWeeklyDao;
 
+    @Autowired
+    private RangeSortIdDao rangeSortIdDao;
+
+    @Autowired
+    private RangeSortGainDao rangeSortGainDao;
+
+    public void calculateRangeSort() {
+        //handle bd range gain
+        rangeSortIdDao.findAll().forEach(rangeVo -> {
+            bdIndicatorDao.findAll().forEach(idVo -> {
+                BdIndicatorDailyVO startVo = bdIndicatorDailyDao.findByStockIdAndDay(idVo.getStockId(), rangeVo.getDayStart());
+                BdIndicatorDailyVO endVo = bdIndicatorDailyDao.findByStockIdAndDay(idVo.getStockId(), rangeVo.getDayEnd());
+                String gainPercent = Utils.calculateDayGainPercentage(endVo.getClosingPrice(), startVo.getClosingPrice()).toString();
+                RangeSortGainVO rangeSortGainVO = new RangeSortGainVO();
+                rangeSortGainVO.setRangeId(rangeVo.getRangeId());
+                rangeSortGainVO.setStockId(idVo.getStockId());
+                rangeSortGainVO.setRangeGain(Double.valueOf(gainPercent));
+                rangeSortGainDao.save(rangeSortGainVO);
+                logger.info("====save=stock={}==rangeSortGain={}",idVo.getStockName(),rangeSortGainVO);
+            });
+        });
+    }
 
     public List<IndicatorVO> queryBaiduIndustriesRealInfo() {
         List<IndicatorVO> list = restRequest.queryBaiduIndustriesRealInfo();
@@ -192,7 +214,7 @@ public class BaiduInfoService {
 
         id.setFlipUpwardDaysFive(flipDays);
         BigDecimal flipDayAvgFive = dayLine.get(abs).getDayAvgFive();
-        int flipAbs = Math.abs(upwardDays)+Math.abs(flipDays);
+        int flipAbs = Math.abs(upwardDays) + Math.abs(flipDays);
         BigDecimal filpDenominator = dayLine.get(flipAbs).getDayAvgFive();
         BigDecimal flipGainPercentFive = Utils.calculateDayGainPercentage(flipDayAvgFive, filpDenominator);
         id.setFlipGainPercentFive(flipGainPercentFive);
@@ -234,7 +256,7 @@ public class BaiduInfoService {
 
         id.setFlipUpwardDaysTen(flipDays);
         BigDecimal flipDayAvg = dayLine.get(abs).getDayAvgTen();
-        int flipAbs = Math.abs(upwardDays)+Math.abs(flipDays);
+        int flipAbs = Math.abs(upwardDays) + Math.abs(flipDays);
         BigDecimal filpDenominator = dayLine.get(flipAbs).getDayAvgTen();
         BigDecimal flipGainPercentFive = Utils.calculateDayGainPercentage(flipDayAvg, filpDenominator);
         id.setFlipGainPercentTen(flipGainPercentFive);
@@ -423,4 +445,10 @@ public class BaiduInfoService {
             }
         });
     }
+
+    public List<RangeSortIDVO> rangeSortQuery() {
+        return rangeSortIdDao.findAll();
+    }
+
+
 }
