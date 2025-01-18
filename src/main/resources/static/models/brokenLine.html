@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>业绩折线图</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+    <style>
+        #chart {
+            width: 600px;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<div id="chart"></div>
+
+<script>
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+var dom = document.getElementById('chart');
+var myChart = echarts.init(dom, null, {
+  renderer: 'canvas',
+  useDirtyRect: false
+});
+var app = {};
+
+var option;
+
+option = {
+  tooltip: {
+    trigger: 'axis'
+  },
+  grid: {
+    top: '3%',
+    left: '3%',
+    right: '4%',
+    bottom: '3%',
+    containLabel: true
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {}
+    }
+  },
+  xAxis: {
+    type: 'category',
+     position: 'top',
+    boundaryGap: false,
+    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+  },
+  yAxis: {
+    type: 'value',
+     position: 'right',
+      max: 1000
+  },
+   dataZoom: [
+    {
+      type: 'slider', // 滑动式缩放
+      show: true,
+      xAxisIndex: [0], // 绑定到 x 轴
+      start: 50, // 起始位置
+      end: 100, // 结束位置
+    },
+    {
+      type: 'inside', // 鼠标滚轮缩放
+      xAxisIndex: [0], // 绑定到 x 轴
+      start: 50,
+      end: 100
+    }
+  ],
+  series: [
+    {
+      name: 'Email',
+      type: 'line',
+      stack: 'Total',
+      data: [120, 132, 101, 134, 90, 230, 210],
+       label: {
+        show: true,
+        position: 'top',
+        formatter: function (params) {
+          return params.value > 100 ? params.value : '';  // 如果数值大于100，则显示
+        }
+      }
+    },
+    {
+      name: 'Union Ads',
+      type: 'line',
+      stack: 'Total',
+      data: [220, 182, 191, 234, 290, 330, 310]
+    },
+    {
+      name: 'Video Ads',
+      type: 'line',
+      stack: 'Total',
+      data: [150, 232, 201, 154, 190, 330, 410]
+    },
+    {
+      name: 'Direct',
+      type: 'line',
+      stack: 'Total',
+      data: [320, 332, 301, 334, 390, 330, 320]
+    },
+    {
+      name: 'Search Engine',
+      type: 'line',
+      stack: 'Total',
+      data: [820, 932, 901, 934, 1290, 1330, 1320]
+    }
+  ]
+};
+
+if (option && typeof option === 'object') {
+  myChart.setOption(option);
+}
+
+window.addEventListener('resize', myChart.resize);
+
+    async function getTableData() {
+        try {
+            const response = await fetch(`http://${serverIp}:8888/bd/financialList/sh000333`);
+            const tableData = await response.json();
+
+            const reportDays = tableData.map(item => item.reportDay);
+            const grossIncomeData = tableData.map(item => item.grossIncomeGain);
+            const grossProfitData = tableData.map(item => item.grossProfitGain);
+
+            chart.setOption({
+                xAxis: {
+                    data: reportDays
+                },
+                series: [
+                    {
+                        name: 'Income',
+                        data: grossIncomeData
+                    },
+                    {
+                        name: 'Profit',
+                        data: grossProfitData
+                    }
+                ]
+            });
+        } catch (error) {
+            console.error('获取数据失败:', error);
+        }
+    }
+
+    getTableData();
+</script>
+</body>
+</html>

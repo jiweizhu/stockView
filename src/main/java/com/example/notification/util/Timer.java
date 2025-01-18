@@ -64,6 +64,21 @@ public class Timer {
 //        }
 //    }
 
+
+    //   every updateEveryWeek
+    @Scheduled(cron = "0 0 9 * * 6")
+    public void updateEveryWeek() {
+        try {
+            logger.info("====cron==start updateEveryWeek=====");
+            baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
+
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+    }
+
+
+
     @Scheduled(cron = "0 10 15 * * ?")
     public void generateReportWhenMarketClose() {
         try {

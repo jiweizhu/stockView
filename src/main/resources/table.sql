@@ -2,6 +2,13 @@ SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS
 
 Create schema stock;
 
+CREATE TABLE bd_financial (
+stock_id VARCHAR(12),
+report_day VARCHAR(12),
+content TEXT,
+PRIMARY KEY(stock_id,report_day)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE range_sort_id (
 range_id VARCHAR(20) primary key,
 day_start DATE,

@@ -77,7 +77,7 @@ public class Controller {
         logger.info("Enter method rangeSort========range={}", range);
         setRangeSortDay(range);
         setTargetFile(CONSTANT_RANGE_SORT);
-        return new ModelAndView("redirect:/stocksDayView.html");
+        return new ModelAndView("redirect:/bdIndicatorsKlineView.html");
     }
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})

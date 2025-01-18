@@ -32,6 +32,9 @@ public class RestRequest {
     static String weeklyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=stockNum,week,,,daysToQuery,qfq";
     static String IntraDay_URL = "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=";
 
+    //https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&group=income_detail&code=000333&company_code=6242&inner_code=30181&market_type=ab
+    private static String Bd_INCOME_URL = "https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&group=income_detail&code=$code&company_code=6242&inner_code=30181&market_type=ab";
+
 
     //https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=399300&market_type=ab&ktype=week
     private static String BdIndictor_StockId_URL = "https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_index_kline&code=$code&market_type=ab&ktype=$type";
@@ -225,6 +228,24 @@ public class RestRequest {
             String ret = restTemplate.getForObject(queryUrl, String.class);
             JsonNode rootNode = objectMapper.readTree(ret);
             JsonNode listNode = rootNode.at("/Result/0/DisplayData/resultData/tplData/result/list");
+            if (listNode == null) {
+                logger.info("=====Error==to get stockIds from Net====indicatorId =={}", indicatorId);
+                return null;
+            }
+            return listNode;
+        } catch (Exception e) {
+            logger.info("=====Error======Exception======", e);
+        }
+        return null;
+    }
+
+    public JsonNode queryBaiduIncomeData(String indicatorId) {
+        logger.info("Enter queryBaiduIndustryStocks === indicatorId= {}", indicatorId);
+        try {
+            String queryUrl = Bd_INCOME_URL.replace("$code", indicatorId);
+            String ret = restTemplate.getForObject(queryUrl, String.class);
+            JsonNode rootNode = objectMapper.readTree(ret);
+            JsonNode listNode = rootNode.at("/Result/data");
             if (listNode == null) {
                 logger.info("=====Error==to get stockIds from Net====indicatorId =={}", indicatorId);
                 return null;

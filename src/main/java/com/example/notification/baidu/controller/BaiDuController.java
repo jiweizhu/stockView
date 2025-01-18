@@ -49,6 +49,12 @@ public class BaiDuController {
         return retList;
     }
 
+    @RequestMapping(value = {"/bd/financialList/{stockId}"})
+    @ResponseBody
+    public Object getBdFinancialList(@PathVariable String stockId) throws Exception {
+        return baiduInfoService.readBdFinacialDataFromDbByStockId(stockId.split("_")[0]);
+    }
+
     @RequestMapping(value = {"/bd/real"})
     @ResponseBody
     public Object getBaiduIndustriesRealInfo() throws Exception {
@@ -131,10 +137,10 @@ public class BaiDuController {
     }
 
     //test api
-    @RequestMapping(value = {"/bd/calculateRangeSort"})
+    @RequestMapping(value = {"/bd/test"})
     @ResponseBody
-    public ResponseEntity calculateRangeSort() {
-        baiduInfoService.calculateRangeSort();
+    public ResponseEntity test() throws Exception {
+        baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
         return ResponseEntity.ok("SuccessFully done! ");
     }
 

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
@@ -38,6 +40,25 @@ public class Utils {
         return formattedDate;
 
     }
+
+    public static double parseMoney(String moneyStr) {
+        if (moneyStr == null || moneyStr.isEmpty()) {
+            throw new IllegalArgumentException("can not use null or empty str");
+        }
+
+        Pattern pattern = Pattern.compile("([0-9.]+)([亿万]?)");
+        Matcher matcher = pattern.matcher(moneyStr);
+
+        if (matcher.find()) {
+            double value = Double.parseDouble(matcher.group(1));
+
+            String unit = matcher.group(2);
+            return value;
+        } else {
+            throw new IllegalArgumentException("Fail to parse money " + moneyStr);
+        }
+    }
+
 
     public static String getServerIp() {
         InetAddress localHost = null;

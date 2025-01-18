@@ -25,6 +25,12 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
+        .income-container {
+            width: 400px;
+            height: 120px;
+            margin-bottom: 2px;
+            background-color: #FFFFCC;
+        }
         .range-container {
             width: 400px;
             height: 280px;
@@ -64,7 +70,67 @@
 <table border="1" id="mainTable">
 </table>
 <script>
-const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+        async function createInComeChart(span) {
+           let chart = echarts.init(span);
+           const response = await fetch(`http://${serverIp}:8888/bd/financialList/` + span.id.replace('income_', ''));
+           const tableData = await response.json();
+
+           const reportDays = tableData.map(item => item.reportDay);
+           const grossIncomeData = tableData.map(item => item.grossIncomeGain);
+           const grossProfitData = tableData.map(item => item.grossProfitGain);
+
+           let option = {
+               tooltip: {
+                   trigger: 'axis',
+                   formatter: function (params) {
+                       let tooltip = params[0].axisValue + '<br>';
+                       params.forEach(item => {
+                           tooltip += `${item.marker} ${item.seriesName}: ${item.value}<br>`;
+                       });
+                       return tooltip;
+                   }
+               },
+               grid: {
+                top: '3%',
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+              },
+               xAxis: {
+                   type: 'category',
+                   data: reportDays,
+                   position: 'top'
+               },
+               yAxis: {
+                   type: 'value',
+                   position: 'right',
+                   axisLabel: {
+                         formatter: '{value}%'
+                   }
+               },
+               series: [
+                   {
+                       name: 'Income',
+                       type: 'line',
+                       data: grossIncomeData
+                   },
+                   {
+                       name: 'Profit',
+                       type: 'line',
+                       data: grossProfitData
+                   }
+               ]
+           };
+
+           chart.setOption(option);
+
+           window.addEventListener('resize', () => chart.resize());
+           chart.resize();
+        }
+</script>
+<script>
 let isWeekly = false;
 //default is 370400, 医药商业
 var showingIndicator = '370400';
@@ -72,7 +138,6 @@ var showingIndicator = '370400';
 document.addEventListener('DOMContentLoaded', function () {
     const serverUrl = `http://${serverIp}:8888/etfs`;
 
-    // 通用 fetch 函数
     async function fetchData(endpoint, containerId) {
         try {
             const response = await fetch(endpoint);
@@ -83,14 +148,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // 加载表格数据
     function loadAllTables() {
         fetchData(`${serverUrl}/targetList`, 'myTable');
         fetchData(`${serverUrl}/main`, 'mainTable');
     }
 
-    // 执行延时任务的函数
-    function executeWithDelay(callback, delay = 1200) {
+    function executeWithDelay(callback, delay = 1500) {
         setTimeout(callback, delay);
     }
 
@@ -182,6 +245,10 @@ document.addEventListener('DOMContentLoaded', function () {
         spans.forEach(span => {
             createETFChart(span);
         });
+        let income_spans = document.querySelectorAll('div[id^="income_"]');
+        income_spans.forEach(income_span => {
+            createInComeChart(income_span);
+        });
     }
 
 async function createETFChart(span) {
@@ -259,7 +326,7 @@ function filterRecentDays(dayCount) {
         option.series.find(series => series.name === 'indicator').data = line_data_indicator; // 更新 indicator
     }
 
-    myChart.setOption(option, true); // 更新图表
+    myChart.setOption(option, true);
     window.addEventListener('resize', () => myChart.resize());
 }
 
@@ -340,10 +407,10 @@ function filterRecentDays(dayCount) {
     };
 
     const option = {
-        legend: {
-            data: ['MA5', 'MA10', 'stock','indicator'],
-            inactiveColor: '#777'
-        },
+<!--        legend: {-->
+<!--            data: ['MA5', 'MA10', 'stock','indicator'],-->
+<!--            inactiveColor: '#777'-->
+<!--        },-->
        yAxis: [
             {
                 type: 'value',
@@ -415,6 +482,7 @@ function filterRecentDays(dayCount) {
             axisLine: { lineStyle: { color: '#8392A5' } }
         },
         grid: {
+            top: '3%',
             bottom: 80
         },
         dataZoom: [
@@ -501,11 +569,11 @@ function filterRecentDays(dayCount) {
 
     document.getElementById('toggle_indicator').addEventListener('click', () => {
         if (isIndicatorDisplayed) {
-            option.legend.data = option.legend.data.filter(item => item !== 'indicator');
+<!--            option.legend.data = option.legend.data.filter(item => item !== 'indicator');-->
             option.yAxis = option.yAxis.filter(axis => axis.name !== 'indicator');
             option.series = option.series.filter(series => series.name !== 'indicator');
         } else {
-            option.legend.data.push('indicator');
+<!--            option.legend.data.push('indicator');-->
             option.yAxis.push(originalYAxisIndicator);
             option.series.push(originalSeriesIndicator);
         }
