@@ -70,7 +70,8 @@ public class Timer {
     public void updateEveryWeek() {
         try {
             logger.info("====cron==start updateEveryWeek=====");
-            baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
+            baiduInfoService.getFromNetAndStoreWeek(false);
+//            baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
@@ -101,7 +102,6 @@ public class Timer {
         try {
             logger.info("Start cron job baiduInfoService.getFromNetAndStore=====");
             baiduInfoService.getFromNetAndStoreDay(100);
-            baiduInfoService.getFromNetAndStoreWeek(false);
             logger.info("End cron job baiduInfoService.getFromNetAndStore=====");
 
             logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");

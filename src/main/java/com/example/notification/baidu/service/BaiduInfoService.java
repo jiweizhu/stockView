@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -30,7 +31,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static com.example.notification.constant.Constants.getRangeSize;
+import static com.example.notification.constant.Constants.*;
 
 @Service
 public class BaiduInfoService {
@@ -49,6 +50,9 @@ public class BaiduInfoService {
 
     @Autowired
     private BdIndicatorDao bdIndicatorDao;
+
+    @Autowired
+    private BdFinancialSumDao bdFinancialSumDao;
 
     @Autowired
     private BdFinacialDao bdFinacialDao;
@@ -308,48 +312,27 @@ public class BaiduInfoService {
     }
 
 
-    public List<FinancialRespVO> readBdFinacialDataFromDbByStockId(String stockId) throws JsonProcessingException {
+    public List<FinancialRespVO> readBdFinacialDataFromDbByStockId(String stockId) {
         List<BdFinancialVO> byStockId = bdFinacialDao.findByStockId(stockId).stream().sorted(Comparator.comparing(BdFinancialVO::getReportDay)).toList();
         List<FinancialRespVO> ret = new ArrayList<>();
         //read data
         byStockId.forEach(vo -> {
-            try {
-                JsonNode rootNode = objectMapper.readTree(vo.getContent());
-                String firstElement = objectMapper.writeValueAsString(rootNode.get(0));
-                JsonNode element0 = objectMapper.readTree(firstElement);
-                JsonNode jsonNode1 = element0.get("data").get(0).get("header");
-
-                String eighthElement = objectMapper.writeValueAsString(rootNode.get(7));
-                if (!eighthElement.contains("七、综合收益总额")) {
-                    eighthElement = objectMapper.writeValueAsString(rootNode.get(6));
-                }
-                JsonNode element7 = objectMapper.readTree(eighthElement);
-                JsonNode jsonNode7 = element7.get("data").get(0).get("header");
-                String texted2 = jsonNode1.get(1).textValue();
-                String texted7 = jsonNode7.get(1).textValue();
-                if (texted2.contains("--") || texted7.contains("--")) {
-                    return;
-                }
-                String reportDay = vo.getReportDay();
-                FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, jsonNode1.get(2).textValue(), Double.parseDouble(texted2.substring(0, texted2.indexOf("%") - 1)),
-                        jsonNode7.get(2).textValue(), Double.parseDouble(texted7.substring(0, texted7.indexOf("%") - 1)));
-                ret.add(newVo);
-            } catch (JsonProcessingException e) {
-                logger.info("======ERROR =====Fail to readTree readBaiduIncomeDataFromDb=========", e);
-            }
+            String reportDay = vo.getReportDay();
+            FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, vo.getGrossIncome(), vo.getGrossIncomeGain(), vo.getGrossProfit(), vo.getGrossProfitGain());
+            ret.add(newVo);
         });
         return ret;
     }
 
     private static String changeReportDay(String reportDay) {
         if (reportDay.contains("一季报")) {
-            reportDay = reportDay.replace("一季报", "0401");
+            reportDay = reportDay.replace("一季报", SEASON_DAY_0401);
         } else if (reportDay.contains("三季报")) {
-            reportDay = reportDay.replace("三季报", "0901");
+            reportDay = reportDay.replace("三季报", SEASON_DAY_0901);
         } else if (reportDay.contains("中报")) {
-            reportDay = reportDay.replace("中报", "0701");
+            reportDay = reportDay.replace("中报", SEASON_DAY_0701);
         } else {
-            reportDay = reportDay.replace("年报", "1231");
+            reportDay = reportDay.replace("年报", SEASON_DAY_1231);
         }
         return reportDay;
     }
@@ -359,15 +342,16 @@ public class BaiduInfoService {
         List<StockNameVO> all = stockDao.findAll();
         if (Utils.isWinSystem()) {
             //for local test
+            List<String> addList = new ArrayList<>();
+            addList.add("sh600498");
+            addList.add("sh600522");
+            addList.add("sh603083");
+            addList.add("sz002313");
+            addList.add("sz000063");
             all = new ArrayList<>();
-            StockNameVO stockNameVO = new StockNameVO();
-            stockNameVO.setStockId("sh600015");
-            stockNameVO.setStockName("sh600015");
-            StockNameVO stockNameVO2 = new StockNameVO();
-            stockNameVO2.setStockId("sh600585");
-            stockNameVO2.setStockName("sh600585");
-            all.add(stockNameVO);
-            all.add(stockNameVO2);
+            for (String str : addList) {
+                all.add(new StockNameVO(str, str));
+            }
         }
         all.forEach(vo -> {
             try {
@@ -382,7 +366,7 @@ public class BaiduInfoService {
     }
 
     public void queryBaiduIncomeDataFromNet(String stockId) throws JsonProcessingException {
-        JsonNode jsonNode = restRequest.queryBaiduIncomeData(stockId.replaceAll("sh|sz", ""));
+        JsonNode jsonNode = restRequest.queryBaiduIncomeDataFromNet(stockId.replaceAll("sh|sz", ""));
         if (jsonNode != null && jsonNode.isArray()) {
             for (JsonNode node : jsonNode) {
                 BdFinancialNetVO bdFinancialVO = objectMapper.treeToValue(node, BdFinancialNetVO.class);
@@ -391,8 +375,81 @@ public class BaiduInfoService {
                 String reportDay = bdFinancialVO.getText();
                 reportDay = changeReportDay(reportDay);
                 target.setReportDay(reportDay);
-                target.setContent(objectMapper.writeValueAsString(bdFinancialVO.getContent()));
+                String content = objectMapper.writeValueAsString(bdFinancialVO.getContent());
+                target.setContent(content);
+
+                JsonNode rootNode = objectMapper.readTree(content);
+                String firstElement = objectMapper.writeValueAsString(rootNode.get(0));
+                JsonNode element0 = objectMapper.readTree(firstElement);
+                JsonNode jsonNode1 = element0.get("data").get(0).get("header");
+
+                String eighthElement = objectMapper.writeValueAsString(rootNode.get(7));
+                if (!eighthElement.contains("七、综合收益总额")) {
+                    eighthElement = objectMapper.writeValueAsString(rootNode.get(6));
+                }
+                JsonNode element7 = objectMapper.readTree(eighthElement);
+                if (element7 == null || element7.get("data") == null || element7.get("data").get(0) == null) {
+                    continue;
+                }
+                JsonNode jsonNode7 = element7.get("data").get(0).get("header");
+
+                String texted2 = jsonNode1.get(1).textValue();
+                String texted7 = jsonNode7.get(1).textValue();
+                if (texted2.contains("--") || texted7.contains("--")) {
+                    continue;
+                }
+                double grossIncomeGain = Double.parseDouble(texted2.substring(0, texted2.indexOf("%")));
+                double grossProfitGain = Double.parseDouble(texted7.substring(0, texted7.indexOf("%")));
+                target.setGrossIncome(jsonNode1.get(2).textValue());
+                target.setGrossIncomeGain(grossIncomeGain);
+                target.setGrossProfit(jsonNode7.get(2).textValue());
+                target.setGrossProfitGain(grossProfitGain);
+
                 bdFinacialDao.save(target);
+            }
+        }
+    }
+
+
+    public void updateTemp() throws JsonProcessingException {
+        while (true) {
+            List<BdFinancialVO> all = bdFinacialDao.findByStockIdLimit();
+            if (all.isEmpty()) {
+                break;
+            }
+            for (BdFinancialVO vo : all) {
+                JsonNode rootNode = objectMapper.readTree(vo.getContent());
+                for (JsonNode jsonNode : rootNode) {
+                    if (jsonNode.get("data").get(0) == null || jsonNode.get("data").get(0).get("header") == null) {
+                        continue;
+                    }
+                    String header = jsonNode.get("data").get(0).get("header").toString();
+                    if (header.contains("综合收益总额")) {
+                        //save in db
+                        JsonNode jsonNode1 = objectMapper.readTree(header);
+                        String gain = jsonNode1.get(1).textValue();
+                        String total = jsonNode1.get(2).textValue();
+                        if (gain.contains("--") || total.contains("--")) {
+                            logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
+                            continue;
+                        }
+                        vo.setGrossIncome(total);
+                        vo.setGrossIncomeGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
+                    }
+                    if (header.contains("总营收")) {
+                        //save in db
+                        JsonNode jsonNode1 = objectMapper.readTree(header);
+                        String gain = jsonNode1.get(1).textValue();
+                        String total = jsonNode1.get(2).textValue();
+                        if (gain.contains("--") || total.contains("--")) {
+                            logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
+                            continue;
+                        }
+                        vo.setGrossProfit(total);
+                        vo.setGrossProfitGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
+                    }
+                }
+                bdFinacialDao.save(vo);
             }
         }
     }
@@ -551,4 +608,83 @@ public class BaiduInfoService {
     }
 
 
+    public Object queryFinancialSum() {
+        List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
+        if (Utils.isWinSystem()) {
+            indicators = new ArrayList<>();
+            indicators.add(new BdIndicatorVO("730200", "通信设备"));
+            indicators.add(new BdIndicatorVO("770100", "个护用品"));
+        }
+        List<Map<String, Object>> retJsonList = new ArrayList<>();
+        // format is like {"name":"电力","2024四收入Asc":"15","2024四收入Desc":"5","2024四利润Asc":"15","2024四利润Desc":"5"}
+        indicators.forEach(indicator -> {
+            List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(indicator.getStockId());
+            Map<String, Object> lineMap = new HashMap<>();
+            for (BdFinancialSumVO vo : voList) {
+                lineMap.put("name", indicator.getStockName());
+                String reportDay = vo.getReportDay();
+                reportDay = changeReportDayToChinese(reportDay);
+                lineMap.put(reportDay + "收Up", vo.getGrossGainAscNum());
+                lineMap.put(reportDay + "收De", vo.getGrossGainDescNum());
+                lineMap.put(reportDay + "利Up", vo.getProfitGainAscNum());
+                lineMap.put(reportDay + "利De", vo.getProfitGainDescNum());
+            }
+            retJsonList.add(lineMap);
+        });
+        return retJsonList;
+    }
+
+    private static String changeReportDayToChinese(String reportDay) {
+        reportDay = reportDay.substring(2);
+        if (reportDay.contains("0401")) {
+            reportDay = reportDay.replace("0401", "04");
+        } else if (reportDay.contains("0901")) {
+            reportDay = reportDay.replace("0901", "07");
+        } else if (reportDay.contains("0701")) {
+            reportDay = reportDay.replace("0701", "10");
+        } else {
+            reportDay = reportDay.replace("1231", "12");
+        }
+        return reportDay;
+    }
+
+
+    public void updateFinancialReportSum() {
+        List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
+        indicators.forEach(vo -> {
+            String voStockIds = vo.getStockIds();
+            if (!StringUtils.hasLength(voStockIds)) {
+                return;
+            }
+            String[] stockIds = voStockIds.split(",");
+            Map<String, BdFinancialSumVO> indicatorReportDayMap = new HashMap<>();
+            for (String stockId : stockIds) {
+                List<BdFinancialVO> financialVOList = bdFinacialDao.findByStockId(stockId);
+                financialVOList.forEach(financialVo -> {
+                    BdFinancialSumVO finSumVO = indicatorReportDayMap.get(financialVo.getReportDay());
+                    if (finSumVO == null) {
+                        finSumVO = BdFinancialSumVO.getInitVO();
+                        indicatorReportDayMap.put(financialVo.getReportDay(), finSumVO);
+                        finSumVO.setReportDay(financialVo.getReportDay());
+                        finSumVO.setIndicatorId(vo.getStockId());
+                    }
+                    if (financialVo.getGrossProfitGain() != null && financialVo.getGrossProfitGain() > 0) {
+                        finSumVO.setGrossGainAscNum(finSumVO.getGrossGainAscNum() + 1);
+                        finSumVO.setGrossGainAscIds(finSumVO.getGrossGainAscIds() + "," + stockId);
+                    } else {
+                        finSumVO.setGrossGainDescNum(finSumVO.getGrossGainDescNum() + 1);
+                        finSumVO.setGrossGainDescIds(finSumVO.getGrossGainDescIds() + "," + stockId);
+                    }
+                    if (financialVo.getGrossIncomeGain()  != null && financialVo.getGrossIncomeGain() > 0) {
+                        finSumVO.setProfitGainAscNum(finSumVO.getProfitGainAscNum() + 1);
+                        finSumVO.setProfitGainAscIds(finSumVO.getProfitGainAscIds() + "," + stockId);
+                    } else {
+                        finSumVO.setProfitGainDescNum(finSumVO.getProfitGainDescNum() + 1);
+                        finSumVO.setProfitGainDescIds(finSumVO.getProfitGainDescIds() + "," + stockId);
+                    }
+                    bdFinancialSumDao.save(finSumVO);
+                });
+            }
+        });
+    }
 }

@@ -41,6 +41,14 @@ public class Constants {
 
     public static Integer rangeSize = 700;
 
+
+    //season
+    public static String SEASON_DAY_0401 = "0401";
+    public static String SEASON_DAY_0701 = "0701";
+    public static String SEASON_DAY_0901 = "0901";
+    public static String SEASON_DAY_1231 = "1231";
+
+
     public static Integer getRangeSize() {
         return rangeSize;
     }

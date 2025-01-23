@@ -19,4 +19,17 @@ public class BdFinancialVO {
 
     @Column(name = "content")
     private String content;
+
+    @Column(name = "gross_income")
+    private String grossIncome;
+
+    @Column(name = "gross_income_gain")
+    private Double grossIncomeGain;
+
+    @Column(name = "gross_profit")
+    private String grossProfit;
+
+    @Column(name = "gross_profit_gain")
+    private Double grossProfitGain;
+
 }

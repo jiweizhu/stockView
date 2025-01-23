@@ -55,6 +55,12 @@ public class BaiDuController {
         return baiduInfoService.readBdFinacialDataFromDbByStockId(stockId.split("_")[0]);
     }
 
+    @RequestMapping(value = {"/bd/financialSum"})
+    @ResponseBody
+    public Object financialSum() {
+        return baiduInfoService.queryFinancialSum();
+    }
+
     @RequestMapping(value = {"/bd/real"})
     @ResponseBody
     public Object getBaiduIndustriesRealInfo() throws Exception {
@@ -132,7 +138,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateIndicatorBelongStocks() {
-        baiduInfoService.getFromNetAndStoreWeek(true);
+        baiduInfoService.updateFinancialReportSum();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
@@ -140,7 +146,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-        baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
+        baiduInfoService.updateTemp();
         return ResponseEntity.ok("SuccessFully done! ");
     }
 

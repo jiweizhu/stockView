@@ -239,8 +239,8 @@ public class RestRequest {
         return null;
     }
 
-    public JsonNode queryBaiduIncomeData(String indicatorId) {
-        logger.info("Enter queryBaiduIndustryStocks === indicatorId= {}", indicatorId);
+    public JsonNode queryBaiduIncomeDataFromNet(String indicatorId) {
+        logger.info("Enter queryBaiduIncomeDataFromNet === indicatorId= {}", indicatorId);
         try {
             String queryUrl = Bd_INCOME_URL.replace("$code", indicatorId);
             String ret = restTemplate.getForObject(queryUrl, String.class);

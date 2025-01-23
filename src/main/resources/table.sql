@@ -1,11 +1,40 @@
 SELECT table_schema AS 'Database', SUM(data_length+index_length)/ 1024 / 1024 AS 'Size (MB)' FROM information_schema.tables GROUP BY table_schema;
+SELECT
+    TABLE_SCHEMA AS '数据库名',
+    TABLE_NAME AS '表名',
+    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS '数据大小(MB)',
+    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS '索引大小(MB)',
+    ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS '总大小(MB)'
+FROM
+    information_schema.TABLES where TABLE_SCHEMA = 'stock'
+ORDER BY
+    (DATA_LENGTH + INDEX_LENGTH) DESC;
+
 
 Create schema stock;
+
+CREATE TABLE bd_indicator_financial_summary (
+indicator_id VARCHAR(12),
+report_day VARCHAR(12),
+profit_gain_asc_num int,
+profit_gain_desc_num int,
+gross_gain_asc_num int,
+gross_gain_desc_num int,
+profit_gain_asc_ids TEXT,
+profit_gain_desc_ids TEXT,
+gross_gain_asc_ids TEXT,
+gross_gain_desc_ids TEXT,
+PRIMARY KEY(indicator_id,report_day)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE bd_financial (
 stock_id VARCHAR(12),
 report_day VARCHAR(12),
 content TEXT,
+gross_income VARCHAR(12),
+gross_income_gain DECIMAL(10,2),
+gross_profit VARCHAR(12),
+gross_profit_gain DECIMAL(10,2),
 PRIMARY KEY(stock_id,report_day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -215,13 +244,3 @@ customer_range_gain_post DECIMAL(10,2)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 alter table stock add column favorite INT;
 
-SELECT
-    TABLE_SCHEMA AS '数据库名',
-    TABLE_NAME AS '表名',
-    ROUND(DATA_LENGTH / 1024 / 1024, 2) AS '数据大小(MB)',
-    ROUND(INDEX_LENGTH / 1024 / 1024, 2) AS '索引大小(MB)',
-    ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS '总大小(MB)'
-FROM
-    information_schema.TABLES where TABLE_SCHEMA = 'stock'
-ORDER BY
-    (DATA_LENGTH + INDEX_LENGTH) DESC;

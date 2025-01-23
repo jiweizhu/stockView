@@ -3,6 +3,9 @@ Note:
 
 Reporter content: 5 day indicator: just to notice curve raising.
 
+// need manually update data
+1. baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
+2. baiduInfoService.updatefinancialSum();
 
 
 ====================

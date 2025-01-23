@@ -85,6 +85,11 @@ public class StockNameVO {
     public StockNameVO() {
     }
 
+    public StockNameVO(String stockName, String stockId) {
+        this.stockName = stockName;
+        this.stockId = stockId;
+    }
+
     public StockNameVO(String stockId) {
         this.stockId = stockId;
     }
