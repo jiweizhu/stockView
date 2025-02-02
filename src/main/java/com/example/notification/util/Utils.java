@@ -112,6 +112,26 @@ public class Utils {
         return gainPercentage;
     }
 
+    public static String divideReturnPercentString(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("denominator can not be zero!");
+        }
+        BigDecimal result = new BigDecimal(a)
+                .multiply(new BigDecimal(100)) // 转换为百分比
+                .divide(new BigDecimal(b), 2, RoundingMode.HALF_UP);
+        return result + "%";
+    }
+
+    public static double divideReturnPercent(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("denominator can not be zero!");
+        }
+        BigDecimal result = new BigDecimal(a)
+                .multiply(new BigDecimal(100)) // 转换为百分比
+                .divide(new BigDecimal(b), 2, RoundingMode.HALF_UP);
+        return result.doubleValue();
+    }
+
     public static String todayDate() {
         String today = format.format(new Date());
         return today;

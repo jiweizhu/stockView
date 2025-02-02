@@ -1,68 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>EasyUI DataGrid with Tagbox Editor</title>
-    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
-    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
-    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/color.css">
-    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
-    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
-    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.edatagrid.js"></script>
+    <meta charset="utf-8">
+    <title>Line Race - Apache ECharts Demo</title>
+    <style>
+        * {
+  margin: 0;
+  padding: 0;
+}
+#chart-container {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+    </style>
 </head>
 <body>
-<table id="dg" class="easyui-datagrid" ctrlSelect="true"
-       idField="stockId" pageSize="50"
-       pagination="true" rownumbers="true" singleSelect="true" style="width:800px;height:400px"
-       title="My Users" toolbar="#toolbar" url="/holdingStock/datagridList">
-    <thead>
-    <tr>
-        <th align="center" editor="{type:'combobox',options:{required:true,
-                url: '/holdingStock/stockList',
-                valueField:'id',
-                textField:'text' }}" field="stockId"
-            width="100">Id
-        </th>
-        <th align="center" editor="{type:'validatebox',options:{required:false}}" field="stockName" width="90">Name</th>
-        <th align="center" editor="{type:'numberbox',options:{precision:3}}" field="oneDayGain">oneDayGain</th>
-        <th align="center" editor="{type:'numberbox',options:{precision:3}}" field="nowPrice">nowPrice</th>
-        <th align="center" editor="{type:'numberspinner',options:{precision:0}}" field="buyInLot">buyInLot</th>
-        <th editor="{type:'numberbox',options:{precision:3}}" field="lastClosePrice">lastClosePrice</th>
-        <th editor="{type:'numberbox',options:{precision:3}}" field="gainPercent">gainPercent</th>
-        <th editor="{type:'numberbox',options:{precision:3}}" field="costPrice">buyInPrice</th>
-        <th align="center" editor="{type:'combobox',options:{
-                url: '/holdingStock/etfList',
-                valueField:'id',
-                textField:'text' }}" field="belongEtf" width="110">belong_etf
-        </th>
-        <th align="center" editor="{type:'tagbox',options:{
-                url: '/holdingStock/etfList',
-                valueField: 'id',
-                textField: 'text',
-                limitToList: true,
-                hasDownArrow: true,
-                multiple: true,
-                prompt: 'Select ETFs'
-            }}" field="belong" width="110">belong
-        </th>
-        <th editor="{type:'datebox'}" field="buyDay">buyDay</th>
-        <th editor="text" field="lastUpdatedTime">lastUpdatedTime</th>
-    </tr>
-    </thead>
-</table>
+<div id="chart-container"></div>
+<script src="https://registry.npmmirror.com/jquery/3.7.1/files/dist/jquery.min.js"></script>
+<script src="https://registry.npmmirror.com/echarts/5.6.0/files/dist/echarts.min.js"></script>
+<script>
 
-<script type="text/javascript">
-        $(function(){
-            $('#dg').datagrid({
-                onClickRow: function(index){
-                    $('#dg').datagrid('beginEdit', index);
-                },
-                onEndEdit: function(index, row){
-                    var ed = $('#dg').datagrid('getEditor', {index:index,field:'belong'});
-                    row.belong = $(ed.target).tagbox('getValues').join(',');
-                }
-            });
+var chartDom = document.getElementById('chart-container');
+var myChart = echarts.init(chartDom);
+var option;
+    $.get(
+      function (_rawData) {
+        run(_rawData);
+      }
+    );
+    function run(_rawData) {
+      // var countries = ['Australia', 'Canada', 'China', 'Cuba', 'Finland', 'France', 'Germany', 'Iceland', 'India', 'Japan', 'North Korea', 'South Korea', 'New Zealand', 'Norway', 'Poland', 'Russia', 'Turkey', 'United Kingdom', 'United States'];
+      const countries = [
+        'Finland',
+        'France',
+        'Germany',
+        'Iceland',
+        'Norway',
+        'Poland',
+        'Russia',
+        'United Kingdom'
+      ];
+      const datasetWithFilters = [];
+      const seriesList = [];
+      echarts.util.each(countries, function (country) {
+        var datasetId = 'dataset_' + country;
+        datasetWithFilters.push({
+          id: datasetId,
+          fromDatasetId: 'dataset_raw',
+          transform: {
+            type: 'filter',
+            config: {
+              and: [
+                { dimension: 'Year', gte: 1950 },
+                { dimension: 'Country', '=': country }
+              ]
+            }
+          }
         });
-    </script>
+        seriesList.push({
+          type: 'line',
+          datasetId: datasetId,
+          showSymbol: false,
+          name: country,
+          endLabel: {
+            show: true,
+            formatter: function (params) {
+              return params.value[3] + ': ' + params.value[0];
+            }
+          },
+          labelLayout: {
+            moveOverlap: 'shiftY'
+          },
+          emphasis: {
+            focus: 'series'
+          },
+          encode: {
+            x: 'Year',
+            y: 'Income',
+            label: ['Country', 'Income'],
+            itemName: 'Year',
+            tooltip: ['Income']
+          }
+        });
+      });
+      option = {
+        animationDuration: 10000,
+        dataset: [
+          {
+            id: 'dataset_raw',
+            source: _rawData
+          },
+          ...datasetWithFilters
+        ],
+        title: {
+          text: 'Income of Germany and France since 1950'
+        },
+        tooltip: {
+          order: 'valueDesc',
+          trigger: 'axis'
+        },
+        xAxis: {
+          type: 'category',
+          nameLocation: 'middle'
+        },
+        yAxis: {
+          name: 'Income'
+        },
+        grid: {
+          right: 140
+        },
+        series: seriesList
+      };
+      myChart.setOption(option);
+    }
+</script>
 </body>
 </html>

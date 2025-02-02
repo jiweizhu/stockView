@@ -52,7 +52,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
     @ResponseBody
     public Object getBdFinancialList(@PathVariable String stockId) throws Exception {
-        return baiduInfoService.readBdFinacialDataFromDbByStockId(stockId.split("_")[0]);
+        return baiduInfoService.readBdFinancialDataFromDbByStockId(stockId.split("_")[0]);
     }
 
     @RequestMapping(value = {"/bd/financialSum"})
@@ -131,6 +131,21 @@ public class BaiDuController {
         baiduInfoService.getFromNetAndStoreDay(950);
         baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
+    }
+
+    @RequestMapping(value = {"/bd/calculateRangeSort"})
+    @ResponseBody
+    public ResponseEntity calculateRangeSort() {
+        baiduInfoService.calculateRangeSort();
+        return ResponseEntity.ofNullable("finish calculateRangeSort");
+    }
+
+
+    @RequestMapping(value = {"/bd/updateFinancialReportSum"})
+    @ResponseBody
+    public ResponseEntity updateFinancialReportSum() {
+        baiduInfoService.updateFinancialReportSum();
+        return ResponseEntity.ofNullable("finish updateFinancialReportSum");
     }
 
 

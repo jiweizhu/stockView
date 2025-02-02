@@ -20,6 +20,7 @@ profit_gain_asc_num int,
 profit_gain_desc_num int,
 gross_gain_asc_num int,
 gross_gain_desc_num int,
+last_updated_time time,
 profit_gain_asc_ids TEXT,
 profit_gain_desc_ids TEXT,
 gross_gain_asc_ids TEXT,
@@ -35,6 +36,7 @@ gross_income VARCHAR(12),
 gross_income_gain DECIMAL(10,2),
 gross_profit VARCHAR(12),
 gross_profit_gain DECIMAL(10,2),
+last_updated_time time,
 PRIMARY KEY(stock_id,report_day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -42,12 +44,14 @@ CREATE TABLE range_sort_id (
 range_id VARCHAR(20) primary key,
 day_start DATE,
 day_end DATE,
+last_updated_time time,
 description VARCHAR(20)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 insert into range_sort_id (range_id, day_start, day_end, description) values ('aaa','20220701','20221028', '300 descreased 21%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('bbb','20221031','20230131', '300 increased 17.38%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ccc','20230721','20240202', '300 decreased 16.5%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ddd','20240202','20240311', '300 increased 10.7%');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('eee','20240521','20240913', '300 decreased ');
 
 CREATE TABLE range_sort_gain (
 range_id VARCHAR(12),
@@ -236,11 +240,10 @@ flip_end_day_ten DATE,
 last_updated_time time,
 belong_etf VARCHAR(12),
 stock_ids TEXT,
-
+favorite INT,
 customer_range VARCHAR(50), -- 20240601_20240615_20240620
 customer_range_gain_pre DECIMAL(10,2),
 customer_range_gain_post DECIMAL(10,2)
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-alter table stock add column favorite INT;
 

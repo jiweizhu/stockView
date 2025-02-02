@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -26,6 +27,8 @@ public class RangeSortIDVO {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "last_updated_time")
+    private Timestamp lastUpdatedTime;
 
     public RangeSortIDVO() {
     }

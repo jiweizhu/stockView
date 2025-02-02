@@ -5,8 +5,8 @@
     <title>EasyUI 动态生成表格</title>
     <link href="https://www.jeasyui.com/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
     <link href="https://www.jeasyui.com/easyui/themes/icon.css" rel="stylesheet" type="text/css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
-    <script src="https://www.jeasyui.com/easyui/jquery.easyui.min.js" type="text/javascript"></script>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/jquery.easyui.min.js" type="text/javascript"></script>
     <style>
         * {
           margin: 0;
@@ -21,7 +21,6 @@
 </head>
 <body>
 <table id="dataGrid"></table>
-
 <script>
     // 数值排序函数
     function numSorter(a, b) {
@@ -69,7 +68,12 @@
                         width: 90,
                         align: 'center',
                         sortable: true,
-                        sorter: numSorter // 使用数值排序函数
+                        sorter: numSorter, // 使用数值排序函数
+                        styler: function(value, row, index) {
+                        if (parseFloat(value) < 50) {
+                            return 'background-color: #f0f0f0;'; // 灰色背景
+                        }
+                    }
                     });
                 });
 

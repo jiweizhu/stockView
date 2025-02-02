@@ -25,6 +25,12 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
+        .income-container {
+            width: 400px;
+            height: 120px;
+            margin-bottom: 2px;
+            background-color: #FFFFCC;
+        }
         .range-container {
             width: 400px;
             height: 280px;
@@ -73,8 +79,83 @@
 <table border="1" id="myTable"></table>
 <script>
 const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-document.getElementById('getDivs').addEventListener('click', getDivs);
+async function createInComeChart(span) {
+   let chart = echarts.init(span);
+   const response = await fetch(`http://${serverIp}:8888/bd/financialList/` + span.id.replace('income_', ''));
+   const tableData = await response.json();
 
+   const reportDays = tableData.map(item => item.reportDay);
+   const grossIncomeData = tableData.map(item => item.grossIncomeGain);
+   const grossProfitData = tableData.map(item => item.grossProfitGain);
+
+   let option = {
+       tooltip: {
+           trigger: 'axis',
+           formatter: function (params) {
+               let tooltip = params[0].axisValue + '<br>';
+               params.forEach(item => {
+                   tooltip += `${item.marker} ${item.seriesName}: ${item.value}<br>`;
+               });
+               return tooltip;
+           }
+       },
+       grid: {
+        top: '3%',
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+       xAxis: {
+           type: 'category',
+           data: reportDays,
+           position: 'top'
+       },
+       yAxis: {
+           type: 'value',
+           position: 'right',
+           axisLabel: {
+                 formatter: '{value}%'
+           }
+       },
+       series: [
+           {
+               name: 'Income',
+               type: 'line',
+               data: grossIncomeData,
+               markLine: {
+                    symbol: 'none', // 不显示箭头
+                    lineStyle: {
+                        color: '#000', // 黑色
+                        width: 2,     // 线宽
+                        type: 'solid' // 实线
+                    },
+                    data: [
+                        {
+                            yAxis: 50, // 在 yAxis 的 50% 位置画线
+                            label: {
+                                show: false // 不显示标签
+                            }
+                        }
+                    ]
+                }
+           },
+           {
+               name: 'Profit',
+               type: 'line',
+               data: grossProfitData
+           }
+       ]
+   };
+
+   chart.setOption(option);
+
+   window.addEventListener('resize', () => chart.resize());
+   chart.resize();
+}
+</script>
+<script>
+document.getElementById('getDivs').addEventListener('click', getDivs);
 document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
           fetch(`http://${serverIp}:8888/bd/indicatorsView`)
@@ -117,6 +198,10 @@ async function getDivs() {
    const spans = document.querySelectorAll('div[id^="span_"]');
     spans.forEach(span => {
        createETFChart(span, data_300);
+    });
+    let income_spans = document.querySelectorAll('div[id^="income_"]');
+    income_spans.forEach(income_span => {
+        createInComeChart(income_span);
     });
 }
 
@@ -233,10 +318,6 @@ function filterRecentDays(dayCount) {
 
 
     const option = {
-        legend: {
-            data: ['MA5', 'MA10', 'stock','300日K'],
-            inactiveColor: '#777'
-        },
        yAxis: [
             {
                 type: 'value',
@@ -308,7 +389,8 @@ function filterRecentDays(dayCount) {
             axisLine: { lineStyle: { color: '#8392A5' } }
         },
         grid: {
-            bottom: 80
+           top: '3%',
+           bottom: 80
         },
         dataZoom: [
             {

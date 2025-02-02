@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -312,15 +313,36 @@ public class BaiduInfoService {
     }
 
 
-    public List<FinancialRespVO> readBdFinacialDataFromDbByStockId(String stockId) {
-        List<BdFinancialVO> byStockId = bdFinacialDao.findByStockId(stockId).stream().sorted(Comparator.comparing(BdFinancialVO::getReportDay)).toList();
+    public List<FinancialRespVO> readBdFinancialDataFromDbByStockId(String stockId) {
+
         List<FinancialRespVO> ret = new ArrayList<>();
-        //read data
-        byStockId.forEach(vo -> {
-            String reportDay = vo.getReportDay();
-            FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, vo.getGrossIncome(), vo.getGrossIncomeGain(), vo.getGrossProfit(), vo.getGrossProfitGain());
-            ret.add(newVo);
-        });
+        if (stockId.startsWith("s")) {
+            List<BdFinancialVO> byStockId = bdFinacialDao.findByStockId(stockId).stream().sorted(Comparator.comparing(BdFinancialVO::getReportDay)).toList();
+            //read data
+            byStockId.forEach(vo -> {
+                String reportDay = vo.getReportDay();
+                FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, vo.getGrossIncome(), vo.getGrossIncomeGain(), vo.getGrossProfit(), vo.getGrossProfitGain());
+                ret.add(newVo);
+            });
+        } else {
+            List<BdFinancialSumVO> byStockId = bdFinancialSumDao.findSumByIndicatorId(stockId).stream().sorted(Comparator.comparing(BdFinancialSumVO::getReportDay)).toList();
+            //read data
+            byStockId.forEach(vo -> {
+                String reportDay = vo.getReportDay();
+                Integer grossGainAscNum = vo.getGrossGainAscNum();
+                Integer grossGainDescNum = vo.getGrossGainDescNum();
+                Integer profitGainAscNum = vo.getProfitGainAscNum();
+                Integer profitGainDescNum = vo.getProfitGainDescNum();
+                int grossGainSum = grossGainAscNum + grossGainDescNum;
+                int profitGainSum = profitGainAscNum + profitGainDescNum;
+
+                double grossGainPercent = Utils.divideReturnPercent(grossGainAscNum, grossGainSum);
+                double profitGainPercent = Utils.divideReturnPercent(profitGainAscNum, profitGainSum);
+                FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, null, grossGainPercent, null, profitGainPercent);
+                ret.add(newVo);
+            });
+        }
+
         return ret;
     }
 
@@ -411,45 +433,65 @@ public class BaiduInfoService {
     }
 
 
-    public void updateTemp() throws JsonProcessingException {
+    public void updateTemp() {
         while (true) {
             List<BdFinancialVO> all = bdFinacialDao.findByStockIdLimit();
             if (all.isEmpty()) {
                 break;
             }
+            List<Callable<Void>> tasks = new ArrayList<>();
             for (BdFinancialVO vo : all) {
-                JsonNode rootNode = objectMapper.readTree(vo.getContent());
-                for (JsonNode jsonNode : rootNode) {
-                    if (jsonNode.get("data").get(0) == null || jsonNode.get("data").get(0).get("header") == null) {
-                        continue;
-                    }
-                    String header = jsonNode.get("data").get(0).get("header").toString();
-                    if (header.contains("综合收益总额")) {
-                        //save in db
-                        JsonNode jsonNode1 = objectMapper.readTree(header);
-                        String gain = jsonNode1.get(1).textValue();
-                        String total = jsonNode1.get(2).textValue();
-                        if (gain.contains("--") || total.contains("--")) {
-                            logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
+                tasks.add(() -> {
+                    JsonNode rootNode = objectMapper.readTree(vo.getContent());
+                    for (JsonNode jsonNode : rootNode) {
+                        if (jsonNode.get("data").get(0) == null || jsonNode.get("data").get(0).get("header") == null) {
                             continue;
                         }
-                        vo.setGrossIncome(total);
-                        vo.setGrossIncomeGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
-                    }
-                    if (header.contains("总营收")) {
-                        //save in db
-                        JsonNode jsonNode1 = objectMapper.readTree(header);
-                        String gain = jsonNode1.get(1).textValue();
-                        String total = jsonNode1.get(2).textValue();
-                        if (gain.contains("--") || total.contains("--")) {
-                            logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
-                            continue;
+                        String header = jsonNode.get("data").get(0).get("header").toString();
+                        if (header.contains("综合收益总额")) {
+                            //save in db
+                            JsonNode jsonNode1 = objectMapper.readTree(header);
+                            String gain = jsonNode1.get(1).textValue();
+                            String total = jsonNode1.get(2).textValue();
+                            if (gain.contains("--") || total.contains("--")) {
+                                logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
+                                continue;
+                            }
+                            vo.setGrossProfit(total);
+                            vo.setGrossProfitGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
                         }
-                        vo.setGrossProfit(total);
-                        vo.setGrossProfitGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
+                        if (header.contains("总营收")) {
+                            //save in db
+                            JsonNode jsonNode1 = objectMapper.readTree(header);
+                            String gain = jsonNode1.get(1).textValue();
+                            String total = jsonNode1.get(2).textValue();
+                            if (gain.contains("--") || total.contains("--")) {
+                                logger.info("=========data not fit=======stockId={}, reportDay={},jsonNode={} ", vo.getStockId(), vo.getReportDay(), jsonNode1);
+                                continue;
+                            }
+                            vo.setGrossIncome(total);
+                            vo.setGrossIncomeGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
+                        }
+                    }
+                    vo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+                    bdFinacialDao.save(vo);
+                    return null;
+                });
+            }
+
+            try {
+                logger.info("========update bd_financial ========start to invokeAll =tasks.size ={}", tasks.size());
+                List<Future<Void>> futures = executorService.getThreadPoolExecutor().invokeAll(tasks);
+                for (Future<Void> future : futures) {
+                    try {
+                        future.get();
+                    } catch (ExecutionException e) {
+                        logger.error("Error executing task", e.getCause());
                     }
                 }
-                bdFinacialDao.save(vo);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Task execution interrupted", e);
             }
         }
     }
@@ -617,17 +659,30 @@ public class BaiduInfoService {
         }
         List<Map<String, Object>> retJsonList = new ArrayList<>();
         // format is like {"name":"电力","2024四收入Asc":"15","2024四收入Desc":"5","2024四利润Asc":"15","2024四利润Desc":"5"}
+        // change to
+        // format is like {"name":"电力","2024四收入Asc(%)":"15","2024四利润Asc(%)":"15"}
         indicators.forEach(indicator -> {
-            List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(indicator.getStockId());
+            String stockId = indicator.getStockId();
+            List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(stockId);
             Map<String, Object> lineMap = new HashMap<>();
             for (BdFinancialSumVO vo : voList) {
-                lineMap.put("name", indicator.getStockName());
+                String stockName = indicator.getStockName();
+                StringBuilder sb = new StringBuilder();
+                sb.append("<a href=\"http://").append(Utils.getServerIp()).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockName).append("</a>");
+                lineMap.put("name", sb.toString());
                 String reportDay = vo.getReportDay();
                 reportDay = changeReportDayToChinese(reportDay);
-                lineMap.put(reportDay + "收Up", vo.getGrossGainAscNum());
-                lineMap.put(reportDay + "收De", vo.getGrossGainDescNum());
-                lineMap.put(reportDay + "利Up", vo.getProfitGainAscNum());
-                lineMap.put(reportDay + "利De", vo.getProfitGainDescNum());
+                Integer grossGainAscNum = vo.getGrossGainAscNum();
+                Integer grossGainDescNum = vo.getGrossGainDescNum();
+                Integer profitGainAscNum = vo.getProfitGainAscNum();
+                Integer profitGainDescNum = vo.getProfitGainDescNum();
+                int grossGainSum = grossGainAscNum + grossGainDescNum;
+                int profitGainSum = profitGainAscNum + profitGainDescNum;
+
+                String grossGainPercent = Utils.divideReturnPercentString(grossGainAscNum, grossGainSum);
+                String profitGainPercent = Utils.divideReturnPercentString(profitGainAscNum, profitGainSum);
+                lineMap.put("收Up" + reportDay, grossGainPercent);
+                lineMap.put("利Up" + reportDay, profitGainPercent);
             }
             retJsonList.add(lineMap);
         });
@@ -675,7 +730,7 @@ public class BaiduInfoService {
                         finSumVO.setGrossGainDescNum(finSumVO.getGrossGainDescNum() + 1);
                         finSumVO.setGrossGainDescIds(finSumVO.getGrossGainDescIds() + "," + stockId);
                     }
-                    if (financialVo.getGrossIncomeGain()  != null && financialVo.getGrossIncomeGain() > 0) {
+                    if (financialVo.getGrossIncomeGain() != null && financialVo.getGrossIncomeGain() > 0) {
                         finSumVO.setProfitGainAscNum(finSumVO.getProfitGainAscNum() + 1);
                         finSumVO.setProfitGainAscIds(finSumVO.getProfitGainAscIds() + "," + stockId);
                     } else {

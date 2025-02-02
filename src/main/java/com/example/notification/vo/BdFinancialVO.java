@@ -3,6 +3,8 @@ package com.example.notification.vo;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 @Data
 @Entity
 @IdClass(BdFinancialKey.class)
@@ -31,5 +33,8 @@ public class BdFinancialVO {
 
     @Column(name = "gross_profit_gain")
     private Double grossProfitGain;
+
+    @Column(name = "last_updated_time")
+    private Timestamp lastUpdatedTime;
 
 }
