@@ -703,6 +703,10 @@ public class BaiduInfoService {
         return reportDay;
     }
 
+    private static void updateStockHolderNum() {
+
+    }
+
 
     public void updateFinancialReportSum() {
         List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
@@ -737,6 +741,7 @@ public class BaiduInfoService {
                         finSumVO.setProfitGainDescNum(finSumVO.getProfitGainDescNum() + 1);
                         finSumVO.setProfitGainDescIds(finSumVO.getProfitGainDescIds() + "," + stockId);
                     }
+                    finSumVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
                     bdFinancialSumDao.save(finSumVO);
                 });
             }

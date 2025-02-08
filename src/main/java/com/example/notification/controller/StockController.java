@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +42,13 @@ public class StockController {
             ret.setCode(401);
         }
         return ret;
+    }
+
+    @RequestMapping(value = {"/stock/like/{stockId}"})
+    @ResponseBody
+    public void likeStock(@PathVariable String stockId) throws JsonProcessingException {
+        logger.info("Enter likeStock ========={}",stockId);
+        kLineMarketClosedService.likeStock(stockId);
     }
 
 }

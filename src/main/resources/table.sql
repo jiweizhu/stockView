@@ -13,6 +13,14 @@ ORDER BY
 
 Create schema stock;
 
+CREATE TABLE favorite (
+stock_id VARCHAR(12),
+indicator_id VARCHAR(12),
+description VARCHAR(500),
+PRIMARY KEY(stock_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+insert into favorite (stock_id, indicator_id) values ('sh600487','730200');
+
 CREATE TABLE bd_indicator_financial_summary (
 indicator_id VARCHAR(12),
 report_day VARCHAR(12),
@@ -20,7 +28,7 @@ profit_gain_asc_num int,
 profit_gain_desc_num int,
 gross_gain_asc_num int,
 gross_gain_desc_num int,
-last_updated_time time,
+last_updated_time TIMESTAMP,
 profit_gain_asc_ids TEXT,
 profit_gain_desc_ids TEXT,
 gross_gain_asc_ids TEXT,
@@ -36,7 +44,8 @@ gross_income VARCHAR(12),
 gross_income_gain DECIMAL(10,2),
 gross_profit VARCHAR(12),
 gross_profit_gain DECIMAL(10,2),
-last_updated_time time,
+holders int;
+last_updated_time TIMESTAMP ,
 PRIMARY KEY(stock_id,report_day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -44,7 +53,7 @@ CREATE TABLE range_sort_id (
 range_id VARCHAR(20) primary key,
 day_start DATE,
 day_end DATE,
-last_updated_time time,
+last_updated_time TIMESTAMP ,
 description VARCHAR(20)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 insert into range_sort_id (range_id, day_start, day_end, description) values ('aaa','20220701','20221028', '300 descreased 21%');
@@ -77,7 +86,7 @@ flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
 stock_ids TEXT,
-last_updated_time time
+last_updated_time TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE cn_daily_price (
@@ -136,7 +145,7 @@ flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
 stock_ids TEXT,
-last_updated_time time
+last_updated_time TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE bd_daily_price (
@@ -174,7 +183,7 @@ last_close_price DECIMAL(10,3),
 
 -- belong_etf VARCHAR(12),
 buy_day DATE,
-last_updated_time time
+last_updated_time TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE intraday_price(
@@ -237,10 +246,10 @@ flip_upward_days_ten INT,
 flip_gain_percent_ten DECIMAL(10,2),
 flip_day_ten DATE,
 flip_end_day_ten DATE,
-last_updated_time time,
+last_updated_time TIMESTAMP ,
 belong_etf VARCHAR(12),
+belong_bd_indicator VARCHAR(12),
 stock_ids TEXT,
-favorite INT,
 customer_range VARCHAR(50), -- 20240601_20240615_20240620
 customer_range_gain_pre DECIMAL(10,2),
 customer_range_gain_post DECIMAL(10,2)

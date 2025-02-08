@@ -2,9 +2,7 @@ package com.example.notification.service;
 
 import com.example.notification.constant.Constants;
 import com.example.notification.http.RestRequest;
-import com.example.notification.repository.StockDailyDao;
-import com.example.notification.repository.StockDao;
-import com.example.notification.repository.WeeklyPriceDao;
+import com.example.notification.repository.*;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -68,6 +66,12 @@ public class KLineMarketClosedService {
 
     @Autowired
     private StockDailyDao stockDailyDao;
+
+    @Autowired
+    private FavoriteDao favoriteDao;
+
+    @Autowired
+    private BdIndicatorDao bdIndicatorDao;
 
     @Autowired
     private WeeklyPriceDao weeklyPriceDao;
@@ -628,6 +632,15 @@ public class KLineMarketClosedService {
             result.add(strings);
         }
         return result;
+    }
+
+    public void likeStock(String stockId) {
+        //todo
+        //1.need to update stock belong bd_indicator
+        //2.like/unlike button
+
+        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
+
     }
 }
 
