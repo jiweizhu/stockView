@@ -145,7 +145,7 @@ public class Controller {
     @RequestMapping(value = {"/delete_HistoryData"})
     @ResponseBody
     public ResponseEntity deleteHistoryData() {
-        Object body = kLineMarketClosedService.delete_HistoryData();
+        Object body = kLineMarketClosedService.deleteDayHistoryData();
         return ResponseEntity.ofNullable(body);
     }
 
@@ -258,7 +258,7 @@ public class Controller {
     @ResponseBody
     public String generateReportEveryDay() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, JsonProcessingException, InterruptedException {
         logger.info("Enter method generateReportEveryDay====");
-        Object body = kLineMarketClosedService.delete_HistoryData();
+        Object body = kLineMarketClosedService.deleteDayHistoryData();
         kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
         etfViewService.generateReportEveryDay();
         return "ok";

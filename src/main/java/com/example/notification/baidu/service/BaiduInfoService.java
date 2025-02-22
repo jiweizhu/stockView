@@ -294,7 +294,7 @@ public class BaiduInfoService {
         id.setUpwardDaysTen(upwardDaysTen);
     }
 
-    public String indicatorsView() {
+    public String indicatorsView(boolean isWeek) {
         List<BdIndicatorVO> list = bdIndicatorDao.findupwardDaysIndicator();
         list.addAll(bdIndicatorDao.findDownwardDaysIndicator());
 //        Comparator<BdIndicatorVO> comparator = Comparator.comparing(BdIndicatorVO::getUpwardDaysFive);
@@ -565,15 +565,15 @@ public class BaiduInfoService {
     public void getFromNetAndStoreWeek(boolean isInitData) {
         List<String> ids = bdIndicatorDao.findIds();
         ids.add("sh000300");
-        logger.info("========getFromNetAndStoreWeek ========ids.size ={}====={}", ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
         LocalDate today = LocalDate.now();
-        LocalDate fiveDaysAgo = today.minusDays(10);
+        LocalDate fiveDaysAgo = today.minusWeeks(50);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String tenDaysBefore = fiveDaysAgo.format(formatter);
         if (isInitData) {
             tenDaysBefore = "2013-08-01";
         }
+        logger.info("========getFromNetAndStoreWeek ========ids.size ={}==tenDaysBefore={}=={}", ids.size(), tenDaysBefore, ids);
         for (String stockId : ids) {
             String finalTenDaysBefore = tenDaysBefore;
             tasks.add(() -> {
@@ -591,7 +591,7 @@ public class BaiduInfoService {
                 // save new in db
                 int loopNum = 0;
                 for (IndicatorDayVO dayVO : fromNetList) {
-                    if (exsitingDaySet.contains(dayVO.getDay()) || dayVO.getMa20avgprice() == null) {
+                    if (exsitingDaySet.contains(dayVO.getDay()) || dayVO.getMa10avgprice() == null) {
                         continue;
                     }
                     loopNum++;
@@ -605,7 +605,6 @@ public class BaiduInfoService {
                     newVo.setIntradayLow(BigDecimal.valueOf(dayVO.getLow()));
                     newVo.setDayAvgFive(BigDecimal.valueOf(dayVO.getMa5avgprice()));
                     newVo.setDayAvgTen(BigDecimal.valueOf(dayVO.getMa10avgprice()));
-                    newVo.setDayAvgTwenty(BigDecimal.valueOf(dayVO.getMa20avgprice()));
                     bdIndicatorWeeklyDao.save(newVo);
                 }
                 logger.info("========getFromNetAndStoreWeek =====stockId={}===exsitingDaySet=={}=fromNetList size={}===loopNum=={}", stockId, exsitingDaySet.size(), fromNetList.size(), loopNum);

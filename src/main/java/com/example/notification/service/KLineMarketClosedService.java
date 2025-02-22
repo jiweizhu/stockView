@@ -206,9 +206,9 @@ public class KLineMarketClosedService {
         }
     }
 
-    public void getWeekHistoryPriceAndStoreInDb(Integer days) {
-        logger.info("Enter getWeekHistoryPriceAndStoreInDb method ========days=" + days);
-        final Integer daysToGet = days;
+    public void getWeekHistoryPriceAndStoreInDb(Integer weeks) {
+        logger.info("Enter getWeekHistoryPriceAndStoreInDb method ========weeks={}", weeks);
+        final Integer weeksToGet = weeks;
         List<Callable<Void>> tasks = new ArrayList<>();
         //iterator to query 50day price history and calculate 10day price, and store in db
 //        List<StockNameVO> etfs = getAllEtfs();
@@ -218,7 +218,7 @@ public class KLineMarketClosedService {
                 // 降低速度，避免网站保护
                 Thread.sleep(10);
                 WebQueryParam webQueryParam = new WebQueryParam();
-                webQueryParam.setDaysToQuery(daysToGet);
+                webQueryParam.setDaysToQuery(weeksToGet);
                 webQueryParam.setIdentifier(etfVO.getStockId());
                 storeHistoryWeeklyPrice(webQueryParam, etfVO);
                 return null;
@@ -600,25 +600,30 @@ public class KLineMarketClosedService {
     private EntityManager entityManager;
 
     @Transactional
-    public Object delete_HistoryData() {
+    public Object deleteDayHistoryData() {
         // also delete today's daily price as sometimes i need to know the real price while the market opening.
         String dayStr = formatter_yyyy_mm_day.format((new Date(System.currentTimeMillis())));
-        String preFiveDay = formatter_yyyy_mm_day.format((new Date(LocalDate.now().minusDays(5).toEpochDay())));
         entityManager.createNativeQuery("delete from daily_price where day = '" + dayStr + "'").executeUpdate();
-
-
-        LocalDate today = LocalDate.now();
-        LocalDate fiveDaysAgo = today.minusDays(5);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String formattedDate = fiveDaysAgo.format(formatter);
-
         entityManager.createNativeQuery("delete from daily_price where day_avg_five is null or day_avg_ten is null or day_gain_of_five is null").executeUpdate();
-        entityManager.createNativeQuery("delete from bd_indicator_wk_price where day > '" + formattedDate + "'").executeUpdate();
 
         entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null ;").executeUpdate();
 
         return "ok";
     }
+
+    @Transactional
+    public Object deleteWkHistoryData(int weeks) {
+        // also delete today's daily price as sometimes i need to know the real price while the market opening.
+        LocalDate today = LocalDate.now();
+        LocalDate fiveDaysAgo = today.minusWeeks(weeks);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = fiveDaysAgo.format(formatter);
+
+        entityManager.createNativeQuery("delete from bd_indicator_wk_price where day > '" + formattedDate + "'").executeUpdate();
+
+        return "ok";
+    }
+
 
     public Object addNewStock(String stockId) {
         return null;

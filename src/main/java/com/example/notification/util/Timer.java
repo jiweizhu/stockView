@@ -70,7 +70,13 @@ public class Timer {
     public void updateEveryWeek() {
         try {
             logger.info("====cron==start updateEveryWeek=====");
+            //for bd indicator from baidu
             baiduInfoService.getFromNetAndStoreWeek(false);
+
+            //for stock from Tencent
+            kLineMarketClosedService.deleteWkHistoryData(2);
+            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(3);
+
 //            baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
         } catch (Exception e) {
@@ -84,13 +90,9 @@ public class Timer {
     public void generateReportWhenMarketClose() {
         try {
             logger.info("Start cron job generateReportEveryMarketDay=====");
-            Object body = kLineMarketClosedService.delete_HistoryData();
-            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(2);
-            etfViewService.generateReportEveryDay();
+            Object body = kLineMarketClosedService.deleteDayHistoryData();
 
-            //2 delete intraday_price data before one week
-            String oneWeekAgeDay = Utils.getOneWeekAgeDay();
-            intraDayService.removeOneWeekAgoData(oneWeekAgeDay);
+            etfViewService.generateReportEveryDay();
 
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);

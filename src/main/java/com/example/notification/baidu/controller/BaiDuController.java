@@ -6,6 +6,7 @@ import com.example.notification.baidu.service.BaiduInfoService;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.constant.Constants;
 import com.example.notification.repository.BdIndicatorDao;
+import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ public class BaiDuController {
 
     @Autowired
     private BdIndicatorDao bdIndicatorDao;
+    @Autowired
+    private KLineMarketClosedService kLineMarketClosedService;
 
     @RequestMapping(value = {"/bd/rangeSort/view"})
     @ResponseBody
@@ -94,11 +97,11 @@ public class BaiDuController {
         return ResponseEntity.ofNullable(body);
     }
 
-    @RequestMapping(value = {"/bd/indicatorsView"})
+    @RequestMapping(value = {"/bd/indicatorsView/{isWeek}"})
     @ResponseBody
-    public ResponseEntity indicatorsView() {
+    public ResponseEntity indicatorsView(@PathVariable String isWeek) {
 //        baiduInfoService.calculateIndicatorsAvg();
-        Object body = baiduInfoService.indicatorsView();
+        Object body = baiduInfoService.indicatorsView(Boolean.parseBoolean(isWeek));
         return ResponseEntity.ofNullable(body);
     }
 
@@ -128,8 +131,8 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/init/getFromNetAndStore"})
     @ResponseBody
     public ResponseEntity getFromNetAndStore() {
-        baiduInfoService.getFromNetAndStoreDay(950);
-        baiduInfoService.getFromNetAndStoreWeek(false);
+        baiduInfoService.getFromNetAndStoreDay(250);
+//        baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish getFromNetAndStore");
     }
 
@@ -153,7 +156,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateIndicatorBelongStocks() {
-        baiduInfoService.updateFinancialReportSum();
+        baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
@@ -161,7 +164,8 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-        baiduInfoService.updateTemp();
+//        baiduInfoService.handleIndicatorDownRangeDay();
+//        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
         return ResponseEntity.ok("SuccessFully done! ");
     }
 
