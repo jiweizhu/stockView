@@ -14,7 +14,7 @@ import java.util.List;
 public class Constants {
     private static final Logger logger = LoggerFactory.getLogger(Constants.class);
     // should set bigger than 9, then it can get 10 days avg value
-    public static Integer MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY = 15;
+    public static Integer MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY = 50;
 
     public static String TOTAL = "total";
     public static String ROWS = "rows";
@@ -40,7 +40,11 @@ public class Constants {
     public static int FAVORITE_STOCK = 100;
 
     public static Integer rangeSize = 700;
+    public static Integer rangeWkSize = 580;
 
+    public static Integer getRangeWkSize() {
+        return rangeWkSize;
+    }
 
     //season
     public static String SEASON_DAY_0401 = "0401";

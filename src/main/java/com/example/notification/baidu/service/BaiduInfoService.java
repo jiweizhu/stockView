@@ -77,6 +77,9 @@ public class BaiduInfoService {
     private BdIndicatorWeeklyDao bdIndicatorWeeklyDao;
 
     @Autowired
+    private BdIndicatorDropDao bdIndicatorDropDao;
+
+    @Autowired
     private RangeSortIdDao rangeSortIdDao;
 
     @Autowired
@@ -138,7 +141,7 @@ public class BaiduInfoService {
             stockId = stockId.split("_")[0];
         }
 
-        Integer rangeSize = getRangeSize();
+        Integer rangeSize = getRangeWkSize();
 
         List<BdIndicatorWeeklyVO> voList = bdIndicatorWeeklyDao.findByIndexStockIdOrderByDay(stockId, rangeSize).stream().sorted(Comparator.comparing(BdIndicatorWeeklyVO::getDay)).toList();
         //as baidu restrict to query
@@ -498,10 +501,11 @@ public class BaiduInfoService {
 
     public void getFromNetAndStoreDay(int daysBofore) {
         List<String> ids = bdIndicatorDao.findIds();
-        //local debug
-//        ids = new ArrayList<>();
-//        ids.add("750200");
-        //local debug
+        if (Utils.isWinSystem()) {
+            ids = new ArrayList<>();
+            ids.add("730200");
+            ids.add("770100");
+        }
         String formattedDaysBefore = Utils.getFormattedDaysBefore(daysBofore);
         logger.info("========getFromNetAndStoreDay =====formattedDaysBefore={}==ids.size ={}====={}", formattedDaysBefore, ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
