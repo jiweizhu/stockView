@@ -247,6 +247,12 @@ public class KLineMarketClosedService {
         List<Callable<Void>> tasks = new ArrayList<>();
         //iterator to query 50day price history and calculate 10day price, and store in db
         List<StockNameVO> storedStocks = storedStocks();
+        if (Utils.isWinSystem()) {
+//            entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null where stock_id = 'sh600009' ;").executeUpdate();
+            StockNameVO byId = stockDao.findById("sh600009").get();
+            storedStocks.clear();
+            storedStocks.add(byId);
+        }
         for (StockNameVO stockNameVO : storedStocks) {
             tasks.add(() -> {
                 if (stockNameVO.getGainPercentFive() != null) {
@@ -486,6 +492,11 @@ public class KLineMarketClosedService {
         logger.info("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
+        if (Utils.isWinSystem()) {
+            StockNameVO byId = stockDao.findById("sh600009").get();
+            stocks.clear();
+            stocks.add(byId);
+        }
         for (StockNameVO stockNameVO : stocks) {
             //loop to calculate each etf
             String stockId = stockNameVO.getStockId();
@@ -618,7 +629,7 @@ public class KLineMarketClosedService {
         if (stockId.contains("_")) {
             stockId = stockId.split("_")[0];
         }
-        List<WeekPriceVO> resultList = weeklyPriceDao.findAllByStockId(stockId, Constants.rangeSize);
+        List<WeekPriceVO> resultList = weeklyPriceDao.findAllByStockId(stockId, Constants.getRangeWkSize());
         Collections.reverse(resultList);
         ArrayList<String[]> result = new ArrayList<>();
         for (WeekPriceVO weekPriceVO : resultList) {
