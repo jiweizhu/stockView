@@ -12,6 +12,17 @@ ORDER BY
 
 
 Create schema stock;
+-- if indicator drop 10%, filter stable stock
+---choose 5 day avg drop more than 10%
+CREATE TABLE indicator_drop (
+indicator_id VARCHAR(12),
+day_start DATE,
+day_end DATE,
+last_updated_time TIMESTAMP ,
+drop_percent DECIMAL(10,2),
+stock_ids TEXT,
+PRIMARY KEY(indicator_id,day_start)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE favorite (
 stock_id VARCHAR(12),
@@ -219,6 +230,8 @@ PRIMARY KEY(stock_id, day)
 
 CREATE TABLE daily_price (
 stock_id VARCHAR(12) NOT NULL,
+day DATE NOT NULL,
+opening_price DECIMAL(10,3),
 closing_price DECIMAL(10,3),
 intraday_high DECIMAL(10,3),
 intraday_low DECIMAL(10,3),
