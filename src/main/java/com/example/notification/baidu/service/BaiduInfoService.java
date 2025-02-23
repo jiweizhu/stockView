@@ -323,6 +323,9 @@ public class BaiduInfoService {
         stocksFlowMap.put(3, new ArrayList<>());
         stocksFlowMap.put(4, new ArrayList<>());
         stocksFlowMap.put(5, new ArrayList<>());
+        stocksFlowMap.put(6, new ArrayList<>());
+        stocksFlowMap.put(7, new ArrayList<>());
+        stocksFlowMap.put(8, new ArrayList<>());
         stocksFlowIndexList.clear();
         stocksFlowIndexList.add(-1);
         stocksFlowIndexList.add(-2);
@@ -332,6 +335,9 @@ public class BaiduInfoService {
         stocksFlowIndexList.add(3);
         stocksFlowIndexList.add(4);
         stocksFlowIndexList.add(5);
+        stocksFlowIndexList.add(6);
+        stocksFlowIndexList.add(7);
+        stocksFlowIndexList.add(8);
     }
 
     // todo optimize buildHtmlForBd
@@ -406,7 +412,7 @@ public class BaiduInfoService {
             if (StringUtils.hasLength(stockIds)) {
                 belongStockNum = stockIds.split(",").length;
             }
-            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]);
+            tdHtml.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 tdHtml.append("(").append(belongStockNum).append(")");
             }
@@ -426,7 +432,7 @@ public class BaiduInfoService {
 
             if (isRangeSort || isWeek) {
                 //do stocksFlowMap iteration
-                int columnNum = index % 5;
+                int columnNum = index % 8;
                 stocksFlowMap.get(columnNum + 1).add(tdHtml.toString());
             } else {
                 if (stocksFlowMap.get(upwardDaysNum) == null) {
