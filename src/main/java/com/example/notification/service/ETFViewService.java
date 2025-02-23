@@ -67,6 +67,9 @@ public class ETFViewService {
     private FavoriteDao favoriteDao;
 
     @Autowired
+    private BdFinacialDao bdFinacialDao;
+
+    @Autowired
     private RangeSortIdDao rangeSortIdDao;
 
     @Autowired
@@ -312,8 +315,8 @@ public class ETFViewService {
         return html.toString();
     }
 
-    private static Map<Integer, List<String>> stocksFlowMap = new LinkedHashMap<>();
-    private static List<Integer> stocksFlowIndexList = new ArrayList<>();
+    private static final Map<Integer, List<String>> stocksFlowMap = new LinkedHashMap<>();
+    private static final List<Integer> stocksFlowIndexList = new ArrayList<>();
 
     private void constructMap() {
         stocksFlowMap.put(-3, new ArrayList<>());
@@ -353,7 +356,6 @@ public class ETFViewService {
         if (StringUtils.hasLength(Constants.getRangeSortDay())) {
             isRangeSort = true;
             //sort by range gain
-
             List<StockNameVO> sortedList = new ArrayList<>();
             String rangeSortDay = getRangeSortDay();
             List<RangeSortGainVO> findAllByRangeId = rangeSortGainDao.findAllByRangeId(rangeSortDay);
@@ -364,6 +366,32 @@ public class ETFViewService {
             industryEtfs = sortedList;
         }
 
+        //sort by profit income gain
+        if (!isRangeSort) {
+            industryEtfs.forEach(vo -> {
+                List<BdFinancialVO> reportVos = bdFinacialDao.findLast2ByStockId(vo.getStockId());
+                if (reportVos.size() != 2 || reportVos.get(0).getGrossIncomeGain() == null || reportVos.get(0).getGrossProfitGain() == null
+                        || reportVos.get(1).getGrossIncomeGain() == null || reportVos.get(1).getGrossProfitGain() == null) {
+                    return;
+                }
+                BdFinancialVO fVo0 = reportVos.get(0);
+                BdFinancialVO fVo1 = reportVos.get(1);
+
+                if (fVo0.getGrossProfitGain() > fVo1.getGrossProfitGain() && fVo0.getGrossIncomeGain() > fVo1.getGrossIncomeGain()) {
+                    vo.setSortTypeNumber(1);
+                } else if (fVo0.getGrossProfitGain() > fVo1.getGrossProfitGain() && fVo0.getGrossIncomeGain() < fVo1.getGrossIncomeGain()) {
+                    vo.setSortTypeNumber(2);
+                } else if (fVo0.getGrossProfitGain() < fVo1.getGrossProfitGain() && fVo0.getGrossIncomeGain() > fVo1.getGrossIncomeGain()) {
+                    vo.setSortTypeNumber(3);
+                } else if (fVo0.getGrossProfitGain() < fVo1.getGrossProfitGain() && fVo0.getGrossIncomeGain() < fVo1.getGrossIncomeGain()) {
+                    vo.setSortTypeNumber(4);
+                }
+            });
+        }
+
+
+
+        // loop to turn to html
         for (int index = 0; index < industryEtfs.size(); index++) {
 
             StringBuilder tdHtml = new StringBuilder();
@@ -402,7 +430,7 @@ public class ETFViewService {
             }
 
             boolean favorite = false;
-            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");
+            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\" ").append("sortNum=\"").append(stock.getSortTypeNumber()).append("\"").append(">");
             if (stock.getStockId().startsWith("sh") || stockId.startsWith("sz")) {
                 String urlPrefix = "<a href=\"https://gushitong.baidu.com/stock/ab-";
                 if (isETF) {
@@ -421,7 +449,7 @@ public class ETFViewService {
                     tdHtml.append(urlPrefix).append(stockId.substring(2)).append("\">");
                 }
             } else {
-                // here stockId is bdIndictorId
+                // here stockId is bdIndicatorId
                 tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#")
                         .append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             }
@@ -430,7 +458,7 @@ public class ETFViewService {
             if (StringUtils.hasLength(stockIds)) {
                 belongStockNum = stockIds.split(",").length;
             }
-            tdHtml.append("<b style=font-size:15px >").append(id_name.split("_")[1]);
+            tdHtml.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 if (favoriteStockNum > 0) {
                     tdHtml.append("(").append(belongStockNum).append("|").append(favoriteStockNum).append(")");
@@ -455,8 +483,11 @@ public class ETFViewService {
                 tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
             }
 
-            tdHtml.append("<div class=\"income-container\" ").append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
+            tdHtml.append("<div class=\"income-container\" ").append("id = \"").append("income_").append(id_name).append("\" ></div>")
+                    .append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
 
+
+            //put into stocksFlowMap
             if (isRangeSort) {
                 //do stocksFlowMap iteration
                 int columnNum = index % 5;
@@ -473,6 +504,8 @@ public class ETFViewService {
                 }
             }
         }
+
+
         if (!isRangeSort) {
             //sort 国企 in the top
             //if it is range_sort, no need to run

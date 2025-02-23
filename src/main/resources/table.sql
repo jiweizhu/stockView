@@ -72,6 +72,7 @@ insert into range_sort_id (range_id, day_start, day_end, description) values ('b
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ccc','20230721','20240202', '300 decreased 16.5%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ddd','20240202','20240311', '300 increased 10.7%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('eee','20240521','20240913', '300 decreased ');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('fff','20240913','20250221', '2025 开年涨势 ');
 
 CREATE TABLE range_sort_gain (
 range_id VARCHAR(12),
@@ -245,6 +246,7 @@ PRIMARY KEY(stock_id, day)
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,
 stock_name VARCHAR(20),
+sort_type_number INT,
 capital_type INT,
 upward_days_five INT,
 gain_percent_five DECIMAL(10,2),

@@ -77,7 +77,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch(`http://${serverIp}:8888/bd/indicatorsView`)
+          fetch(`http://${serverIp}:8888/bd/indicatorsView/true`)
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');

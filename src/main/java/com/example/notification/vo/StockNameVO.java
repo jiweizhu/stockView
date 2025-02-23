@@ -23,8 +23,16 @@ public class StockNameVO {
     @Column(name = "stockName")
     private String stockName;
 
+    // sort type number
+    //1, profit: increase income: increase
+    //2, profit: increase income: decrease
+    //3, profit: decrease income: increase
+    //4, profit: decrease income: decrease
+    @Column(name = "sort_type_number")
+    private Integer sortTypeNumber = 1;
+
     @Column(name = "capital_type")
-    private Integer capitalType;
+    private Integer capitalType = 300;
 
     @Column(name = "stock_ids")
     private String stockIds;

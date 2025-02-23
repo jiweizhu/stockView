@@ -16,4 +16,8 @@ public interface BdIndicatorWeeklyDao extends JpaRepository<BdIndicatorWeeklyVO,
 
     @Query(value = "SELECT * FROM bd_indicator_wk_price where stock_id = ?1 ", nativeQuery = true)
     List<BdIndicatorWeeklyVO> findAllByStockId(String stock_id);
+
+
+    @Query(value = "SELECT count(*) FROM bd_indicator_wk_price where stock_id = ?1 ", nativeQuery = true)
+    int lineCountByStockId(String stock_id);
 }

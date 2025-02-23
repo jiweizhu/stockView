@@ -10,12 +10,14 @@ Reporter content: 5 day indicator: just to notice curve raising.
 
 ====================
 issues:
-1.The decimal place is wrong
-2.sz002916 and sh002916 both exist! how to filter?
+1.The decimal place is wrong --- done 20250101
+2.sz002916 and sh002916 both exist! how to filter? --- manually delete. done 20250101
 
 =================================
 
 need to do:
+5. top 10 holders if has 社保？！
+4. add 市值 ?
 3.IMPORTANT!----calculate the upAndDown program! to choose which ETF is the best to do upAndDown!---done
 2.if not a opening day, skip to do realtime query! In order to void sending the same email as yesterday's.---done
 1.down 10days price---done;20230729

@@ -158,7 +158,7 @@ async function createInComeChart(span) {
 document.getElementById('getDivs').addEventListener('click', getDivs);
 document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
-          fetch(`http://${serverIp}:8888/bd/indicatorsView`)
+          fetch(`http://${serverIp}:8888/bd/indicatorsView/false`)
              .then(response => response.text())
              .then(data => {
                 const dataContainer = document.getElementById('myTable');

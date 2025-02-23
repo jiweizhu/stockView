@@ -23,7 +23,6 @@ public class Constants {
     public static String CONSTANT_ETF = "etf";
 
     //green   #00FF00
-
     public static int YangQi = 100;
     public static String YangQi_Color = "#FF8888";
     //朱红色(pink) #FF8888 央企100
@@ -35,6 +34,10 @@ public class Constants {
     public static int MinQi = 300;
     public static String MinQi_Color = "#C0C0C0";
     //grey   #C0C0C0 民企300
+
+
+    //sort type number keywords
+    public static String YangQiColor = "#FF8888";
 
     // favorite stock
     public static int FAVORITE_STOCK = 100;

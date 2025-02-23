@@ -6,24 +6,32 @@
 </head>
 <body>
 <style>
-.toggleButton {
-background-color: grey; /* 设置按钮背景颜色 */
-color: black; /* 按钮文字颜色 */
-padding: 10px 15px; /* 内边距 */
-border: none; /* 去掉边框 */
-border-radius: 5px; /* 圆角 */
-cursor: pointer; /* 鼠标悬浮样式 */
-text-align: center; /* 居中 */
-text-decoration: none; /* 去掉下划线 */
-}
+    .toggleButton {
+    background-color: grey; /* 设置按钮背景颜色 */
+    color: black; /* 按钮文字颜色 */
+    padding: 10px 15px; /* 内边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 5px; /* 圆角 */
+    cursor: pointer; /* 鼠标悬浮样式 */
+    text-align: center; /* 居中 */
+    text-decoration: none; /* 去掉下划线 */
+    }
 </style>
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+
+<div id="container"></div>
+<h3>View Data</h3>
+<!--let stocks view sort by profit gain-->
+<button class="toggleButton" id="gainSort">Gain Sort</button><span id="sortResult">gainSort=true</span>
+<button class="toggleButton" id="sortByFiveOrTenDay">sortByFiveOrTenDay</button>
+
 <script>
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
     document.addEventListener('DOMContentLoaded', function() {
-    const url = 'http://124.71.19.6:8888/listStockFiles';
+    const url = `http://${serverIp}:8888/listStockFiles`;
 
     fetch(url)
         .then(response => {
@@ -38,27 +46,36 @@ text-decoration: none; /* 去掉下划线 */
         .catch(error => {
             console.error('There has been a problem with your fetch operation:', error);
         });
-});
+  });
 
+  document.getElementById('gainSort').addEventListener('click', function() {
+    fetch(`http://${serverIp}:8888/gainSort`)
+        .then(response => response.text()) // 修改为获取文本数据
+        .then(data => {
+            document.getElementById('sortResult').innerText = data; // 将返回的字符串显示在sortResult元素中
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+  });
 
 </script>
-
-<div id="container"></div>
-<h3>View Data</h3>
-<button class="toggleButton" id="sortByFiveOrTenDay" >sortByFiveOrTenDay</button>
-<button class="toggleButton" id="sortByGainFiveOrTenDay" >Gain Sort(Five Ten)</button>
 
 <h2>===================baidu=============</h2>
 <a href=""><font size="5">http://124.71.19.6:8888/range/500</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicators.html"><font size="5">bdIndicators real time sorting</font></a><br>
 <a href="http://124.71.19.6:8888/bdIndicatorsKlineView.html"><font size="5">bdIndicatorsKlineView</font></a><br>
-<a href="http://124.71.19.6:8888/bdIndicatorsKlineWeekView.html"><font size="5">bdIndicatorsKlineWeekView.html</font></a><br>
+<a href="http://124.71.19.6:8888/bdIndicatorsKlineWeekView.html"><font
+        size="5">bdIndicatorsKlineWeekView.html</font></a><br>
 <a href="http://124.71.19.6:8888/wholeEtfsView.html"><font size="5">wholeEtfsView.html</font></a><br>
-<a href="http://124.71.19.6:8888/rangeSort.html"><font size="5">rangeSort.html 设定日期范围，查看涨跌情况__</font><a href="http://124.71.19.6:8888/bd/calculateRangeSort">calculateRangeSort</a></a><br>
-<a href="http://124.71.19.6:8888/bdFinancialSum.html"><font size="5">bdFinancialSum.html 行业财务排序__</font><a href="http://124.71.19.6:8888/bd/updateFinancialReportSum">updateFinancialReportSum</a></a><br>
+<a href="http://124.71.19.6:8888/rangeSort.html"><font size="5">rangeSort.html 设定日期范围，查看涨跌情况__</font><a
+        href="http://124.71.19.6:8888/bd/calculateRangeSort">calculateRangeSort</a></a><br>
+<a href="http://124.71.19.6:8888/bdFinancialSum.html"><font size="5">bdFinancialSum.html 行业财务排序__</font><a
+        href="http://124.71.19.6:8888/bd/updateFinancialReportSum">updateFinancialReportSum</a></a><br>
 <h2>===================baidu=============</h2>
 <h2>============files=============</h2>
-<div id = "targetFiles"></div>
+<div id="targetFiles"></div>
 <a href="http://124.71.19.6:8888/stocksDayView.html"><font size="5">targetFile.html</font></a><br>
 
 <h2>===================CN=============</h2>
