@@ -618,7 +618,7 @@ public class BaiduInfoService {
                         target.setGrossIncomeGain(Double.parseDouble(gain.substring(0, gain.indexOf("%"))));
                     }
                 }
-                if(target.getGrossProfit() == null){
+                if (target.getGrossProfit() == null) {
                     continue;
                 }
                 target.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
@@ -626,6 +626,7 @@ public class BaiduInfoService {
             }
         }
     }
+
     public void getFromNetAndStoreDay(int daysBofore) {
         List<String> ids = bdIndicatorDao.findIds();
         if (Utils.isWinSystem()) {
@@ -892,12 +893,13 @@ public class BaiduInfoService {
         stockIds.forEach(stockId -> {
 
             BdFinancialVO lastByStockId = bdFinacialDao.findLastByStockId(stockId);
+            if (lastByStockId == null || lastByStockId.getGrossProfit() == null || lastByStockId.getGrossIncome() == null) {
+                logger.info("========updateStockfinancialType=====data error=====stockVo={}", lastByStockId);
+                return;
+            }
             // set stock profit type
             String grossProfit = lastByStockId.getGrossProfit();
-            String grossIncome = lastByStockId.getGrossIncome();
-            if (grossProfit == null || grossIncome == null) {
-                logger.info("========updateStockfinancialType=====data error=====stockVo={}", lastByStockId);
-            }
+
             boolean profitNegative = grossProfit.contains("-");
             StockNameVO vo = stockDao.findById(stockId).get();
             if (!profitNegative && lastByStockId.getGrossProfitGain() > 0) {
