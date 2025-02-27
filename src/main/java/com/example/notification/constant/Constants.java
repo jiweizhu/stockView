@@ -22,6 +22,16 @@ public class Constants {
     public static String CONSTANT_RANGE_SORT = "range_sort";
     public static String CONSTANT_ETF = "etf";
 
+    // 400 profit>0 & profitGain > 0
+    // 300 profit>0 & profitGain < 0
+    // 200 profit< 0 & profitGain > 0
+    // 100 profit< 0 & profitGain < 0
+    public static int PROFIT_TYPE_100 = 100;
+    public static int PROFIT_TYPE_200 = 200;
+    public static int PROFIT_TYPE_300 = 300;
+    public static int PROFIT_TYPE_400 = 400;
+
+
     //green   #00FF00
     public static int YangQi = 100;
     public static String YangQi_Color = "#FF8888";

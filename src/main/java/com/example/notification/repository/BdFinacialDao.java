@@ -20,4 +20,8 @@ public interface BdFinacialDao extends JpaRepository<BdFinancialVO, BdFinancialK
 
     @Query(value = "SELECT * FROM bd_financial where stock_id = ?1  order by report_day desc limit 2 ", nativeQuery = true)
     List<BdFinancialVO> findLast2ByStockId(String stock_id);
+
+    @Query(value = "SELECT * FROM bd_financial " +
+            "where stock_id = ?1  order by report_day desc limit 1 ", nativeQuery = true)
+    BdFinancialVO findLastByStockId(String stock_id);
 }

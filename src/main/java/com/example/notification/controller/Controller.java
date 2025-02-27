@@ -7,6 +7,7 @@ import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
 import com.example.notification.util.EmailUtil;
+import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
 import com.example.notification.vo.StockNameVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,13 +61,15 @@ public class Controller {
 
     //370400#医药商业 for debug locally
     @Getter
-    private static String targetFile = "bd_370400";
+    private static String targetFile = "bd_730200";
+
     public static void setTargetFileSize(String targetFileSize) {
         Controller.targetFileSize = targetFileSize;
     }
 
     @Getter
     private static String targetFileSize;
+
     public static void setTargetFile(String targetFile) {
         Controller.targetFile = targetFile;
     }
@@ -82,6 +85,9 @@ public class Controller {
 
     @RequestMapping(value = {"/listTargetFileStocks/{target}"})
     public ModelAndView listTargetFileStocks(@PathVariable String target) throws Exception {
+        if (Utils.isWinSystem() && target == null) {
+            target = "bd_730200";
+        }
         if (target.contains(CONSTANT_BD) || target.contains(CONSTANT_ETF)) {
             // return bd indicator or ETF stocks
             targetFile = target;

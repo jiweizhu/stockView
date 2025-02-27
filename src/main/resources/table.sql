@@ -246,7 +246,10 @@ PRIMARY KEY(stock_id, day)
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,
 stock_name VARCHAR(20),
-sort_type_number INT,
+financial_type INT,
+market_value VARCHAR(12),
+gross_profit_gain DECIMAL(10,2),
+
 capital_type INT,
 upward_days_five INT,
 gain_percent_five DECIMAL(10,2),

@@ -58,6 +58,12 @@ public class BaiDuController {
         return baiduInfoService.readBdFinancialDataFromDbByStockId(stockId.split("_")[0]);
     }
 
+    @RequestMapping(value = {"/bd/updateStockfinancialType"})
+    @ResponseBody
+    public Object updateStockfinancialType() throws Exception {
+        return baiduInfoService.updateStockfinancialType();
+    }
+
     @RequestMapping(value = {"/bd/financialSum"})
     @ResponseBody
     public Object financialSum() {
@@ -164,7 +170,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-//        baiduInfoService.handleIndicatorDownRangeDay();
+        baiduInfoService.updateStockfinancialType();
 //        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
         return ResponseEntity.ok("SuccessFully done! ");
     }
