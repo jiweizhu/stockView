@@ -31,6 +31,12 @@
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
+         .income-container-grey {
+            width: 400px;
+            height: 120px;
+            margin-bottom: 2px;
+            background-color: #D3D3D3;
+        }
         .range-container {
             width: 400px;
             height: 280px;
@@ -129,6 +135,66 @@
            window.addEventListener('resize', () => chart.resize());
            chart.resize();
         }
+
+    async function createInComeChartTemp(span) {
+           let chart = echarts.init(span);
+           const response = await fetch(`http://${serverIp}:8888/bd/financialList/` + span.id.replace('income_', ''));
+           const tableData = await response.json();
+
+           const reportDays = tableData.map(item => item.reportDay);
+           const grossIncomeData = tableData.map(item => item.grossIncomeGain);
+           const grossProfitData = tableData.map(item => item.grossProfitGain);
+
+           let option = {
+               tooltip: {
+                   trigger: 'axis',
+                   formatter: function (params) {
+                       let tooltip = params[0].axisValue + '<br>';
+                       params.forEach(item => {
+                           tooltip += `${item.marker} ${item.seriesName}: ${item.value}<br>`;
+                       });
+                       return tooltip;
+                   }
+               },
+               grid: {
+                top: '3%',
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+              },
+               xAxis: {
+                   type: 'category',
+                   data: reportDays,
+                   position: 'top'
+               },
+               yAxis: {
+                   type: 'value',
+                   position: 'right',
+                   axisLabel: {
+                         formatter: '{value}%'
+                   }
+               },
+               series: [
+                   {
+                       name: 'Income',
+                       type: 'line',
+                       data: grossIncomeData
+                   },
+                   {
+                       name: 'Profit',
+                       type: 'line',
+                       data: grossProfitData
+                   }
+               ]
+           };
+
+           chart.setOption(option);
+
+           window.addEventListener('resize', () => chart.resize());
+           chart.resize();
+        }
+
 </script>
 <script>
 let isWeekly = false;

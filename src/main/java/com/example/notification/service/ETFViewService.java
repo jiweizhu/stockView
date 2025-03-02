@@ -474,8 +474,12 @@ public class ETFViewService {
             if (isRangeSort) {
                 tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
             }
-
-            tdHtml.append("<div class=\"income-container\" ").append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
+            if(stock.getFinancialType() != null && stock.getFinancialType()<=200){
+                tdHtml.append("<div class=\"income-container-grey\" ");
+            }else {
+                tdHtml.append("<div class=\"income-container\" ");
+            }
+            tdHtml.append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
 
 
             //put into stocksFlowMap
