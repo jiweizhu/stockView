@@ -5,6 +5,7 @@ import com.example.notification.repository.HoldingStockDao;
 import com.example.notification.repository.IntraDayPriceDao;
 import com.example.notification.repository.StockDailyDao;
 import com.example.notification.repository.StockDao;
+import com.example.notification.responseVo.MinuteRespVO;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.*;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -66,13 +67,11 @@ public class IntraDayService {
 
         //etfs need to get minute data as well
         List<StockNameVO> stockDaoAll = stockDao.findAll();
-        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf")).forEach(
-                etfVo -> {
-                    HoldingStockVO holdingStockVO = new HoldingStockVO();
-                    holdingStockVO.setStockId(etfVo.getStockId());
-                    holdingStockDaoAll.add(holdingStockVO);
-                }
-        );
+        stockDaoAll.stream().filter(vo -> vo.getStockName().toLowerCase().contains("etf")).forEach(etfVo -> {
+            HoldingStockVO holdingStockVO = new HoldingStockVO();
+            holdingStockVO.setStockId(etfVo.getStockId());
+            holdingStockDaoAll.add(holdingStockVO);
+        });
 
         Date today = new Date(System.currentTimeMillis());
         String formattedToday = dateFormat.format(today);
@@ -150,6 +149,34 @@ public class IntraDayService {
     public void clearTodayIntraPrice() {
         String todayDate = Utils.getTodayDate();
         intraDayPriceDao.clearTodayIntraPrice(todayDate);
+    }
+
+    public Object getMinuteById(String stockId) {
+//        if (Utils.isWinSystem()) {
+//            stockId = "sh600636";
+//        }
+        WebQueryParam webQueryParam = new WebQueryParam();
+        webQueryParam.setIdentifier(stockId);
+        QueryFromTencentResponseVO intraDayData = restRequest.getIntraDayData(webQueryParam);
+        if (null == intraDayData) {
+            return null;
+        }
+        Map data = (Map) ((Map) intraDayData.getData().get(stockId)).get("data");
+
+        List object = (List) ((Map) ((Map) intraDayData.getData().get(stockId)).get("qt")).get(stockId);
+        Object tmpObj = object.get(4);
+        double lastDayCloseVal = Double.parseDouble(tmpObj.toString());
+        List<String> minutePriceList = (List) data.get("data");
+
+        List<MinuteRespVO> ret = new ArrayList<>();
+        for (String line : minutePriceList) {
+            String[] split = line.split("\\s+");
+            MinuteRespVO vo = new MinuteRespVO();
+            vo.setMinute(split[0]);
+            vo.setPrice(Utils.calculateDayGainPercentage(new BigDecimal(split[1]), new BigDecimal(lastDayCloseVal)).doubleValue());
+            ret.add(vo);
+        }
+        return ret;
     }
 }
 

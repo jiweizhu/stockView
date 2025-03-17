@@ -137,12 +137,21 @@ public class HoldingController {
     }
 
 
-//    @RequestMapping(value = {"/getPriceByminute"})
-//    @ResponseBody
-//    public Object getPriceByminute() throws ParseException {
-//        logger.info("======= Enter HoldingController getPriceByminute =========");
-//        Object list = intraDayService.getPriceByminute();
-//        return list;
-//    }
+    @RequestMapping(value = {"/getPriceByminute"})
+    @ResponseBody
+    public Object getPriceByminute() throws ParseException {
+        logger.info("======= Enter HoldingController getPriceByminute =========");
+        Object list = intraDayService.getPriceByminute();
+        return list;
+    }
+
+    @RequestMapping(value = {"/getMinuteById/{stockId}"})
+    @ResponseBody
+    public Object getMinuteById(@PathVariable String stockId) throws ParseException {
+        logger.info("======= Enter HoldingController getMinuteById =========");
+        Object list = intraDayService.getMinuteById(stockId);
+        return list;
+    }
+
 
 }

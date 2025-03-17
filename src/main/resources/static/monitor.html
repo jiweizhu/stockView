@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>Time Series Chart</title>
+    <style>
+        body {
+            background-color: #fff;
+            color: #000;
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+        }
+        .chart-container {
+            width: 25%;
+            height: 280px;
+            box-sizing: border-box;
+        }
+        .chart-row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<div class="chart-row">
+    <div id="sh000001" name="上指" class="chart-container"></div>
+    <div id="sz399300" name="沪深300" class="chart-container"></div>
+    <div id="sz000852" name="中证1000" class="chart-container"></div>
+    <div id="sh000688" name="科创50" class="chart-container"></div>
+    <div id="sz399673" name="创业板50" class="chart-container"></div>
+</div>
+<script src="https://echarts.apache.org/zh/js/vendors/echarts/dist/echarts.min.js"></script>
+<script>
+    async function fetchDataAndRenderChart(dom) {
+        const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+        var myChart = echarts.init(dom, null, {
+            renderer: 'canvas'
+        });
+
+        try {
+            const elementName = dom.attributes.name.value;
+            const elementId = dom.id;
+            const response = await fetch(`http://${serverIp}:8888/getMinuteById/${elementId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const tableData = await response.json();
+
+            if (!tableData || tableData.length === 0) {
+                console.error(`Data is empty or invalid for ${elementId}.`);
+                return;
+            }
+
+            const percentageData = tableData.map(item => item.price);
+            const minValue = Math.min(...percentageData);
+            const maxValue = Math.max(...percentageData);
+            const range = maxValue - minValue;
+
+            const xAxisData = Array.from({ length: 242 }, (_, i) => i);
+            const seriesData = Array(242).fill(NaN);
+
+            tableData.forEach((item, index) => {
+                seriesData[index] = item.price;
+            });
+
+            var option = {
+                backgroundColor: '#fff',
+                title: {
+                    text: elementName,
+                    left: 'center',
+                    bottom: 0,
+                    textStyle: {
+                        color: '#000',
+                        fontSize: 12
+                    }
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '10%',
+                    top: '10%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'category',
+                    data: xAxisData,
+                    axisLine: { lineStyle: { color: '#000' } },
+                    axisLabel: {
+                        show: false,
+                        interval: 60
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    min: minValue - range * 0.1,
+                    max: maxValue + range * 0.1,
+                    splitNumber: 5,
+                    axisLine: { lineStyle: { color: '#000' } },
+                    axisLabel: {
+                        color: '#000',
+                        formatter: function (value) {
+                            return value.toFixed(2);
+                        }
+                    },
+                    splitLine: { lineStyle: { color: '#ccc' } }
+                },
+                series: [{
+                    data: seriesData,
+                    type: 'line',
+                    lineStyle: {
+                        color: function (param) {
+                            return param.value > 0 ? 'pink' : '#000';
+                        },
+                        width: 1
+                    },
+                    itemStyle: { color: '#000' },
+                    markPoint: {
+                        data: (seriesData[tableData.length - 1] !== NaN && tableData.length - 1 >= 0) ? [
+                            {
+                                name: '最后一个点',
+                                value: seriesData[tableData.length - 1],
+                                xAxis: tableData.length - 1,
+                                yAxis: seriesData[tableData.length - 1]
+                            }
+                        ] : []
+                    }
+                }],
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: '#eee',
+                    textStyle: { color: '#000' },
+                    borderWidth: 0,
+                    formatter: function (params) {
+                        if (params && params.length > 0) {
+                            const data = params[0].data;
+                            const value = data.toFixed(2);
+                            return `
+                                ${params[0].name}<br/>
+                                <span style="display:inline-block;margin-right:5px;border-radius:10px;width:10px;height:10px;background-color:${params[0].color};"></span>
+                                ${value}
+                            `;
+                        }
+                        return '';
+                    }
+                }
+            };
+            myChart.setOption(option);
+            window.addEventListener('resize', myChart.resize);
+        } catch (error) {
+            console.error(`Error fetching data for ${dom.id}:`, error);
+        }
+    }
+
+    const chartContainers = document.querySelectorAll('.chart-container');
+    chartContainers.forEach(container => {
+        fetchDataAndRenderChart(container);
+    });
+</script>
+</body>
+</html>
