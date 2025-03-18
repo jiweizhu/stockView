@@ -20,9 +20,20 @@
             display: flex;
             flex-wrap: wrap;
         }
+          #stopwatch {
+            position: fixed;
+            top: 10px;
+            left: 10px; /* 修改为左上角 */
+            font-size: 16px;
+            background-color: #eee;
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 1000; /* 设置较高的 z-index 值 */
+        }
     </style>
 </head>
 <body>
+<div id="stopwatch">00:00:00</div>
 <div class="chart-row">
     <div id="sh000001" name="上指" class="chart-container"></div>
     <div id="sz399300" name="沪深300" class="chart-container"></div>
@@ -152,10 +163,36 @@
         }
     }
 
-    const chartContainers = document.querySelectorAll('.chart-container');
-    chartContainers.forEach(container => {
-        fetchDataAndRenderChart(container);
-    });
+   const chartContainers = document.querySelectorAll('.chart-container');
+
+    function refreshCharts() {
+        chartContainers.forEach(container => {
+            fetchDataAndRenderChart(container);
+        });
+    }
+
+    refreshCharts();
+
+    setInterval(refreshCharts, 60000);
+
+    // 秒表功能
+    const stopwatchElement = document.getElementById('stopwatch');
+    let seconds = 0;
+
+    function updateStopwatch() {
+        seconds++;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainingSeconds = seconds % 60;
+
+        const formattedHours = hours.toString().padStart(2, '0');
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
+
+        stopwatchElement.textContent = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
+
+    setInterval(updateStopwatch, 1000);
 </script>
 </body>
 </html>

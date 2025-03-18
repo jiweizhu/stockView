@@ -795,7 +795,12 @@ public class BaiduInfoService {
         indicators.forEach(indicator -> {
             String stockId = indicator.getStockId();
             List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(stockId);
-            int length = bdIndicatorDao.findStockIdsByIndicatorId(indicator.getStockId()).split(",").length;
+            String stockIdsByIndicatorId = bdIndicatorDao.findStockIdsByIndicatorId(stockId);
+            if(!StringUtils.hasLength(stockIdsByIndicatorId)){
+                logger.info("=====Error====Not found by findStockIdsByIndicatorId=={}",indicator);
+                return;
+            }
+            int length = stockIdsByIndicatorId.split(",").length;
             Map<String, Object> lineMap = new HashMap<>();
             for (BdFinancialSumVO vo : voList) {
                 String stockName = indicator.getStockName();
