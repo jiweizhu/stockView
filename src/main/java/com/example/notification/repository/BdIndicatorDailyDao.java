@@ -18,13 +18,13 @@ public interface BdIndicatorDailyDao extends JpaRepository<BdIndicatorDailyVO, B
     @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 order by day desc", nativeQuery = true)
     List<BdIndicatorDailyVO> findAllByStockId(String stock_id);
 
-    @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 order by day desc limit 500", nativeQuery = true)
-    List<BdIndicatorDailyVO> findAllByStockIdLimit(String stock_id);
+    @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 order by day desc limit ?2", nativeQuery = true)
+    List<BdIndicatorDailyVO> findAllByStockIdLimit(String stock_id, int days);
 
     @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 order by day desc limit ?2", nativeQuery = true)
     List<BdIndicatorDailyVO> findLastDaysByNumAndId(String stock_id, int lastNumDays);
 
-    @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 and day = ?2", nativeQuery = true)
+    @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 and day <= ?2 order by day desc limit 1", nativeQuery = true)
     BdIndicatorDailyVO findByStockIdAndDay(String stock_id, Date day);
 
 }

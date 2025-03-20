@@ -52,6 +52,21 @@ public class BaiDuController {
         return retList;
     }
 
+    @RequestMapping(value = {"/bd/queryIndexDropRangeAll"})
+    @ResponseBody
+    public Object queryIndexDropRangeAll() {
+        logger.info("======Enter method queryIndexDropRangeAll========");
+        return baiduInfoService.queryIndexDropRangeAll();
+    }
+
+    @RequestMapping(value = {"/bd/DropRange/{stockId}"})
+    @ResponseBody
+    public Object queryIndexDropRangeByIndex(@PathVariable String stockId) {
+        logger.info("======Enter method queryIndexDropRange========");
+        return baiduInfoService.queryIndexDropRange(stockId);
+    }
+
+
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
     @ResponseBody
     public Object getBdFinancialList(@PathVariable String stockId) throws Exception {
@@ -170,7 +185,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-        baiduInfoService.updateStockfinancialType();
+        baiduInfoService.calculateDropRange();
 //        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
         return ResponseEntity.ok("SuccessFully done! ");
     }

@@ -79,6 +79,20 @@
        plain="true">Cancel</a>
 </div>
 
+<table class="easyui-datagrid" ctrlSelect="true"
+       id="dg2" pageSize="50"
+       pagination="false" rownumbers="true" singleSelect="true" style="width:300px;height:250px"
+       title="Index Range Sort" toolbar="#toolbar">
+    <thead>
+    <tr>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="indicatorId" width="120" >indicatorId</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="indicatorName" width="120" >indicatorName</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayStart" width="120" >dayStart</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayEnd" width="120" >dayEnd</th>
+        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="dropPercent" width="120" >dropPercent</th>
+    </tr>
+    </thead>
+</table>
 <script type="text/javascript">
     var refreshInterval;
     var nextRefreshTime;
@@ -93,6 +107,21 @@
             view: detailview,
             autoUpdateDetail: true,
             sortName: 'rangeId',
+            sortOrder: 'asc',
+            detailFormatter: function(rowIndex, rowData){}
+    })
+    });
+
+    $(function(){
+        $('#dg2').edatagrid({
+            url: '/bd/queryIndexDropRangeAll',
+            remoteSort: false,
+            onSave: function(index, row) {
+                        $('#dg2').edatagrid('reload');
+                    },
+            view: detailview,
+            autoUpdateDetail: true,
+            sortName: 'indicatorId',
             sortOrder: 'asc',
             detailFormatter: function(rowIndex, rowData){}
     })

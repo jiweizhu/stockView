@@ -32,5 +32,15 @@ public class BdIndicatorDropVO {
     @Column(name = "stock_ids")
     private String stockIds;
 
+    public BdIndicatorDropVO() {
+    }
 
+    public BdIndicatorDropVO(String indicatorId, Date dayStart, Date dayEnd, Timestamp lastUpdatedTime, BigDecimal dropPercent, String stockIds) {
+        this.indicatorId = indicatorId;
+        this.dayStart = dayStart;
+        this.dayEnd = dayEnd;
+        this.lastUpdatedTime = lastUpdatedTime;
+        this.dropPercent = dropPercent;
+        this.stockIds = stockIds;
+    }
 }

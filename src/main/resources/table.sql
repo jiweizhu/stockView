@@ -60,6 +60,7 @@ last_updated_time TIMESTAMP ,
 PRIMARY KEY(stock_id,report_day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- this table is for 300 index range
 CREATE TABLE range_sort_id (
 range_id VARCHAR(20) primary key,
 day_start DATE,
@@ -73,6 +74,9 @@ insert into range_sort_id (range_id, day_start, day_end, description) values ('c
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ddd','20240202','20240311', '300 increased 10.7%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('eee','20240521','20240913', '300 decreased ');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('fff','20240913','20250221', '2025 开年涨势 ');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('ff1','20241112','20250110', '2025 开年涨势 ');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('ggg','20250113','20250319', '2025 3月 ');
+insert into range_sort_id (range_id, day_start, day_end, description) values ('hhh','','20250113', '2025 March down');
 
 CREATE TABLE range_sort_gain (
 range_id VARCHAR(12),

@@ -1,10 +1,10 @@
 package com.example.notification.baidu.service;
 
 import com.example.notification.baidu.respVo.FinancialRespVO;
+import com.example.notification.baidu.respVo.IndexDropRangeRespVO;
 import com.example.notification.baidu.vo.BdFinancialNetVO;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
-import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
 import com.example.notification.http.RestRequest;
 import com.example.notification.repository.*;
@@ -103,6 +103,84 @@ public class BaiduInfoService {
             });
         });
     }
+
+
+    private static Map<String, String> BDINDEXMAP = new HashMap<>();
+
+    public String getIndexNameById(String indexId) {
+        if (!StringUtils.hasLength(BDINDEXMAP.get(indexId))) {
+            List<BdIndicatorVO> list = bdIndicatorDao.findAll();
+            list.forEach(indicatorVO -> {
+                BDINDEXMAP.put(indicatorVO.getStockId(), indicatorVO.getStockName());
+            });
+        }
+        return BDINDEXMAP.get(indexId);
+    }
+
+    public List<IndexDropRangeRespVO> queryIndexDropRangeAll() {
+        List<BdIndicatorDropVO> all = bdIndicatorDropDao.findAll();
+        List<IndexDropRangeRespVO> list = new ArrayList<>();
+        all.forEach(vo -> {
+            IndexDropRangeRespVO indicatorVO = new IndexDropRangeRespVO();
+            BeanUtils.copyProperties(vo, indicatorVO);
+            indicatorVO.setDropPercent(vo.getDropPercent().doubleValue());
+            indicatorVO.setIndicatorName(getIndexNameById(vo.getIndicatorId()));
+            list.add(indicatorVO);
+        });
+        return list;
+    }
+
+    public List<IndexDropRangeRespVO> queryIndexDropRange(String id) {
+        List<BdIndicatorDropVO> all = bdIndicatorDropDao.findByIndexId(id);
+        List<IndexDropRangeRespVO> list = new ArrayList<>();
+        all.forEach(vo -> {
+            IndexDropRangeRespVO indicatorVO = new IndexDropRangeRespVO();
+            BeanUtils.copyProperties(vo, indicatorVO);
+            indicatorVO.setDropPercent(vo.getDropPercent().doubleValue());
+            indicatorVO.setIndicatorName(getIndexNameById(id));
+            list.add(indicatorVO);
+        });
+        return list;
+    }
+
+    public void calculateDropRange() {
+        List<String> ids = bdIndicatorDao.findIds();
+        for (String id : ids) {
+            //find 5day avg drop if exceeds 10%
+            List<BdIndicatorDailyVO> allByStockIdLimit = bdIndicatorDailyDao.findAllByStockIdLimit(id, 200);
+            int minusDay = 0;
+            BdIndicatorDailyVO dropEndDay = null;
+            BdIndicatorDailyVO dropStartDay;
+            boolean flip = false;
+            for (int i = 0; i < allByStockIdLimit.size() - 1; i++) {
+                if (flip) {
+                    flip = false;
+                    minusDay = 0;
+                }
+                BigDecimal today = allByStockIdLimit.get(i).getDayAvgFive();
+                BigDecimal beforeDay = allByStockIdLimit.get(i + 1).getDayAvgFive();
+                if (today == null || beforeDay == null) {
+                    continue;
+                }
+                if (today.compareTo(beforeDay) < 0) {
+                    if (minusDay == 0) {
+                        dropEndDay = allByStockIdLimit.get(i);
+                    }
+                    minusDay++;
+                } else if (today.compareTo(beforeDay) >= 0 && minusDay > 0) {
+                    flip = true;
+                    //handle drop percent
+                    dropStartDay = allByStockIdLimit.get(i);
+                    BigDecimal dropPercent = Utils.calculateDayGainPercentage(dropEndDay.getDayAvgFive(), dropStartDay.getDayAvgFive());
+                    if (dropPercent.compareTo(new BigDecimal("-10")) < 0) {
+                        BdIndicatorDropVO entity = new BdIndicatorDropVO(id, dropStartDay.getDay(), dropEndDay.getDay(), new Timestamp(System.currentTimeMillis()), dropPercent, null);
+                        bdIndicatorDropDao.save(entity);
+                    }
+                }
+            }
+        }
+    }
+
 
     public List<IndicatorVO> queryBaiduIndustriesRealInfo() {
         List<IndicatorVO> list = restRequest.queryBaiduIndustriesRealInfo();
@@ -368,7 +446,7 @@ public class BaiduInfoService {
         });
 
         boolean isRangeSort = false;
-        if (StringUtils.hasLength(Constants.getRangeSortDay())) {
+        if (StringUtils.hasLength(getRangeSortDay())) {
             isRangeSort = true;
             //sort by range gain
 
@@ -405,8 +483,7 @@ public class BaiduInfoService {
 
             tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");
             // here stockId is bdIndictorId
-            tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#")
-                    .append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+            tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             String stockIds = stock.getStockIds();
             int belongStockNum = 0;
             if (StringUtils.hasLength(stockIds)) {
@@ -416,13 +493,8 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 tdHtml.append("(").append(belongStockNum).append(")");
             }
-            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")")
-                    .append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")");
-            tdHtml.append("<br>")
-                    .append("</div>")
-                    .append("<div style=\"background-color:").append(tenBackGroudColor).append("\">")
-                    .append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")")
-                    .append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
+            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")");
+            tdHtml.append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
             // add rangeSort gain
             if (isRangeSort) {
                 tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
@@ -796,8 +868,8 @@ public class BaiduInfoService {
             String stockId = indicator.getStockId();
             List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(stockId);
             String stockIdsByIndicatorId = bdIndicatorDao.findStockIdsByIndicatorId(stockId);
-            if(!StringUtils.hasLength(stockIdsByIndicatorId)){
-                logger.info("=====Error====Not found by findStockIdsByIndicatorId=={}",indicator);
+            if (!StringUtils.hasLength(stockIdsByIndicatorId)) {
+                logger.info("=====Error====Not found by findStockIdsByIndicatorId=={}", indicator);
                 return;
             }
             int length = stockIdsByIndicatorId.split(",").length;
