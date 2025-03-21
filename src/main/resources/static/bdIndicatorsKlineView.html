@@ -67,11 +67,10 @@
     </style>
 </head>
 <body>
-<button id="getDivs">getDivs</button>
-<button id="generateChart">generateChart</button>
+
 <table border="1" id="mainTable">
 </table>
-<a href="#" class="easyui-linkbutton" onclick="toggleColumn()">Toggle Column</a>
+<button id="toggleWk"  class="easyui-linkbutton" >toggleWk</button>
 <button class="toggleButton" id="toggle_300" >Toggle 300K</button>
 <button class="toggleButton" id="toggle_700" >Last 700</button>
 <button class="toggleButton" id="toggle_500" >Last 500</button>
@@ -79,83 +78,9 @@
 <table border="1" id="myTable"></table>
 <script>
 const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
-async function createInComeChart(span) {
-   let chart = echarts.init(span);
-   const response = await fetch(`http://${serverIp}:8888/bd/financialList/` + span.id.replace('income_', ''));
-   const tableData = await response.json();
-
-   const reportDays = tableData.map(item => item.reportDay);
-   const grossIncomeData = tableData.map(item => item.grossIncomeGain);
-   const grossProfitData = tableData.map(item => item.grossProfitGain);
-
-   let option = {
-       tooltip: {
-           trigger: 'axis',
-           formatter: function (params) {
-               let tooltip = params[0].axisValue + '<br>';
-               params.forEach(item => {
-                   tooltip += `${item.marker} ${item.seriesName}: ${item.value}<br>`;
-               });
-               return tooltip;
-           }
-       },
-       grid: {
-        top: '3%',
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-       xAxis: {
-           type: 'category',
-           data: reportDays,
-           position: 'top'
-       },
-       yAxis: {
-           type: 'value',
-           position: 'right',
-           axisLabel: {
-                 formatter: '{value}%'
-           }
-       },
-       series: [
-           {
-               name: 'Income',
-               type: 'line',
-               data: grossIncomeData,
-               markLine: {
-                    symbol: 'none', // 不显示箭头
-                    lineStyle: {
-                        color: '#000', // 黑色
-                        width: 2,     // 线宽
-                        type: 'solid' // 实线
-                    },
-                    data: [
-                        {
-                            yAxis: 50, // 在 yAxis 的 50% 位置画线
-                            label: {
-                                show: false // 不显示标签
-                            }
-                        }
-                    ]
-                }
-           },
-           {
-               name: 'Profit',
-               type: 'line',
-               data: grossProfitData
-           }
-       ]
-   };
-
-   chart.setOption(option);
-
-   window.addEventListener('resize', () => chart.resize());
-   chart.resize();
-}
 </script>
 <script>
-document.getElementById('getDivs').addEventListener('click', getDivs);
+var isWeekly = false;
 document.addEventListener('DOMContentLoaded', function () {
        function loadTableData() {
           fetch(`http://${serverIp}:8888/bd/indicatorsView/false`)
@@ -186,12 +111,24 @@ document.addEventListener('DOMContentLoaded', function () {
 <!-- loadIndexTableData();-->
 var data_300;
 async function get300Data() {
-    data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());;
+    if(isWeekly) {
+        data_300 = await fetch(`http://${serverIp}:8888/bd/wk/stock/sh000300`).then(response => response.json());
+    }else{
+        data_300 = await fetch(`http://${serverIp}:8888/stock/sh510300`).then(response => response.json());;
+    }
 }
 get300Data();
 
-function toggleColumn() {
-  $('.hide-column').toggle();
+ // 按钮事件绑定
+function bindEvents() {
+    document.getElementById('toggleWk').addEventListener('click', () => {
+        isWeekly = !isWeekly;
+        get300Data();
+        const spans = document.querySelectorAll('div[id^="span_"]');
+            spans.forEach(span => {
+            createETFChart(span, data_300);
+        });
+    });
 }
 
 async function getDivs() {
@@ -199,10 +136,7 @@ async function getDivs() {
     spans.forEach(span => {
        createETFChart(span, data_300);
     });
-    let income_spans = document.querySelectorAll('div[id^="income_"]');
-    income_spans.forEach(income_span => {
-        createInComeChart(income_span);
-    });
+    bindEvents();
 }
 
 setTimeout(function() {
@@ -213,7 +147,7 @@ setTimeout(function() {
 
 
 async function createETFChart(span, data_300) {
-    let rawData = await fetch(`http://${serverIp}:8888/bd/stock/` + span.id.replace('span_', '')).then(response => response.json());
+    let rawData = await fetch(`http://${serverIp}:8888/bd/${isWeekly ? 'wk/' : ''}stock/` + span.id.replace('span_', '')).then(response => response.json());
 
     let dates = rawData.map(item => item[0]);
     let stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
