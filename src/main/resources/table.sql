@@ -68,6 +68,7 @@ day_end DATE,
 last_updated_time TIMESTAMP ,
 description VARCHAR(20)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+insert into range_sort_id (range_id, day_start, day_end, description) values ('z1','20250319','20250321', 'latest tracing');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('aaa','20220701','20221028', '300 descreased 21%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('bbb','20221031','20230131', '300 increased 17.38%');
 insert into range_sort_id (range_id, day_start, day_end, description) values ('ccc','20230721','20240202', '300 decreased 16.5%');

@@ -16,6 +16,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -992,5 +994,16 @@ public class BaiduInfoService {
             stockDao.save(vo);
         });
         return "update successfully";
+    }
+
+    @PersistenceContext
+    private EntityManager entityManager;
+    public void updateZ1ToToday() {
+        RangeSortIDVO z1Day = rangeSortIdDao.findZ1Day();
+        Date date = Date.valueOf(LocalDate.now());
+        if (z1Day.getDayEnd().toString().equals(date.toString())) {
+            return;
+        }
+        entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ").executeUpdate();
     }
 }

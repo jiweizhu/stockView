@@ -91,8 +91,8 @@ public class Timer {
         try {
             logger.info("Start cron job generateReportEveryMarketDay=====");
             Object body = kLineMarketClosedService.deleteDayHistoryData();
-
             etfViewService.generateReportEveryDay();
+            baiduInfoService.updateZ1ToToday();
 
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
