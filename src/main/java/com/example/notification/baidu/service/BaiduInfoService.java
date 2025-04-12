@@ -462,7 +462,9 @@ public class BaiduInfoService {
         stocksFlowIndexList.add(8);
     }
 
-    // todo optimize buildHtmlForBd
+    // todo optimize buildHtmlForBd:
+    //  1.extract html part from business logic
+    //  2. BusinessVo for sorting
     public String buildHtmlForBd(List<StockNameVO> industryEtfs, Boolean returnFiveSort, boolean isWeek) {
         if (isWeek) {
             LinkedList<StockNameVO> sortedList = new LinkedList();

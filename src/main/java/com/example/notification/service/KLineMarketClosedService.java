@@ -650,6 +650,7 @@ public class KLineMarketClosedService {
         return result;
     }
 
+    //favourite stock
     public void likeStock(String stockId) {
         //todo
         //1.need to update stock belong bd_indicator

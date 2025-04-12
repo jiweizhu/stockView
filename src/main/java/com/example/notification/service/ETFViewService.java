@@ -483,7 +483,7 @@ public class ETFViewService {
             }
             //todo
             //here need to add
-            //end todo
+            //end_todo
 
             if (stock.getFinancialType() != null && stock.getFinancialType() <= 200) {
                 tdHtml.append("<div class=\"income-container-grey\" ");
