@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -89,6 +90,10 @@ public class BaiduInfoService {
     @Autowired
     private RangeSortGainDao rangeSortGainDao;
 
+
+    @Value("${notification.stock.filter.drop.percent}")
+    private String dropPercent;
+
     public void calculateRangeSort() {
         //handle bd range gain
         rangeSortIdDao.findAll().forEach(rangeVo -> {
@@ -132,6 +137,30 @@ public class BaiduInfoService {
         return list;
     }
 
+    public List<IndexDropRangeRespVO> queryIndexDropRangeByIndicator(String targetFile) {
+        List<BdIndicatorDropVO> all = bdIndicatorDropDao.findByIndexId(targetFile.split("_")[1]);
+        List<IndexDropRangeRespVO> list = new ArrayList<>();
+        all.forEach(vo -> {
+            IndexDropRangeRespVO indicatorVO = new IndexDropRangeRespVO();
+            BeanUtils.copyProperties(vo, indicatorVO);
+            indicatorVO.setDropPercent(vo.getDropPercent().doubleValue());
+            indicatorVO.setIndicatorName(getIndexNameById(vo.getIndicatorId()));
+            list.add(indicatorVO);
+        });
+        return list;
+    }
+
+
+    public List<IndexDropRangeRespVO> dropRangeStocksSort(String rangId) {
+        //handle stock range gain and sort to return view
+        List<IndexDropRangeRespVO> list = new ArrayList<>();
+        return list;
+    }
+
+
+
+
+
     public List<IndexDropRangeRespVO> queryIndexDropRange(String id) {
         List<BdIndicatorDropVO> all = bdIndicatorDropDao.findByIndexId(id);
         List<IndexDropRangeRespVO> list = new ArrayList<>();
@@ -145,6 +174,8 @@ public class BaiduInfoService {
         return list;
     }
 
+    //添加10线做辅助，
+    //如果10线也在向下，则继续计算5线的下跌
     public void calculateDropRange() {
         List<String> ids = bdIndicatorDao.findIds();
         for (String id : ids) {
@@ -170,11 +201,22 @@ public class BaiduInfoService {
                     }
                     minusDay++;
                 } else if (today.compareTo(beforeDay) >= 0 && minusDay > 0) {
+                    //chk if 10day avg also declining now
+                    BigDecimal tenDayAvgEnd = allByStockIdLimit.get(i).getDayAvgTen();
+                    BigDecimal tenDayAvgStart = allByStockIdLimit.get(i + 1).getDayAvgTen();
+                    if (tenDayAvgEnd == null || tenDayAvgStart == null) {
+                        continue;
+                    }
+                    if (tenDayAvgEnd.compareTo(tenDayAvgStart) < 0) {
+                        minusDay++;
+                        continue;
+                    }
+
                     flip = true;
                     //handle drop percent
                     dropStartDay = allByStockIdLimit.get(i);
                     BigDecimal dropPercent = Utils.calculateDayGainPercentage(dropEndDay.getDayAvgFive(), dropStartDay.getDayAvgFive());
-                    if (dropPercent.compareTo(new BigDecimal("-10")) < 0) {
+                    if (dropPercent.compareTo(new BigDecimal(String.valueOf(dropPercent))) < 0) {
                         BdIndicatorDropVO entity = new BdIndicatorDropVO(id, dropStartDay.getDay(), dropEndDay.getDay(), new Timestamp(System.currentTimeMillis()), dropPercent, null);
                         bdIndicatorDropDao.save(entity);
                     }
@@ -701,14 +743,15 @@ public class BaiduInfoService {
         }
     }
 
-    public void getFromNetAndStoreDay(int daysBofore) {
+    public void getFromNetAndStoreDay(int daysBefore) {
         List<String> ids = bdIndicatorDao.findIds();
         if (Utils.isWinSystem()) {
             ids = new ArrayList<>();
             ids.add("730200");
-            ids.add("770100");
+            ids.add("740200");
+            ids.add("370200");
         }
-        String formattedDaysBefore = Utils.getFormattedDaysBefore(daysBofore);
+        String formattedDaysBefore = Utils.getFormattedDaysBefore(daysBefore);
         logger.info("========getFromNetAndStoreDay =====formattedDaysBefore={}==ids.size ={}====={}", formattedDaysBefore, ids.size(), ids);
         List<Callable<Void>> tasks = new ArrayList<>();
         for (String stockId : ids) {
@@ -998,6 +1041,7 @@ public class BaiduInfoService {
 
     @PersistenceContext
     private EntityManager entityManager;
+
     public void updateZ1ToToday() {
         RangeSortIDVO z1Day = rangeSortIdDao.findZ1Day();
         Date date = Date.valueOf(LocalDate.now());

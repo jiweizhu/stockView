@@ -1,5 +1,6 @@
 package com.example.notification.service;
 
+import com.example.notification.businessVo.StockBisVO;
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
 import com.example.notification.http.RestRequest;
@@ -342,13 +343,19 @@ public class ETFViewService {
         //sort 10day avg desc
         industryEtfs = industryEtfs.stream().sorted(Comparator.comparing(StockNameVO::getGainPercentTen)).toList();
 
+        List<StockBisVO> bisList = new ArrayList<>();
+        for (StockNameVO vo : industryEtfs) {
+            StockBisVO bisVO = new StockBisVO();
+            BeanUtils.copyProperties(vo, bisVO);
+            bisList.add(bisVO);
+        }
         //process
         constructMap();
         String serverIp = Utils.getServerIp();
 
-        HashMap<String, StockNameVO> etsMapForRangeSort = new HashMap<>();
+        HashMap<String, StockBisVO> etsMapForRangeSort = new HashMap<>();
         HashMap<String, Double> etsMapForRangeSortGain = new HashMap<>();
-        industryEtfs.forEach(vo -> {
+        bisList.forEach(vo -> {
             etsMapForRangeSort.put(vo.getStockId(), vo);
         });
 
@@ -356,21 +363,21 @@ public class ETFViewService {
         if (StringUtils.hasLength(Constants.getRangeSortDay())) {
             isRangeSort = true;
             //sort by range gain
-            List<StockNameVO> sortedList = new ArrayList<>();
+            List<StockBisVO> sortedList = new ArrayList<>();
             String rangeSortDay = getRangeSortDay();
             List<RangeSortGainVO> findAllByRangeId = rangeSortGainDao.findAllByRangeId(rangeSortDay);
             findAllByRangeId.forEach(rangeVo -> {
                 etsMapForRangeSortGain.put(rangeVo.getStockId(), rangeVo.getRangeGain());
                 sortedList.add(etsMapForRangeSort.get(rangeVo.getStockId()));
             });
-            industryEtfs = sortedList;
+            bisList = sortedList;
         }
 
         //1. sort by financialType first, put profit down stock at bottom
         //2. pick yangQi and guoQi at top
-        List<StockNameVO> profitUp = new ArrayList<>();
-        List<StockNameVO> profitDown = new ArrayList<>();
-        List<StockNameVO> list = industryEtfs.stream().map(vo -> {
+        List<StockBisVO> profitUp = new ArrayList<>();
+        List<StockBisVO> profitDown = new ArrayList<>();
+        List<StockBisVO> list = bisList.stream().map(vo -> {
             if (vo.getFinancialType() == null) {
                 vo.setFinancialType(PROFIT_TYPE_100);
             }
@@ -378,7 +385,7 @@ public class ETFViewService {
                 vo.setCapitalType(MinQi);
             }
             return vo;
-        }).sorted(Comparator.comparing(StockNameVO::getFinancialType).reversed()).toList();
+        }).sorted(Comparator.comparing(StockBisVO::getFinancialType).reversed()).toList();
 
         list.forEach(vo -> {
             if (vo.getFinancialType() != null && vo.getFinancialType() >= 300) {
@@ -388,13 +395,13 @@ public class ETFViewService {
             }
         });
         //let GuoQi at top
-        List<StockNameVO> ret = peekGuoQi(profitUp);
+        List<StockBisVO> ret = peekGuoQi(profitUp);
         ret.addAll(profitDown);
 //        Collections.reverse(ret);
         for (int index = 0; index < ret.size(); index++) {
 
             StringBuilder tdHtml = new StringBuilder();
-            StockNameVO stock = ret.get(index);
+            StockBisVO stock = ret.get(index);
 
             boolean isETF = false;
             if (stock.getStockName().contains("ETF")) {
@@ -474,9 +481,13 @@ public class ETFViewService {
             if (isRangeSort) {
                 tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
             }
-            if(stock.getFinancialType() != null && stock.getFinancialType()<=200){
+            //todo
+            //here need to add
+            //end todo
+
+            if (stock.getFinancialType() != null && stock.getFinancialType() <= 200) {
                 tdHtml.append("<div class=\"income-container-grey\" ");
-            }else {
+            } else {
                 tdHtml.append("<div class=\"income-container\" ");
             }
             tdHtml.append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
@@ -512,6 +523,7 @@ public class ETFViewService {
         retHtml.append("<tr>");
 
         for (int i = 0; i < stocksFlowIndexList.size(); i++) {
+            //put page column title!
             List<String> tdList = stocksFlowMap.get(stocksFlowIndexList.get(i));
             int size = tdList.size();
             retHtml.append("<td >").append(size);
@@ -545,9 +557,9 @@ public class ETFViewService {
         return retHtml.toString();
     }
 
-    private List<StockNameVO> peekGuoQi(List<StockNameVO> profitUp) {
-        List<StockNameVO> guoQi = new ArrayList<>();
-        List<StockNameVO> minQi = new ArrayList<>();
+    private List<StockBisVO> peekGuoQi(List<StockBisVO> profitUp) {
+        List<StockBisVO> guoQi = new ArrayList<>();
+        List<StockBisVO> minQi = new ArrayList<>();
         profitUp.forEach(stock -> {
             if (stock.getCapitalType() != null && (stock.getCapitalType() == YangQi || stock.getCapitalType() == GuoQi)) {
                 guoQi.add(stock);
@@ -555,7 +567,7 @@ public class ETFViewService {
                 minQi.add(stock);
             }
         });
-        List<StockNameVO> collect = new ArrayList<>(guoQi.stream().sorted(Comparator.comparing(StockNameVO::getGrossProfitGain)).toList());
+        List<StockBisVO> collect = new ArrayList<>(guoQi.stream().sorted(Comparator.comparing(StockBisVO::getGrossProfitGain)).toList());
         collect.addAll(minQi);
         return collect;
     }

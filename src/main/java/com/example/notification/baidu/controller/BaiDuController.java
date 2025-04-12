@@ -5,7 +5,9 @@ import com.example.notification.baidu.respVo.RangeSortRespVO;
 import com.example.notification.baidu.service.BaiduInfoService;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.constant.Constants;
+import com.example.notification.controller.Controller;
 import com.example.notification.repository.BdIndicatorDao;
+import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
@@ -58,6 +60,24 @@ public class BaiDuController {
         logger.info("======Enter method queryIndexDropRangeAll========");
         return baiduInfoService.queryIndexDropRangeAll();
     }
+
+    @RequestMapping(value = {"/bd/queryIndexDropRangeByIndicator"})
+    @ResponseBody
+    public Object queryIndexDropRangeByIndicator() {
+        logger.info("======Enter method queryIndexDropRangeByIndicator========");
+        String targetFile = Controller.getTargetFile();
+        return baiduInfoService.queryIndexDropRangeByIndicator(targetFile);
+    }
+
+    @RequestMapping(value = {"/bd/dropRange/{indicatorId_rangId}"})
+    @ResponseBody
+    public Object dropRangeStocksSort(@PathVariable String indicatorId_rangId) {
+        logger.info("======Enter method dropRangeStocksSort========{}", indicatorId_rangId);
+        String[] split = indicatorId_rangId.split("_");
+        Controller.setTargetFile(split[0]);
+        return baiduInfoService.dropRangeStocksSort(split[1]);
+    }
+
 
     @RequestMapping(value = {"/bd/DropRange/{stockId}"})
     @ResponseBody
@@ -181,11 +201,18 @@ public class BaiDuController {
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
+
+    @Autowired
+    private ETFViewService etfViewService;
+
     //test api
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-        baiduInfoService.calculateDropRange();
+        baiduInfoService.getFromNetAndStoreDay(200);
+        Object body = kLineMarketClosedService.deleteDayHistoryData();
+        etfViewService.generateReportEveryDay();
+
 //        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
         return ResponseEntity.ok("SuccessFully done! ");
     }

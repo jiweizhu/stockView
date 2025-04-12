@@ -9,8 +9,6 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 @Data
 @Entity
@@ -95,7 +93,6 @@ public class StockNameVO {
     @Column(name = "customer_range_gain_post", columnDefinition = "DECIMAL(10,2)")
     private BigDecimal customerRangeGainPost;
 
-    static Map<String, String[]> sortArrayMap = new HashMap<>();
 
     public StockNameVO() {
     }
@@ -109,13 +106,6 @@ public class StockNameVO {
         this.stockId = stockId;
     }
 
-    public static Map<String, String[]> getSortArrayMap() {
-        sortArrayMap.put("five", new String[]{"upwardDaysFive", "gainPercentFive"});
-        sortArrayMap.put("fiveFlip", new String[]{"flipUpwardDaysFive", "flipGainPercentFive"});
-        sortArrayMap.put("ten", new String[]{"upwardDaysTen", "gainPercentTen"});
-        sortArrayMap.put("tenFlip", new String[]{"flipUpwardDaysTen", "flipGainPercentTen"});
-        return sortArrayMap;
-    }
 
     @Override
     public String toString() {

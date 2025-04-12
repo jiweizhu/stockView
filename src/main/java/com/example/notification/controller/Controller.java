@@ -61,7 +61,7 @@ public class Controller {
 
     //370400#医药商业 for debug locally
     @Getter
-    private static String targetFile = "bd_730200";
+    private static String targetFile = "bd_370200";
 
     public static void setTargetFileSize(String targetFileSize) {
         Controller.targetFileSize = targetFileSize;

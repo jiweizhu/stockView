@@ -16,6 +16,7 @@ issues:
 =================================
 
 need to do:
+6. adding stock sortColum, to decouple code sorting with html view.  In future, need extract html code and stock value code building html---- 20250323
 5. top 10 holders if has 社保？！
 4. add 市值 ?
 3.IMPORTANT!----calculate the upAndDown program! to choose which ETF is the best to do upAndDown!---done
