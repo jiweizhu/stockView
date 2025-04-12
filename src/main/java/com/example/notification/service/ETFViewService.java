@@ -306,7 +306,7 @@ public class ETFViewService {
             String id_name = stock.getStockId() + "_" + stock.getStockName();
             String backGroudColor = GREY_Color;
             if (stock.getUpwardDaysFive() >= 0) {
-                backGroudColor = "#00FF00";
+                backGroudColor = GREEN_Color;
             }
             html.append("<td><div style=\"background-color:").append(backGroudColor).append("\">").append(id_name).append("(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("</br>").append("(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen() + ")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");
             if (i % columnSize == columnSize) {
@@ -399,7 +399,6 @@ public class ETFViewService {
         ret.addAll(profitDown);
         for (int index = 0; index < ret.size(); index++) {
 
-            StringBuilder tdHtml = new StringBuilder();
             StockBisVO stock = ret.get(index);
 
             boolean isETF = false;
@@ -410,8 +409,8 @@ public class ETFViewService {
             String stockId = stock.getStockId();
             String id_name = stockId + "_" + stock.getStockName();
 
-            int favoriteStockNum = favoriteDao.findGroupByIndicatorId(stockId).size();
 
+            String capitalTypeColor = GREY_Color;
             String fiveBackGroudColor = GREY_Color;
             String tenBackGroudColor = GREY_Color;
 
@@ -423,75 +422,95 @@ public class ETFViewService {
 
             if (capitalType != null && capitalType == YangQi) {
                 //ChineseRed 央企
-                fiveBackGroudColor = ChineseRed_Color;
+                capitalTypeColor = ChineseRed_Color;
             }
             if (capitalType != null && capitalType == GuoQi) {
                 //yellow 国企
-                fiveBackGroudColor = YELLOW_Color;
+                capitalTypeColor = YELLOW_Color;
+            }
+
+            if (stock.getUpwardDaysFive() >= 0) {
+                fiveBackGroudColor = GREEN_Color;
             }
 
             if (stock.getUpwardDaysTen() >= 0) {
-                tenBackGroudColor = "#00FF00";
+                tenBackGroudColor = GREEN_Color;
             }
 
             boolean favorite = false;
-            tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\" ").append(">");
+            // one whole graph is one td
+            StringBuilder tdHtml = new StringBuilder("<td>");
+            StringBuilder nameDiv = new StringBuilder();
+
+            nameDiv.append("<div style=\"background-color:").append(capitalTypeColor).append("\" ").append(">");
             if (stock.getStockId().startsWith("sh") || stockId.startsWith("sz")) {
                 String urlPrefix = "<a href=\"https://gushitong.baidu.com/stock/ab-";
                 if (isETF) {
                     urlPrefix = "<a href=\"https://gushitong.baidu.com/fund/ab-";
                     // format is sh1596110#电力ETF
-                    tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("etf_").append(stockId).append("\">").append(stockId).append("</a>#").append(urlPrefix).append(stockId.substring(2)).append("\">");
+                    nameDiv.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("etf_").append(stockId).append("\">").append(stockId).append("</a>#").append(urlPrefix).append(stockId.substring(2)).append("\">");
                 } else {
                     //stock
                     //like stock
                     FavoriteVO favoriteVO = favoriteDao.findByStockId(stockId);
                     if (favoriteVO != null) {
                         favorite = true;
-                        tdHtml.append("<span style=\"font-size: 16px; color: red;\">❤</span>");
+                        nameDiv.append("<span style=\"font-size: 16px; color: red;\">❤</span>");
                     }
-                    tdHtml.append(urlPrefix).append(stockId.substring(2)).append("\">");
+                    nameDiv.append(urlPrefix).append(stockId.substring(2)).append("\">");
                 }
             } else {
                 // here stockId is bdIndicatorId
-                tdHtml.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+                nameDiv.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
             }
             String stockIds = stock.getStockIds();
             int belongStockNum = 0;
             if (StringUtils.hasLength(stockIds)) {
                 belongStockNum = stockIds.split(",").length;
             }
-            tdHtml.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
+            nameDiv.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
+
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
+                int favoriteStockNum = favoriteDao.findGroupByIndicatorId(stockId).size();
                 if (favoriteStockNum > 0) {
-                    tdHtml.append("(").append(belongStockNum).append("|").append(favoriteStockNum).append(")");
+                    nameDiv.append("(").append(belongStockNum).append("|").append(favoriteStockNum).append(")");
                 } else {
-                    tdHtml.append("(").append(belongStockNum).append(")");
+                    nameDiv.append("(").append(belongStockNum).append(")");
                 }
             }
-            tdHtml.append("</b></a>(").append(stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")");
             if (favorite) {
-                tdHtml.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/unlike/").append(stockId).append("\"> UNLike</a>");
+                nameDiv.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/unlike/").append(stockId).append("\"> UNLike</a>");
             } else {
-                tdHtml.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/like/").append(stockId).append("\">Like</a>");
+                nameDiv.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/like/").append(stockId).append("\">Like</a>");
             }
-            tdHtml.append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
+            nameDiv.append("</b></a>");
+            tdHtml.append(nameDiv);
+
+            StringBuilder dayDiv = new StringBuilder("<div>");
+            StringBuilder fiveDaySpan = new StringBuilder();
+            fiveDaySpan.append("<span style=\"background-color:").append(fiveBackGroudColor).append("\">").append("5Day(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive()).append(")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("</span>");
+
+
+            StringBuilder tenDaySpan = new StringBuilder();
+            tenDaySpan.append("<span style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
             // add rangeSort gain
             if (isRangeSort) {
-                tdHtml.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
+                tenDaySpan.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
             }
-            //todo
-            //here need to add
-            //end_todo
+            tenDaySpan.append("</span>");
+            dayDiv.append(fiveDaySpan).append(tenDaySpan).append("</div>");
+            tdHtml.append(dayDiv);
 
+            //add income graph
+            StringBuilder incomeHtml = new StringBuilder();
             if (stock.getFinancialType() != null && stock.getFinancialType() <= 200) {
-                tdHtml.append("<div class=\"income-container-grey\" ");
+                incomeHtml.append("<div class=\"income-container-grey\" ");
             } else {
-                tdHtml.append("<div class=\"income-container\" ");
+                incomeHtml.append("<div class=\"income-container\" ");
             }
-            tdHtml.append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
+            incomeHtml.append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
 
-
+            tdHtml.append(incomeHtml);
             //put into stocksFlowMap
             if (isRangeSort) {
                 //do stocksFlowMap iteration
@@ -510,12 +529,22 @@ public class ETFViewService {
             }
         }
 
+        StringBuilder retHtml = getRetHtml(isRangeSort);
+
+        setRangeSortDay(null);
+        if (!Utils.isWinSystem()) {
+            Controller.setTargetFile(null);
+        }
+        return retHtml.toString();
+    }
+
+    private StringBuilder getRetHtml(boolean isRangeSort) {
+        //build tr header
+        // loop each td column to tr.
         int trLineSize = getTrLineSize();
 
-        //build html
         StringBuilder retHtml = new StringBuilder();
         retHtml.append("<tr>");
-
         for (int i = 0; i < stocksFlowIndexList.size(); i++) {
             //put page column title!
             List<String> tdList = stocksFlowMap.get(stocksFlowIndexList.get(i));
@@ -529,6 +558,13 @@ public class ETFViewService {
         }
 
         retHtml.append("</tr>");
+
+        fillBlankGraph(trLineSize, retHtml);
+        return retHtml;
+    }
+
+    private static void fillBlankGraph(int trLineSize, StringBuilder retHtml) {
+        //use <td>null</td> to fill the blank
         for (int i = 0; i < trLineSize; i++) {
             StringBuilder trString = new StringBuilder();
             trString.append("<tr>");
@@ -544,11 +580,6 @@ public class ETFViewService {
             trString.append("</tr>");
             retHtml.append(trString);
         }
-        if (!Utils.isWinSystem()) {
-            setRangeSortDay(null);
-            Controller.setTargetFile(null);
-        }
-        return retHtml.toString();
     }
 
     private static int getTrLineSize() {
@@ -591,14 +622,14 @@ public class ETFViewService {
             String tenBackGroudColor = GREY_Color;
 
             if (stock.getUpwardDaysFive() >= 0) {
-                fiveBackGroudColor = "#00FF00";
+                fiveBackGroudColor = GREEN_Color;
             }
 
             if (i < fiveDayExceedTen_num) {
                 fiveBackGroudColor = " pink";
             }
             if (stock.getUpwardDaysTen() >= 0) {
-                tenBackGroudColor = "#00FF00";
+                tenBackGroudColor = GREEN_Color;
             }
 
             html.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">").append("<a href=\"https://gushitong.baidu.com/fund/ab-").append(stock.getStockId().substring(2)).append("\">").append(id_name).append("</a>").append("(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive() + ")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("<br>").append("</div>").append("<div style=\"background-color:").append(tenBackGroudColor).append("\">").append("(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("10Day(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\"").append("</td>");

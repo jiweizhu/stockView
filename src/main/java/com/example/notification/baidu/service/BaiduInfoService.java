@@ -524,7 +524,7 @@ public class BaiduInfoService {
 
 
             if (stock.getUpwardDaysTen() >= 0) {
-                tenBackGroudColor = "#00FF00";
+                tenBackGroudColor = GREEN_Color;
             }
 
             tdHtml.append("<td><div style=\"background-color:").append(fiveBackGroudColor).append("\">");

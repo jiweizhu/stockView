@@ -33,6 +33,8 @@ public class Constants {
 
 
     //green   #00FF00
+    public static String GREEN_Color = "#00FF00";
+
     public static int YangQi = 100;
     public static String ChineseRed_Color = "#FF8888";
     //朱红色(pink) #FF8888 央企100
