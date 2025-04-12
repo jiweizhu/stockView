@@ -514,8 +514,8 @@ public class BaiduInfoService {
             String stockId = stock.getStockId();
             String id_name = stockId + "_" + stock.getStockName();
 
-            String fiveBackGroudColor = "#C0C0C0";
-            String tenBackGroudColor = "#C0C0C0";
+            String fiveBackGroudColor = GREY_Color;
+            String tenBackGroudColor = GREY_Color;
 
             Integer upwardDaysNum = stock.getUpwardDaysFive();
             if (!returnFiveSort) {

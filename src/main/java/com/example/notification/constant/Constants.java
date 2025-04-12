@@ -34,15 +34,15 @@ public class Constants {
 
     //green   #00FF00
     public static int YangQi = 100;
-    public static String YangQi_Color = "#FF8888";
+    public static String ChineseRed_Color = "#FF8888";
     //朱红色(pink) #FF8888 央企100
 
     public static int GuoQi = 200;
-    public static String GuoQi_Color = "#FF9900";
+    public static String YELLOW_Color = "#FF9900";
     //yellow #FF9900 国企200
 
     public static int MinQi = 300;
-    public static String MinQi_Color = "#C0C0C0";
+    public static String GREY_Color = "#C0C0C0";
     //grey   #C0C0C0 民企300
 
 

@@ -304,7 +304,7 @@ public class ETFViewService {
                 html.append("<tr>");
             }
             String id_name = stock.getStockId() + "_" + stock.getStockName();
-            String backGroudColor = "#C0C0C0";
+            String backGroudColor = GREY_Color;
             if (stock.getUpwardDaysFive() >= 0) {
                 backGroudColor = "#00FF00";
             }
@@ -388,7 +388,7 @@ public class ETFViewService {
         }).sorted(Comparator.comparing(StockBisVO::getFinancialType).reversed()).toList();
 
         list.forEach(vo -> {
-            if (vo.getFinancialType() != null && vo.getFinancialType() >= 300) {
+            if (vo.getFinancialType() != null && vo.getFinancialType() >= PROFIT_TYPE_300) {
                 profitUp.add(vo);
             } else {
                 profitDown.add(vo);
@@ -397,7 +397,6 @@ public class ETFViewService {
         //let GuoQi at top
         List<StockBisVO> ret = peekGuoQi(profitUp);
         ret.addAll(profitDown);
-//        Collections.reverse(ret);
         for (int index = 0; index < ret.size(); index++) {
 
             StringBuilder tdHtml = new StringBuilder();
@@ -413,8 +412,8 @@ public class ETFViewService {
 
             int favoriteStockNum = favoriteDao.findGroupByIndicatorId(stockId).size();
 
-            String fiveBackGroudColor = "#C0C0C0";
-            String tenBackGroudColor = "#C0C0C0";
+            String fiveBackGroudColor = GREY_Color;
+            String tenBackGroudColor = GREY_Color;
 
             Integer upwardDaysNum = stock.getUpwardDaysFive();
             Integer capitalType = stock.getCapitalType();
@@ -423,12 +422,12 @@ public class ETFViewService {
             }
 
             if (capitalType != null && capitalType == YangQi) {
-                //pink 央企
-                fiveBackGroudColor = YangQi_Color;
+                //ChineseRed 央企
+                fiveBackGroudColor = ChineseRed_Color;
             }
             if (capitalType != null && capitalType == GuoQi) {
                 //yellow 国企
-                fiveBackGroudColor = GuoQi_Color;
+                fiveBackGroudColor = YELLOW_Color;
             }
 
             if (stock.getUpwardDaysTen() >= 0) {
@@ -511,12 +510,7 @@ public class ETFViewService {
             }
         }
 
-        //calculate max number in column
-        List<Integer> intList = new ArrayList<>();
-        stocksFlowMap.keySet().forEach(key -> {
-            intList.add(stocksFlowMap.get(key).size());
-        });
-        int trLineSize = intList.stream().sorted(Comparator.reverseOrder()).toList().get(0);
+        int trLineSize = getTrLineSize();
 
         //build html
         StringBuilder retHtml = new StringBuilder();
@@ -557,6 +551,16 @@ public class ETFViewService {
         return retHtml.toString();
     }
 
+    private static int getTrLineSize() {
+        //calculate max number in column
+        List<Integer> intList = new ArrayList<>();
+        stocksFlowMap.keySet().forEach(key -> {
+            intList.add(stocksFlowMap.get(key).size());
+        });
+        int trLineSize = intList.stream().sorted(Comparator.reverseOrder()).toList().get(0);
+        return trLineSize;
+    }
+
     private List<StockBisVO> peekGuoQi(List<StockBisVO> profitUp) {
         List<StockBisVO> guoQi = new ArrayList<>();
         List<StockBisVO> minQi = new ArrayList<>();
@@ -583,8 +587,8 @@ public class ETFViewService {
             }
 
             String id_name = stock.getStockId() + "_" + stock.getStockName();
-            String fiveBackGroudColor = "#C0C0C0";
-            String tenBackGroudColor = "#C0C0C0";
+            String fiveBackGroudColor = GREY_Color;
+            String tenBackGroudColor = GREY_Color;
 
             if (stock.getUpwardDaysFive() >= 0) {
                 fiveBackGroudColor = "#00FF00";
