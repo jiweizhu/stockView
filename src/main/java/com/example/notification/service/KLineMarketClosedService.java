@@ -249,7 +249,7 @@ public class KLineMarketClosedService {
         List<StockNameVO> storedStocks = storedStocks();
         if (Utils.isWinSystem()) {
 //            entityManager.createNativeQuery("update stock set gain_percent_five = null,  last_updated_time = null where stock_id = 'sh600009' ;").executeUpdate();
-            StockNameVO byId = stockDao.findById("sh600009").get();
+            StockNameVO byId = stockDao.findById("sz000519").get();
             storedStocks.clear();
             storedStocks.add(byId);
         }

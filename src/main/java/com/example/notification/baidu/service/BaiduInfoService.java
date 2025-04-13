@@ -9,6 +9,7 @@ import com.example.notification.controller.Controller;
 import com.example.notification.http.RestRequest;
 import com.example.notification.repository.*;
 import com.example.notification.service.ETFViewService;
+import com.example.notification.service.HoldingService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.*;
@@ -90,6 +91,9 @@ public class BaiduInfoService {
     @Autowired
     private RangeSortGainDao rangeSortGainDao;
 
+    @Autowired
+    private HoldingService holdingService;
+
 
     @Value("${notification.stock.filter.drop.percent}")
     private String DROP_THRESHOLD;
@@ -145,6 +149,7 @@ public class BaiduInfoService {
             BeanUtils.copyProperties(vo, indicatorVO);
             indicatorVO.setDropPercent(vo.getDropPercent().doubleValue());
             indicatorVO.setIndicatorName(getIndexNameById(vo.getIndicatorId()));
+            indicatorVO.setStockIds(vo.getStockIds());
             list.add(indicatorVO);
         });
         return list;
@@ -169,6 +174,51 @@ public class BaiduInfoService {
             list.add(indicatorVO);
         });
         return list;
+    }
+
+    public void calculateStockDropRange() {
+        logger.info("====Enter==method calculateStockDropRange=====");
+        List<String> ids = bdIndicatorDao.findIds();
+        if (Utils.isWinSystem()) {
+            ids = new ArrayList<>();
+            //中兵红箭
+            ids.add("650300");
+        }
+        //find the last drop range record
+        for (String id : ids) {
+            List<BdIndicatorDropVO> voList = bdIndicatorDropDao.findByIndexId(id);
+            voList.forEach(vo -> {
+                //calculate belong stocks drop percent
+                Date dayStart = vo.getDayStart();
+                Date dayEnd = vo.getDayEnd();
+                String stockIdsByIndicatorId = bdIndicatorDao.findStockIdsByIndicatorId(id);
+                if (!StringUtils.hasLength(stockIdsByIndicatorId)) return;
+                List<String> list = Arrays.stream(stockIdsByIndicatorId.split(",")).toList();
+
+                //use treemap to sort the stock drop percent
+                TreeMap<Double, String> sortMap = new TreeMap();
+
+                list.forEach(stockId -> {
+                    StockDailyVO startVo = stockDailyDao.findLastPriceByStockIdAndDay(stockId, dayStart);
+                    StockDailyVO endVo = stockDailyDao.findLastPriceByStockIdAndDay(stockId, dayEnd);
+                    if (startVo == null || endVo == null) return;
+                    BigDecimal drop = Utils.calculateDayGainPercentage(startVo.getClosingPrice(), endVo.getClosingPrice());
+
+                    StringBuilder sb = new StringBuilder();
+                    String name = holdingService.getStockIdOrNameByMap(stockId);
+                    sb.append(stockId).append("_").append(name).append("_").append(drop);
+                    sortMap.put(drop.doubleValue(), sb.toString());
+                });
+                StringBuilder stockIds = new StringBuilder();
+                sortMap.descendingMap().forEach((k, v) -> {
+                    stockIds.append(v).append(",");
+                });
+                vo.setStockIds(stockIds.toString());
+                bdIndicatorDropDao.save(vo);
+                logger.info("======method calculateStockDropRange===save vo={}", vo);
+            });
+        }
+        logger.info("====End==method calculateStockDropRange=====");
     }
 
     //backwards to calculate drop range,

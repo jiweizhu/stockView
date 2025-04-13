@@ -97,6 +97,16 @@ public class BaiDuController {
     }
 
 
+    // when got new indicator dropRange record, need to sort range for stock
+    @RequestMapping(value = {"/bd/calculateStockDropRange"})
+    @ResponseBody
+    public Object calculateStockDropRange() {
+        logger.info("======Enter method calculateStockDropRange========");
+        baiduInfoService.calculateStockDropRange();
+        return "successfully";
+    }
+
+
 
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
     @ResponseBody

@@ -15,4 +15,6 @@ public class IndexDropRangeRespVO {
     private Date dayEnd;
 
     private double dropPercent;
+
+    private String stockIds;
 }
