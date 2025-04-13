@@ -92,7 +92,7 @@ public class BaiduInfoService {
 
 
     @Value("${notification.stock.filter.drop.percent}")
-    private String dropPercent;
+    private String DROP_THRESHOLD;
 
     public void calculateRangeSort() {
         //handle bd range gain
@@ -158,9 +158,6 @@ public class BaiduInfoService {
     }
 
 
-
-
-
     public List<IndexDropRangeRespVO> queryIndexDropRange(String id) {
         List<BdIndicatorDropVO> all = bdIndicatorDropDao.findByIndexId(id);
         List<IndexDropRangeRespVO> list = new ArrayList<>();
@@ -174,13 +171,25 @@ public class BaiduInfoService {
         return list;
     }
 
-    //添加10线做辅助，
-    //如果10线也在向下，则继续计算5线的下跌
+    //backwards to calculate drop range,
+    // so, if 10avg is falling, then continue to count backwards
     public void calculateDropRange() {
+        logger.info("====Enter==method calculateDropRange=====");
         List<String> ids = bdIndicatorDao.findIds();
+        if (Utils.isWinSystem()) {
+            ids = new ArrayList<>();
+            ids.add("650300");
+        }
         for (String id : ids) {
             //find 5day avg drop if exceeds 10%
-            List<BdIndicatorDailyVO> allByStockIdLimit = bdIndicatorDailyDao.findAllByStockIdLimit(id, 200);
+            //find the last record endDay
+            BdIndicatorDropVO lastVo = bdIndicatorDropDao.findLastByIndexId(id);
+            List<BdIndicatorDailyVO> allByStockIdLimit;
+            if (lastVo == null) {
+                allByStockIdLimit = bdIndicatorDailyDao.findAllByStockIdLimit(id, 200);
+            } else {
+                allByStockIdLimit = bdIndicatorDailyDao.findDaysByStockIdAndDay(id, lastVo.getDayEnd());
+            }
             int minusDay = 0;
             BdIndicatorDailyVO dropEndDay = null;
             BdIndicatorDailyVO dropStartDay;
@@ -216,13 +225,16 @@ public class BaiduInfoService {
                     //handle drop percent
                     dropStartDay = allByStockIdLimit.get(i);
                     BigDecimal dropPercent = Utils.calculateDayGainPercentage(dropEndDay.getDayAvgFive(), dropStartDay.getDayAvgFive());
-                    if (dropPercent.compareTo(new BigDecimal(String.valueOf(dropPercent))) < 0) {
+                    logger.info("======method calculateDropRange==got dropPercent={}", dropPercent.toString());
+                    if (dropPercent.compareTo(new BigDecimal(String.valueOf(DROP_THRESHOLD))) < 0) {
                         BdIndicatorDropVO entity = new BdIndicatorDropVO(id, dropStartDay.getDay(), dropEndDay.getDay(), new Timestamp(System.currentTimeMillis()), dropPercent, null);
                         bdIndicatorDropDao.save(entity);
                     }
                 }
+                logger.info("==got minusDay={}===start from: {} to End: {}", minusDay, allByStockIdLimit.get(allByStockIdLimit.size() - 1), allByStockIdLimit.get(0));
             }
         }
+        logger.info("====End==method calculateDropRange=====");
     }
 
 
@@ -749,7 +761,7 @@ public class BaiduInfoService {
         List<String> ids = bdIndicatorDao.findIds();
         if (Utils.isWinSystem()) {
             ids = new ArrayList<>();
-            ids.add("730200");
+            ids.add("650300");
             ids.add("740200");
             ids.add("370200");
         }
@@ -810,6 +822,7 @@ public class BaiduInfoService {
     }
 
     public void getFromNetAndStoreWeek(boolean isInitData) {
+        logger.info("====Enter==method getFromNetAndStoreWeek=====");
         List<String> ids = bdIndicatorDao.findIds();
         ids.add("sh000300");
         List<Callable<Void>> tasks = new ArrayList<>();

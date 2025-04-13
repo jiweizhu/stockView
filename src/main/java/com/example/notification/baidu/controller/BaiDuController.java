@@ -86,6 +86,17 @@ public class BaiDuController {
         return baiduInfoService.queryIndexDropRange(stockId);
     }
 
+    //to calculate indicator DropRange
+    //when 5avg goes up, check if drop percent bigger than 10%(default value is 10%)
+    @RequestMapping(value = {"/bd/calculateDropRange"})
+    @ResponseBody
+    public Object calculateDropRange() {
+        logger.info("======Enter method calculateDropRange========");
+        baiduInfoService.calculateDropRange();
+        return "successfully";
+    }
+
+
 
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
     @ResponseBody
@@ -209,9 +220,9 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/test"})
     @ResponseBody
     public ResponseEntity test() throws Exception {
-        baiduInfoService.getFromNetAndStoreDay(200);
-        Object body = kLineMarketClosedService.deleteDayHistoryData();
-        etfViewService.generateReportEveryDay();
+        baiduInfoService.calculateDropRange();
+//        Object body = kLineMarketClosedService.deleteDayHistoryData();
+//        etfViewService.generateReportEveryDay();
 
 //        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
         return ResponseEntity.ok("SuccessFully done! ");

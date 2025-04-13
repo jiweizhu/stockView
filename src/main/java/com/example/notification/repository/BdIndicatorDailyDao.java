@@ -27,4 +27,7 @@ public interface BdIndicatorDailyDao extends JpaRepository<BdIndicatorDailyVO, B
     @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 and day <= ?2 order by day desc limit 1", nativeQuery = true)
     BdIndicatorDailyVO findByStockIdAndDay(String stock_id, Date day);
 
+    @Query(value = "SELECT * FROM bd_daily_price where stock_id = ?1 and day > ?2 order by day desc ", nativeQuery = true)
+    List<BdIndicatorDailyVO> findDaysByStockIdAndDay(String stock_id, Date day);
+
 }

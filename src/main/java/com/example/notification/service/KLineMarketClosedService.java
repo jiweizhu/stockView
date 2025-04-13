@@ -613,6 +613,7 @@ public class KLineMarketClosedService {
 
     @Transactional
     public Object deleteWkHistoryData(int weeks) {
+        logger.info("====Enter==method deleteWkHistoryData=====");
         // also delete today's daily price as sometimes i need to know the real price while the market opening.
         LocalDate today = LocalDate.now();
         LocalDate fiveDaysAgo = today.minusWeeks(weeks);

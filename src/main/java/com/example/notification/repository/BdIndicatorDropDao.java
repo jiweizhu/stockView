@@ -15,4 +15,8 @@ public interface BdIndicatorDropDao extends JpaRepository<BdIndicatorDropVO, BdI
     @Query(value = "SELECT * FROM indicator_drop where indicator_id = ?1 ", nativeQuery = true)
     List<BdIndicatorDropVO> findByIndexId(String indicatorId);
 
+    @Query(value = "SELECT * FROM indicator_drop where indicator_id = ?1  order by day_end desc limit 1  ", nativeQuery = true)
+    BdIndicatorDropVO findLastByIndexId(String indicatorId);
+
+
 }
