@@ -74,8 +74,9 @@ public class Timer {
             baiduInfoService.getFromNetAndStoreWeek(false);
 
             //for stock from Tencent
-            kLineMarketClosedService.deleteWkHistoryData(2);
-            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(3);
+            //202250401 baidu has no wk data from 20250401
+//            kLineMarketClosedService.deleteWkHistoryData(2);
+//            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(3);
 
             baiduInfoService.calculateDropRange();
 
