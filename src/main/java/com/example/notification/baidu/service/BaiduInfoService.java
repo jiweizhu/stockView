@@ -99,6 +99,9 @@ public class BaiduInfoService {
     @Value("${notification.stock.filter.drop.percent}")
     private String DROP_THRESHOLD;
 
+    @Value("${notification.stock.drop.range.beginning.days.before}")
+    private String DROP_RANGE_BEFORE;
+
     public void calculateRangeSort() {
         //handle bd range gain
         rangeSortIdDao.findAll().forEach(rangeVo -> {
@@ -179,11 +182,11 @@ public class BaiduInfoService {
             StockNameVO vo = stockDao.findById(splitStock.split("_")[0]).get();
             list.add(vo);
         }
-        return buildHtml(list, true);
+        return buildHtmlForDropRange(list, true);
     }
 
 
-    public String buildHtml(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+    public String buildHtmlForDropRange(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
 
         List<StockBisVO> bisList = new ArrayList<>();
         for (StockNameVO vo : industryEtfs) {
@@ -196,38 +199,13 @@ public class BaiduInfoService {
         String serverIp = Utils.getServerIp();
 
         HashMap<String, StockBisVO> etsMapForRangeSort = new HashMap<>();
-        HashMap<String, Double> etsMapForRangeSortGain = new HashMap<>();
         bisList.forEach(vo -> {
             etsMapForRangeSort.put(vo.getStockId(), vo);
         });
 
-        //1. sort by financialType first, put profit down stock at bottom
-        //2. pick yangQi and guoQi at top
-        List<StockBisVO> profitUp = new ArrayList<>();
-        List<StockBisVO> profitDown = new ArrayList<>();
-        List<StockBisVO> list = bisList.stream().map(vo -> {
-            if (vo.getFinancialType() == null) {
-                vo.setFinancialType(PROFIT_TYPE_100);
-            }
-            if (vo.getCapitalType() == null) {
-                vo.setCapitalType(MinQi);
-            }
-            return vo;
-        }).sorted(Comparator.comparing(StockBisVO::getFinancialType).reversed()).toList();
+        for (int index = 0; index < bisList.size(); index++) {
 
-        list.forEach(vo -> {
-            if (vo.getFinancialType() != null && vo.getFinancialType() >= PROFIT_TYPE_300) {
-                profitUp.add(vo);
-            } else {
-                profitDown.add(vo);
-            }
-        });
-        //let GuoQi at top
-        List<StockBisVO> ret = peekGuoQi(profitUp);
-        ret.addAll(profitDown);
-        for (int index = 0; index < ret.size(); index++) {
-
-            StockBisVO stock = ret.get(index);
+            StockBisVO stock = bisList.get(index);
 
             String stockId = stock.getStockId();
             String id_name = stockId + "_" + stock.getStockName();
@@ -237,11 +215,7 @@ public class BaiduInfoService {
             String fiveBackGroudColor = GREY_Color;
             String tenBackGroudColor = GREY_Color;
 
-            Integer upwardDaysNum = stock.getUpwardDaysFive();
             Integer capitalType = stock.getCapitalType();
-            if (!returnFiveSort) {
-                upwardDaysNum = stock.getUpwardDaysTen();
-            }
 
             if (capitalType != null && capitalType == YangQi) {
                 //ChineseRed 央企
@@ -260,7 +234,6 @@ public class BaiduInfoService {
                 tenBackGroudColor = GREEN_Color;
             }
 
-            boolean favorite = false;
             // one whole graph is one td
             StringBuilder tdHtml = new StringBuilder("<td>");
             StringBuilder nameDiv = new StringBuilder();
@@ -317,10 +290,6 @@ public class BaiduInfoService {
 
         StringBuilder retHtml = getRetHtml(false);
 
-        setRangeSortDay(null);
-        if (!Utils.isWinSystem()) {
-            Controller.setTargetFile(null);
-        }
         return retHtml.toString();
     }
 
@@ -435,7 +404,7 @@ public class BaiduInfoService {
                     StockDailyVO startVo = stockDailyDao.findLastPriceByStockIdAndDay(stockId, dayStart);
                     StockDailyVO endVo = stockDailyDao.findLastPriceByStockIdAndDay(stockId, dayEnd);
                     if (startVo == null || endVo == null) return;
-                    BigDecimal drop = Utils.calculateDayGainPercentage(startVo.getClosingPrice(), endVo.getClosingPrice());
+                    BigDecimal drop = Utils.calculateDayGainPercentage(endVo.getClosingPrice(), startVo.getClosingPrice());
 
                     StringBuilder sb = new StringBuilder();
                     String name = holdingService.getStockIdOrNameByMap(stockId);
@@ -471,7 +440,7 @@ public class BaiduInfoService {
             BdIndicatorDropVO lastVo = bdIndicatorDropDao.findLastByIndexId(id);
             List<BdIndicatorDailyVO> allByStockIdLimit;
             if (lastVo == null) {
-                allByStockIdLimit = bdIndicatorDailyDao.findAllByStockIdLimit(id, 200);
+                allByStockIdLimit = bdIndicatorDailyDao.findAllByStockIdLimit(id, Integer.parseInt(DROP_RANGE_BEFORE));
             } else {
                 allByStockIdLimit = bdIndicatorDailyDao.findDaysByStockIdAndDay(id, lastVo.getDayEnd());
             }

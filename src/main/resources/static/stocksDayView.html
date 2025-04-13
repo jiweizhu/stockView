@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
          onClickRow: function(rowIndex, rowData) {
             var indicatorId = rowData.indicatorId;
             var dayStart = rowData.dayStart;
-
+            document.getElementById('myTable').innerHTML = '';
             var url = '/bd/dropRange/stocksView/' + indicatorId+'_'+dayStart;
 
             $.get(url, function(data) {
