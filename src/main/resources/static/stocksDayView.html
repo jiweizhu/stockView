@@ -307,26 +307,20 @@ document.addEventListener('DOMContentLoaded', function () {
                },
        view: detailview,
        autoUpdateDetail: true,
-       sortName: 'indicatorId',
-       sortOrder: 'asc',
+       sortName: 'dayStart',
+       sortOrder: 'desc',
        detailFormatter: function(rowIndex, rowData){},
          onClickRow: function(rowIndex, rowData) {
-            // 获取点击行的 indicatorId
             var indicatorId = rowData.indicatorId;
             var dayStart = rowData.dayStart;
 
-            // 构建后台 URL，假设你的后台 URL 是 /api/yourEndpoint/
-            var url = '/bd/dropRange/' + indicatorId+'_'+dayStart;
+            var url = '/bd/dropRange/stocksView/' + indicatorId+'_'+dayStart;
 
-            // 发送请求，这里使用 jQuery 的 $.get 示例，你可以根据需要更改为 $.post 或其他方法
             $.get(url, function(data) {
-                // 请求成功后的处理，例如显示返回的数据
-                console.log('请求成功，返回数据：', data);
-                // 你可以在这里添加你的处理逻辑，例如更新页面内容
+                document.getElementById('myTable').innerHTML = data;
+                getDivs();
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                // 请求失败的处理
                 console.error('请求失败：', textStatus, errorThrown);
-                // 你可以在这里添加错误处理逻辑，例如显示错误消息
             });
         }
     })
@@ -710,17 +704,16 @@ function filterRecentDays(dayCount) {
        title="Index Range Sort" toolbar="#toolbar">
     <thead>
     <tr>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="indicatorId" width="120" >indicatorId</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="indicatorName" width="120" >indicatorName</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayStart" width="120" >dayStart</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:numSorter" field="dayEnd" width="120" >dayEnd</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="dropPercent" width="120" >dropPercent</th>
-        <th align="left" editor="{type:'validatebox',options:{required:false}}" data-options="sortable:true,sorter:strSorter" field="stockIds" width="800" >stockIds</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="indicatorId" width="120" >indicatorId</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="indicatorName" width="120" >indicatorName</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="dayStart" width="120" >dayStart</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="dayEnd" width="120" >dayEnd</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="dropPercent" width="120" >dropPercent</th>
+        <th align="left"  data-options="sortable:true,sorter:strSorter" field="stockIds" width="800" >stockIds</th>
     </tr>
     </thead>
 </table>
 <script>
-
 </script>
 <table border="1" id="myTable"></table>
 </body>

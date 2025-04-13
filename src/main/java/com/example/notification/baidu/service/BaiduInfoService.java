@@ -5,6 +5,7 @@ import com.example.notification.baidu.respVo.IndexDropRangeRespVO;
 import com.example.notification.baidu.vo.BdFinancialNetVO;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
+import com.example.notification.businessVo.StockBisVO;
 import com.example.notification.controller.Controller;
 import com.example.notification.http.RestRequest;
 import com.example.notification.repository.*;
@@ -162,6 +163,236 @@ public class BaiduInfoService {
         return list;
     }
 
+    public Object dropRangeStocksView(String stockId_startDay) {
+        //return view of stocks belong indicator drop range
+        String[] split = stockId_startDay.split("_");
+        BdIndicatorDropVO byIdAndStartDay = bdIndicatorDropDao.findByIdAndStartDay(split[0], Date.valueOf(split[1]));
+        String[] splitStocks = byIdAndStartDay.getStockIds().split(",");
+        //already sorted stocks
+        if (splitStocks.length == 0) {
+            logger.info("==Method dropRangeStocksView===no stock in drop range======");
+            return null;
+        }
+//        setRangeSortDay("true");
+        List<StockNameVO> list = new ArrayList<>();
+        for (String splitStock : splitStocks) {
+            StockNameVO vo = stockDao.findById(splitStock.split("_")[0]).get();
+            list.add(vo);
+        }
+        return buildHtml(list, true);
+    }
+
+
+    public String buildHtml(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+
+        List<StockBisVO> bisList = new ArrayList<>();
+        for (StockNameVO vo : industryEtfs) {
+            StockBisVO bisVO = new StockBisVO();
+            BeanUtils.copyProperties(vo, bisVO);
+            bisList.add(bisVO);
+        }
+        //process
+        constructMap();
+        String serverIp = Utils.getServerIp();
+
+        HashMap<String, StockBisVO> etsMapForRangeSort = new HashMap<>();
+        HashMap<String, Double> etsMapForRangeSortGain = new HashMap<>();
+        bisList.forEach(vo -> {
+            etsMapForRangeSort.put(vo.getStockId(), vo);
+        });
+
+        //1. sort by financialType first, put profit down stock at bottom
+        //2. pick yangQi and guoQi at top
+        List<StockBisVO> profitUp = new ArrayList<>();
+        List<StockBisVO> profitDown = new ArrayList<>();
+        List<StockBisVO> list = bisList.stream().map(vo -> {
+            if (vo.getFinancialType() == null) {
+                vo.setFinancialType(PROFIT_TYPE_100);
+            }
+            if (vo.getCapitalType() == null) {
+                vo.setCapitalType(MinQi);
+            }
+            return vo;
+        }).sorted(Comparator.comparing(StockBisVO::getFinancialType).reversed()).toList();
+
+        list.forEach(vo -> {
+            if (vo.getFinancialType() != null && vo.getFinancialType() >= PROFIT_TYPE_300) {
+                profitUp.add(vo);
+            } else {
+                profitDown.add(vo);
+            }
+        });
+        //let GuoQi at top
+        List<StockBisVO> ret = peekGuoQi(profitUp);
+        ret.addAll(profitDown);
+        for (int index = 0; index < ret.size(); index++) {
+
+            StockBisVO stock = ret.get(index);
+
+            String stockId = stock.getStockId();
+            String id_name = stockId + "_" + stock.getStockName();
+
+
+            String capitalTypeColor = GREY_Color;
+            String fiveBackGroudColor = GREY_Color;
+            String tenBackGroudColor = GREY_Color;
+
+            Integer upwardDaysNum = stock.getUpwardDaysFive();
+            Integer capitalType = stock.getCapitalType();
+            if (!returnFiveSort) {
+                upwardDaysNum = stock.getUpwardDaysTen();
+            }
+
+            if (capitalType != null && capitalType == YangQi) {
+                //ChineseRed 央企
+                capitalTypeColor = ChineseRed_Color;
+            }
+            if (capitalType != null && capitalType == GuoQi) {
+                //yellow 国企
+                capitalTypeColor = YELLOW_Color;
+            }
+
+            if (stock.getUpwardDaysFive() >= 0) {
+                fiveBackGroudColor = GREEN_Color;
+            }
+
+            if (stock.getUpwardDaysTen() >= 0) {
+                tenBackGroudColor = GREEN_Color;
+            }
+
+            boolean favorite = false;
+            // one whole graph is one td
+            StringBuilder tdHtml = new StringBuilder("<td>");
+            StringBuilder nameDiv = new StringBuilder();
+
+            nameDiv.append("<div style=\"background-color:").append(capitalTypeColor).append("\" ").append(">");
+            if (stock.getStockId().startsWith("sh") || stockId.startsWith("sz")) {
+                String urlPrefix = "<a href=\"https://gushitong.baidu.com/stock/ab-";
+                //stock
+                nameDiv.append(urlPrefix).append(stockId.substring(2)).append("\">");
+            } else {
+                // here stockId is bdIndicatorId
+                nameDiv.append("<a href=\"http://").append(serverIp).append(":8888/listTargetFileStocks/").append("bd_").append(stockId).append("\">").append(stockId).append("</a>#").append("<a href=\"https://gushitong.baidu.com/block/ab-").append(stockId).append("\">");
+            }
+            String stockIds = stock.getStockIds();
+            int belongStockNum = 0;
+            if (StringUtils.hasLength(stockIds)) {
+                belongStockNum = stockIds.split(",").length;
+            }
+            nameDiv.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
+
+            if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
+                nameDiv.append("(").append(belongStockNum).append(")");
+            }
+            nameDiv.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/like/").append(stockId).append("\">Like</a>");
+            nameDiv.append("</b></a>");
+            tdHtml.append(nameDiv);
+
+            StringBuilder dayDiv = new StringBuilder("<div>");
+            StringBuilder fiveDaySpan = new StringBuilder();
+            fiveDaySpan.append("<span style=\"background-color:").append(fiveBackGroudColor).append("\">").append("5Day(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive()).append(")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("</span>");
+
+
+            StringBuilder tenDaySpan = new StringBuilder();
+            tenDaySpan.append("<span style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
+            tenDaySpan.append("</span>");
+            dayDiv.append(fiveDaySpan).append(tenDaySpan).append("</div>");
+            tdHtml.append(dayDiv);
+
+            //add income graph
+            StringBuilder incomeHtml = new StringBuilder();
+            if (stock.getFinancialType() != null && stock.getFinancialType() <= 200) {
+                incomeHtml.append("<div class=\"income-container-grey\" ");
+            } else {
+                incomeHtml.append("<div class=\"income-container\" ");
+            }
+            incomeHtml.append("id = \"").append("income_").append(id_name).append("\" ></div>").append("</div>").append("<div class=\"index-container\" ").append("id = \"").append("span_").append(id_name).append("\" ></div>").append("</td>");
+
+            tdHtml.append(incomeHtml);
+            //put into stocksFlowMap
+            //do stocksFlowMap iteration
+            int columnNum = index % 5;
+            stocksFlowMap.get(columnNum + 1).add(tdHtml.toString());
+        }
+
+        StringBuilder retHtml = getRetHtml(false);
+
+        setRangeSortDay(null);
+        if (!Utils.isWinSystem()) {
+            Controller.setTargetFile(null);
+        }
+        return retHtml.toString();
+    }
+
+    private List<StockBisVO> peekGuoQi(List<StockBisVO> profitUp) {
+        List<StockBisVO> guoQi = new ArrayList<>();
+        List<StockBisVO> minQi = new ArrayList<>();
+        profitUp.forEach(stock -> {
+            if (stock.getCapitalType() != null && (stock.getCapitalType() == YangQi || stock.getCapitalType() == GuoQi)) {
+                guoQi.add(stock);
+            } else {
+                minQi.add(stock);
+            }
+        });
+        List<StockBisVO> collect = new ArrayList<>(guoQi.stream().sorted(Comparator.comparing(StockBisVO::getGrossProfitGain)).toList());
+        collect.addAll(minQi);
+        return collect;
+    }
+
+    private StringBuilder getRetHtml(boolean isRangeSort) {
+        //build tr header
+        // loop each td column to tr.
+        int trLineSize = getTrLineSize();
+
+        StringBuilder retHtml = new StringBuilder();
+        retHtml.append("<tr>");
+        for (int i = 0; i < stocksFlowIndexList.size(); i++) {
+            //put page column title!
+            List<String> tdList = stocksFlowMap.get(stocksFlowIndexList.get(i));
+            int size = tdList.size();
+            retHtml.append("<td >").append(size);
+            if (isRangeSort && size != 0) {
+                RangeSortIDVO rangeSortIDVO = rangeSortIdDao.findById(getRangeSortDay()).get();
+                retHtml.append("|RangeSort ").append(rangeSortIDVO.getDayStart()).append(" to ").append(rangeSortIDVO.getDayEnd());
+            }
+            retHtml.append("</td>");
+        }
+
+        retHtml.append("</tr>");
+
+        fillBlankGraph(trLineSize, retHtml);
+        return retHtml;
+    }
+
+    private static void fillBlankGraph(int trLineSize, StringBuilder retHtml) {
+        //use <td>null</td> to fill the blank
+        for (int i = 0; i < trLineSize; i++) {
+            StringBuilder trString = new StringBuilder();
+            trString.append("<tr>");
+            for (Integer integer : stocksFlowIndexList) {
+                List<String> tdList = stocksFlowMap.get(integer);
+                int size = tdList.size();
+                if (i < size) {
+                    trString.append(tdList.get(i));
+                } else {
+                    trString.append("<td>null</td>");
+                }
+            }
+            trString.append("</tr>");
+            retHtml.append(trString);
+        }
+    }
+
+    private static int getTrLineSize() {
+        //calculate max number in column
+        List<Integer> intList = new ArrayList<>();
+        stocksFlowMap.keySet().forEach(key -> {
+            intList.add(stocksFlowMap.get(key).size());
+        });
+        int trLineSize = intList.stream().sorted(Comparator.reverseOrder()).toList().get(0);
+        return trLineSize;
+    }
+
 
     public List<IndexDropRangeRespVO> queryIndexDropRange(String id) {
         List<BdIndicatorDropVO> all = bdIndicatorDropDao.findByIndexId(id);
@@ -183,6 +414,8 @@ public class BaiduInfoService {
             ids = new ArrayList<>();
             //中兵红箭
             ids.add("650300");
+            ids.add("730200");
+            ids.add("370200");
         }
         //find the last drop range record
         for (String id : ids) {
@@ -229,6 +462,8 @@ public class BaiduInfoService {
         if (Utils.isWinSystem()) {
             ids = new ArrayList<>();
             ids.add("650300");
+            ids.add("730200");
+            ids.add("370200");
         }
         for (String id : ids) {
             //find 5day avg drop if exceeds 10%

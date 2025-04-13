@@ -69,6 +69,13 @@ public class BaiDuController {
         return baiduInfoService.queryIndexDropRangeByIndicator(targetFile);
     }
 
+    @RequestMapping(value = {"/bd/dropRange/stocksView/{stockId_startDay}"})
+    @ResponseBody
+    public Object dropRangeStocksView(@PathVariable String stockId_startDay) {
+        logger.info("======Enter method dropRangeStocksView====stockId_startDay={}", stockId_startDay);
+        return baiduInfoService.dropRangeStocksView(stockId_startDay);
+    }
+
     @RequestMapping(value = {"/bd/dropRange/{indicatorId_rangId}"})
     @ResponseBody
     public Object dropRangeStocksSort(@PathVariable String indicatorId_rangId) {
@@ -93,6 +100,7 @@ public class BaiDuController {
     public Object calculateDropRange() {
         logger.info("======Enter method calculateDropRange========");
         baiduInfoService.calculateDropRange();
+        baiduInfoService.calculateStockDropRange();
         return "successfully";
     }
 
@@ -105,7 +113,6 @@ public class BaiDuController {
         baiduInfoService.calculateStockDropRange();
         return "successfully";
     }
-
 
 
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
