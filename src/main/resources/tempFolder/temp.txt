@@ -33,3 +33,5 @@ INSERT INTO bd_indicator (
     'sz000576,sh688543,sh600435,sz300875,sz300922,sz300527,sh600967,sh600184,sz000519,sz002519,sz301357,sh601606',
     NULL
 );
+
+  .append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));

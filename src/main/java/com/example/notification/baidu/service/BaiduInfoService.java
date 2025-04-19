@@ -176,24 +176,21 @@ public class BaiduInfoService {
             logger.info("==Method dropRangeStocksView===no stock in drop range======");
             return null;
         }
-//        setRangeSortDay("true");
-        List<StockNameVO> list = new ArrayList<>();
+        List<StockBisVO> list = new ArrayList<>();
         for (String splitStock : splitStocks) {
-            StockNameVO vo = stockDao.findById(splitStock.split("_")[0]).get();
-            list.add(vo);
+            String[] splitStr = splitStock.split("_");
+            StockNameVO vo = stockDao.findById(splitStr[0]).get();
+            StockBisVO bisVO = new StockBisVO();
+            BeanUtils.copyProperties(vo, bisVO);
+            bisVO.setCustomerRange(splitStr[2]);
+            list.add(bisVO);
         }
         return buildHtmlForDropRange(list, true);
     }
 
 
-    public String buildHtmlForDropRange(List<StockNameVO> industryEtfs, Boolean returnFiveSort) {
+    public String buildHtmlForDropRange(List<StockBisVO> bisList, Boolean returnFiveSort) {
 
-        List<StockBisVO> bisList = new ArrayList<>();
-        for (StockNameVO vo : industryEtfs) {
-            StockBisVO bisVO = new StockBisVO();
-            BeanUtils.copyProperties(vo, bisVO);
-            bisList.add(bisVO);
-        }
         //process
         constructMap();
         String serverIp = Utils.getServerIp();
@@ -257,8 +254,7 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
-            nameDiv.append("<a href=\"https://").append(Utils.getServerIp()).append("/stock/like/").append(stockId).append("\">Like</a>");
-            nameDiv.append("</b></a>");
+            nameDiv.append("</b></a>").append("| RangeGain = ").append(stock.getCustomerRange());
             tdHtml.append(nameDiv);
 
             StringBuilder dayDiv = new StringBuilder("<div>");

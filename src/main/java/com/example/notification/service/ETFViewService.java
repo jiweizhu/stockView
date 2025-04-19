@@ -492,7 +492,7 @@ public class ETFViewService {
 
 
             StringBuilder tenDaySpan = new StringBuilder();
-            tenDaySpan.append("<span style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
+            tenDaySpan.append("<span style=\"background-color:").append(tenBackGroudColor).append("\">").append("=10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
             // add rangeSort gain
             if (isRangeSort) {
                 tenDaySpan.append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
