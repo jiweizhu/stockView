@@ -1,37 +1,2079 @@
-INSERT INTO bd_indicator (
-    indicator_id,
-    indicator_name,
-    upward_days_five,
-    gain_percent_five,
-    flip_upward_days_five,
-    flip_gain_percent_five,
-    flip_day_five,
-    flip_end_day_five,
-    upward_days_ten,
-    gain_percent_ten,
-    flip_upward_days_ten,
-    flip_gain_percent_ten,
-    flip_day_ten,
-    flip_end_day_ten,
-    stock_ids,
-    last_updated_time
-) VALUES (
-    650300,
-    '地面兵装Ⅱ',
-    2,
-    1.24,
-    -16,
-    -12.05,
-    '2025-04-09',
-    '2025-03-17',
-    1,
-    0.03,
-    -13,
-    -8.40,
-    '2025-04-10',
-    '2025-03-21',
-    'sz000576,sh688543,sh600435,sz300875,sz300922,sz300527,sh600967,sh600184,sz000519,sz002519,sz301357,sh601606',
-    NULL
-);
+{
+  "ResultCode": 0,
+  "ResultNum": 0,
+  "QueryID": "2998711070032800150",
+  "Result": {
+    "pankouinfos": {
+      "indicatorTitle": "指标说明",
+      "indicatorUrl": "/sf?pd=new_stock&openapi=1&dspName=iphone&from_sf=1&resource_id=5307&title=%E6%8C%87%E6%A0%87%E8%AF%B4%E6%98%8E&word=000001",
+      "list": [
+        {
+          "ename": "open",
+          "name": "今开",
+          "value": "11.04",
+          "status": "down",
+          "originValue": "11.04"
+        },
+        {
+          "ename": "high",
+          "name": "最高",
+          "value": "11.19",
+          "status": "up",
+          "originValue": "11.19"
+        },
+        {
+          "ename": "volume",
+          "name": "成交量",
+          "value": "72.71万手",
+          "originValue": "72709815"
+        },
+        {
+          "ename": "preClose",
+          "name": "昨收",
+          "value": "11.06",
+          "originValue": "11.06"
+        },
+        {
+          "ename": "low",
+          "name": "最低",
+          "value": "11.03",
+          "status": "down",
+          "originValue": "11.03"
+        },
+        {
+          "ename": "amount",
+          "name": "成交额",
+          "value": "8.10亿",
+          "originValue": "810031605.00"
+        },
+        {
+          "ename": "turnoverRatio",
+          "name": "换手率",
+          "value": "0.37%",
+          "originValue": "0.37"
+        },
+        {
+          "ename": "peratio",
+          "name": "市盈(TTM)",
+          "value": "4.88",
+          "helpIcon": "1",
+          "originValue": "4.875"
+        },
+        {
+          "ename": "capitalization",
+          "name": "总市值",
+          "value": "2170亿",
+          "originValue": "216958165453"
+        },
+        {
+          "ename": "volumeRatio",
+          "name": "量比",
+          "value": "0.97",
+          "status": "down",
+          "helpIcon": "1",
+          "originValue": "0.97"
+        },
+        {
+          "ename": "lyr",
+          "name": "市盈(静)",
+          "value": "4.88",
+          "originValue": "4.875"
+        },
+        {
+          "ename": "totalShareCapital",
+          "name": "总股本",
+          "value": "194.06亿",
+          "originValue": "19405918198"
+        },
+        {
+          "ename": "weibiRatio",
+          "name": "委比",
+          "value": "-42.58%",
+          "originValue": "-42.58"
+        },
+        {
+          "ename": "avgPrice",
+          "name": "均价",
+          "value": "11.14",
+          "status": "up",
+          "originValue": "11.14"
+        },
+        {
+          "ename": "currencyValue",
+          "name": "流通值",
+          "value": "2170亿",
+          "originValue": "216954293283"
+        },
+        {
+          "ename": "limitUp",
+          "name": "涨停",
+          "value": "12.17",
+          "status": "up",
+          "originValue": "12.17"
+        },
+        {
+          "ename": "priceLimit",
+          "name": "涨跌幅",
+          "value": "+1.08%",
+          "status": "up",
+          "originValue": "1.08"
+        },
+        {
+          "ename": "circulatingCapital",
+          "name": "流通股",
+          "value": "194.06亿",
+          "originValue": "19405571850"
+        },
+        {
+          "ename": "limitDown",
+          "name": "跌停",
+          "value": "9.95",
+          "status": "down",
+          "originValue": "9.95"
+        },
+        {
+          "ename": "amplitudeRatio",
+          "name": "振幅",
+          "value": "1.45%",
+          "originValue": "1.45"
+        },
+        {
+          "ename": "inside",
+          "name": "内盘",
+          "value": "32.50万",
+          "status": "down",
+          "helpIcon": "1",
+          "originValue": "32502039"
+        },
+        {
+          "ename": "priceSaleRatio",
+          "name": "市销率",
+          "value": "--",
+          "helpIcon": "1",
+          "originValue": ""
+        },
+        {
+          "ename": "bvRatio",
+          "name": "市净率",
+          "value": "0.51",
+          "originValue": "0.51"
+        },
+        {
+          "ename": "outside",
+          "name": "外盘",
+          "value": "40.21万",
+          "status": "up",
+          "originValue": "40207776"
+        },
+        {
+          "ename": "w52_high",
+          "name": "52周高",
+          "value": "13.18",
+          "originValue": "13.18"
+        },
+        {
+          "ename": "w52_low",
+          "name": "52周低",
+          "value": "9.36",
+          "originValue": "9.36"
+        }
+      ]
+    },
+    "outMarketInfo": {
+      "type": "",
+      "price": "",
+      "increase": "",
+      "ratio": "",
+      "time": "",
+      "update_time": 0,
+      "timestamp": 0
+    },
+    "basicinfos": {
+      "exchange": "SZ",
+      "code": "000001",
+      "name": "平安银行",
+      "stockStatus": "5",
+      "stock_market_code": "",
+      "stockCode": "",
+      "tradeStatus": "已收盘",
+      "tradeStatusCN": "ENDTR",
+      "logo": "https://baidu-finance.cdn.bcebos.com/imgs/icons/000001.svg?authorization=bce-auth-v1%2FALTAKO2HklqHKsKK1hUYgysK2c%2F2025-04-18T17%3A02%3A58Z%2F-1%2F%2F504ddcf994b2a35372fbe8a5172330fc612b55d2135bc0783ef581dd6b82271f",
+      "logoType": "img"
+    },
+    "askinfos": [
+      {
+        "askprice": "11.22",
+        "askvolume": "437900"
+      },
+      {
+        "askprice": "11.21",
+        "askvolume": "541600"
+      },
+      {
+        "askprice": "11.20",
+        "askvolume": "2247200"
+      },
+      {
+        "askprice": "11.19",
+        "askvolume": "1178620"
+      },
+      {
+        "askprice": "11.18",
+        "askvolume": "316500"
+      }
+    ],
+    "buyinfos": [
+      {
+        "bidprice": "11.17",
+        "bidvolume": "322100"
+      },
+      {
+        "bidprice": "11.16",
+        "bidvolume": "503800"
+      },
+      {
+        "bidprice": "11.15",
+        "bidvolume": "301300"
+      },
+      {
+        "bidprice": "11.14",
+        "bidvolume": "247100"
+      },
+      {
+        "bidprice": "11.13",
+        "bidvolume": "527400"
+      }
+    ],
+    "detailinfos": [
+      {
+        "time": "1744958826",
+        "volume": "14300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958829",
+        "volume": "58300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958832",
+        "volume": "14900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958835",
+        "volume": "17000",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958838",
+        "volume": "90900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958841",
+        "volume": "77800",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958844",
+        "volume": "60900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958847",
+        "volume": "8300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958850",
+        "volume": "101000",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958853",
+        "volume": "8800",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958856",
+        "volume": "57200",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958859",
+        "volume": "20600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958862",
+        "volume": "1600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958865",
+        "volume": "1400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958868",
+        "volume": "59400",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958871",
+        "volume": "23800",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958874",
+        "volume": "5000",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958877",
+        "volume": "60100",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:47"
+      },
+      {
+        "time": "1744958880",
+        "volume": "10500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958883",
+        "volume": "83900",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958886",
+        "volume": "13200",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958889",
+        "volume": "22500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958892",
+        "volume": "63900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958895",
+        "volume": "59400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958898",
+        "volume": "15300",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958901",
+        "volume": "51500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958904",
+        "volume": "15500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958907",
+        "volume": "184300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958910",
+        "volume": "3200",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958913",
+        "volume": "50700",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958916",
+        "volume": "16400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958919",
+        "volume": "81400",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958922",
+        "volume": "5500",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958925",
+        "volume": "50900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958928",
+        "volume": "14500",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958931",
+        "volume": "2600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958934",
+        "volume": "57400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958937",
+        "volume": "6500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:48"
+      },
+      {
+        "time": "1744958940",
+        "volume": "21300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958943",
+        "volume": "10000",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958946",
+        "volume": "4200",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958949",
+        "volume": "3600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958952",
+        "volume": "1700",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958955",
+        "volume": "45200",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958958",
+        "volume": "6300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958961",
+        "volume": "30500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958964",
+        "volume": "29800",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958967",
+        "volume": "33900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958970",
+        "volume": "25600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958973",
+        "volume": "76300",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958976",
+        "volume": "16800",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958979",
+        "volume": "72400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958982",
+        "volume": "11300",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958985",
+        "volume": "3500",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958988",
+        "volume": "77900",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958991",
+        "volume": "10800",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958994",
+        "volume": "24900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744958997",
+        "volume": "9600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:49"
+      },
+      {
+        "time": "1744959000",
+        "volume": "72000",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959003",
+        "volume": "40100",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959006",
+        "volume": "35300",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959009",
+        "volume": "67300",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959012",
+        "volume": "79900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959015",
+        "volume": "10300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959018",
+        "volume": "67400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959021",
+        "volume": "13200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959024",
+        "volume": "69600",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959027",
+        "volume": "5000",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959030",
+        "volume": "31700",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959033",
+        "volume": "12100",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959036",
+        "volume": "39900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959039",
+        "volume": "11600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959042",
+        "volume": "6500",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959045",
+        "volume": "22500",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959048",
+        "volume": "72000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959051",
+        "volume": "17900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959054",
+        "volume": "73800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959057",
+        "volume": "140400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:50"
+      },
+      {
+        "time": "1744959060",
+        "volume": "16200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959063",
+        "volume": "22700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959066",
+        "volume": "70600",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959069",
+        "volume": "41100",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959072",
+        "volume": "20500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959075",
+        "volume": "26500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959078",
+        "volume": "78000",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959081",
+        "volume": "31900",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959084",
+        "volume": "95700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959087",
+        "volume": "25900",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959090",
+        "volume": "41400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959093",
+        "volume": "21400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959096",
+        "volume": "22300",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959099",
+        "volume": "14100",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959102",
+        "volume": "36100",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959105",
+        "volume": "82900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959108",
+        "volume": "83500",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959111",
+        "volume": "20100",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959114",
+        "volume": "334600",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959117",
+        "volume": "69200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:51"
+      },
+      {
+        "time": "1744959120",
+        "volume": "76800",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959123",
+        "volume": "45300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959126",
+        "volume": "39700",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959129",
+        "volume": "351000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959132",
+        "volume": "60200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959135",
+        "volume": "14900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959138",
+        "volume": "84700",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959141",
+        "volume": "27700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959144",
+        "volume": "52800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959147",
+        "volume": "104500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959150",
+        "volume": "40800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959153",
+        "volume": "117300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959156",
+        "volume": "53800",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959159",
+        "volume": "87500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959162",
+        "volume": "57800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959165",
+        "volume": "140800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959168",
+        "volume": "72700",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959171",
+        "volume": "31500",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959174",
+        "volume": "10900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959177",
+        "volume": "29300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:52"
+      },
+      {
+        "time": "1744959180",
+        "volume": "35900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959183",
+        "volume": "26300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959186",
+        "volume": "40500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959189",
+        "volume": "64400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959192",
+        "volume": "32000",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959195",
+        "volume": "18500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959198",
+        "volume": "28900",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959201",
+        "volume": "343300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959204",
+        "volume": "21700",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959207",
+        "volume": "7400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959210",
+        "volume": "26400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959213",
+        "volume": "31200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959216",
+        "volume": "15800",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959219",
+        "volume": "24600",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959222",
+        "volume": "29800",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959225",
+        "volume": "50600",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959228",
+        "volume": "36900",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959231",
+        "volume": "40400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959234",
+        "volume": "34800",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959237",
+        "volume": "45100",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:53"
+      },
+      {
+        "time": "1744959240",
+        "volume": "24200",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959243",
+        "volume": "34200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959246",
+        "volume": "50300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959249",
+        "volume": "69000",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959252",
+        "volume": "26000",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959255",
+        "volume": "45300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959258",
+        "volume": "26000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959261",
+        "volume": "29400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959264",
+        "volume": "15300",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959267",
+        "volume": "25000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959270",
+        "volume": "30000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959273",
+        "volume": "31700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959276",
+        "volume": "41800",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959279",
+        "volume": "31400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959282",
+        "volume": "32200",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959285",
+        "volume": "51400",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959288",
+        "volume": "107500",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959291",
+        "volume": "48400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959294",
+        "volume": "29400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959297",
+        "volume": "28400",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:54"
+      },
+      {
+        "time": "1744959300",
+        "volume": "60900",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959303",
+        "volume": "25700",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959306",
+        "volume": "28000",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959309",
+        "volume": "50800",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959312",
+        "volume": "40600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959315",
+        "volume": "22100",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959318",
+        "volume": "22900",
+        "price": "11.16",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959321",
+        "volume": "138600",
+        "price": "11.17",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959324",
+        "volume": "66700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959327",
+        "volume": "41600",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959330",
+        "volume": "26600",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959333",
+        "volume": "76300",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959336",
+        "volume": "81500",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959339",
+        "volume": "47400",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959342",
+        "volume": "82000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959345",
+        "volume": "67000",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959348",
+        "volume": "41900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959351",
+        "volume": "36700",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959354",
+        "volume": "56900",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959357",
+        "volume": "47000",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:55"
+      },
+      {
+        "time": "1744959360",
+        "volume": "116600",
+        "price": "11.17",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959363",
+        "volume": "125900",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959366",
+        "volume": "99200",
+        "price": "11.18",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959369",
+        "volume": "44500",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959372",
+        "volume": "99700",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959375",
+        "volume": "24000",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959378",
+        "volume": "73200",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959381",
+        "volume": "62600",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959384",
+        "volume": "45400",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959387",
+        "volume": "41600",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959390",
+        "volume": "32700",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959393",
+        "volume": "41200",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959396",
+        "volume": "21000",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959399",
+        "volume": "101700",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959402",
+        "volume": "33700",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959405",
+        "volume": "79800",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959408",
+        "volume": "61100",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959411",
+        "volume": "9900",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959414",
+        "volume": "26600",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959417",
+        "volume": "15400",
+        "price": "11.19",
+        "type": "1",
+        "bsFlag": "B",
+        "formatTime": "14:56"
+      },
+      {
+        "time": "1744959420",
+        "volume": "20000",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "14:57"
+      },
+      {
+        "time": "1744959600",
+        "volume": "822900",
+        "price": "11.18",
+        "type": "0",
+        "bsFlag": "S",
+        "formatTime": "15:00"
+      }
+    ],
+    "update": {
+      "text": "04-18 15:00:00",
+      "time": "1744959600",
+      "realUpdateTime": "1744959600",
+      "timezone": "北京时间",
+      "shortZone": "北京",
+      "time_diff": 0,
+      "stockStatus": "已收盘",
+      "tradeStatus": "ENDTR",
+      "tradeStatusCN": "已收盘"
+    },
+    "provider": "东方财富",
+    "cur": {
+      "time": 1744959600,
+      "price": "11.18",
+      "ratio": "+1.08%",
+      "increase": "+0.12",
+      "volume": "822900",
+      "avgPrice": "11.14",
+      "timeKey": "1500",
+      "amount": "920.00万",
+      "show": 1,
+      "unit": "元"
+    },
+    "adr_info": [],
+    "upDownStatus": "",
+    "newMarketData": {
+      "headers": [
+        "时间戳",
+        "时间",
+        "价格",
+        "均价",
+        "涨跌额",
+        "涨跌幅",
+        "成交量",
+        "成交额",
+        "累积成交量",
+        "累积成交额"
+      ],
+      "keys": [
+        "timestamp",
+        "time",
+        "price",
+        "avgPrice",
+        "range",
+        "ratio",
+        "volume",
+        "amount",
+        "totalVolume",
+        "totalAmount"
+      ],
+      "marketData": [
+        {
+          "date": "2025-04-18",
+          "p": "1744939800,04-18 09:30,11.04,11.04,-0.02,-0.18,347600,3837504,347600,3837504;1744939860,04-18 09:31,11.06,11.05,0.00,0.00,1664000,18389359,2011600,22226863;1744939920,04-18 09:32,11.05,11.05,-0.01,-0.09,418500,4627938,2430100,26854801;1744939980,04-18 09:33,11.06,11.05,0.00,0.00,757417,8376804,3187517,35231605;1744940040,04-18 09:34,11.07,11.06,+0.01,+0.09,1030100,11408411,4217617,46640016;1744940100,04-18 09:35,11.08,11.06,+0.02,+0.18,757297,8391237,4974914,55031253;1744940160,04-18 09:36,11.10,11.07,+0.04,+0.36,1163400,12905281,6138314,67936534;1744940220,04-18 09:37,11.10,11.07,+0.04,+0.36,797100,8847382,6935414,76783916;1744940280,04-18 09:38,11.10,11.07,+0.04,+0.36,902600,10024368,7838014,86808284;1744940340,04-18 09:39,11.11,11.08,+0.05,+0.45,1070300,11891800,8908314,98700084;1744940400,04-18 09:40,11.11,11.08,+0.05,+0.45,568800,6315982,9477114,105016066;1744940460,04-18 09:41,11.09,11.08,+0.03,+0.27,353000,3915014,9830114,108931080;1744940520,04-18 09:42,11.08,11.08,+0.02,+0.18,403500,4473958,10233614,113405038;1744940580,04-18 09:43,11.08,11.08,+0.02,+0.18,208300,2308887,10441914,115713925;1744940640,04-18 09:44,11.09,11.08,+0.03,+0.27,301300,3340396,10743214,119054321;1744940700,04-18 09:45,11.08,11.08,+0.02,+0.18,93300,1034122,10836514,120088443;1744940760,04-18 09:46,11.09,11.08,+0.03,+0.27,85900,952335,10922414,121040778;1744940820,04-18 09:47,11.09,11.08,+0.03,+0.27,328500,3642332,11250914,124683110;1744940880,04-18 09:48,11.09,11.08,+0.03,+0.27,198600,2202507,11449514,126885617;1744940940,04-18 09:49,11.09,11.08,+0.03,+0.27,236900,2629011,11686414,129514628;1744941000,04-18 09:50,11.10,11.08,+0.04,+0.36,119700,1327915,11806114,130842543;1744941060,04-18 09:51,11.10,11.08,+0.04,+0.36,233500,2591609,12039614,133434152;1744941120,04-18 09:52,11.10,11.08,+0.04,+0.36,375600,4169838,12415214,137603990;1744941180,04-18 09:53,11.11,11.09,+0.05,+0.45,1119400,12436687,13534614,150040677;1744941240,04-18 09:54,11.11,11.09,+0.05,+0.45,299000,3322474,13833614,153363151;1744941300,04-18 09:55,11.12,11.09,+0.06,+0.54,431140,4793770,14264754,158156921;1744941360,04-18 09:56,11.12,11.09,+0.06,+0.54,632000,7027683,14896754,165184604;1744941420,04-18 09:57,11.13,11.09,+0.07,+0.63,416610,4634273,15313364,169818877;1744941480,04-18 09:58,11.12,11.09,+0.06,+0.54,614100,6834748,15927464,176653625;1744941540,04-18 09:59,11.12,11.09,+0.06,+0.54,237300,2639696,16164764,179293321;1744941600,04-18 10:00,11.13,11.09,+0.07,+0.63,419300,4664810,16584064,183958131;1744941660,04-18 10:01,11.13,11.09,+0.07,+0.63,762400,8485880,17346464,192444011;1744941720,04-18 10:02,11.14,11.10,+0.08,+0.72,396600,4417291,17743064,196861302;1744941780,04-18 10:03,11.14,11.10,+0.08,+0.72,1049439,11690595,18792503,208551897;1744941840,04-18 10:04,11.15,11.10,+0.09,+0.81,374600,4175041,19167103,212726938;1744941900,04-18 10:05,11.14,11.10,+0.08,+0.72,755861,8419996,19922964,221146934;1744941960,04-18 10:06,11.13,11.10,+0.07,+0.63,728300,8113375,20651264,229260309;1744942020,04-18 10:07,11.12,11.10,+0.06,+0.54,425800,4739015,21077064,233999324;1744942080,04-18 10:08,11.13,11.10,+0.07,+0.63,177200,1972350,21254264,235971674;1744942140,04-18 10:09,11.14,11.10,+0.08,+0.72,228900,2548468,21483164,238520142;1744942200,04-18 10:10,11.14,11.10,+0.08,+0.72,117000,1303104,21600164,239823246;1744942260,04-18 10:11,11.14,11.10,+0.08,+0.72,938100,10449862,22538264,250273108;1744942320,04-18 10:12,11.14,11.11,+0.08,+0.72,426800,4754641,22965064,255027749;1744942380,04-18 10:13,11.14,11.11,+0.08,+0.72,325500,3628495,23290564,258656244;1744942440,04-18 10:14,11.15,11.11,+0.09,+0.81,146600,1634068,23437164,260290312;1744942500,04-18 10:15,11.15,11.11,+0.09,+0.81,274900,3063358,23712064,263353670;1744942560,04-18 10:16,11.13,11.11,+0.07,+0.63,328100,3654751,24040164,267008421;1744942620,04-18 10:17,11.14,11.11,+0.08,+0.72,166500,1853381,24206664,268861802;1744942680,04-18 10:18,11.13,11.11,+0.07,+0.63,175400,1953066,24382064,270814868;1744942740,04-18 10:19,11.13,11.11,+0.07,+0.63,164100,1826807,24546164,272641675;1744942800,04-18 10:20,11.13,11.11,+0.07,+0.63,161200,1794231,24707364,274435906;1744942860,04-18 10:21,11.13,11.11,+0.07,+0.63,291300,3242272,24998664,277678178;1744942920,04-18 10:22,11.14,11.11,+0.08,+0.72,87600,975230,25086264,278653408;1744942980,04-18 10:23,11.14,11.11,+0.08,+0.72,126800,1411839,25213064,280065247;1744943040,04-18 10:24,11.13,11.11,+0.07,+0.63,80400,895152,25293464,280960399;1744943100,04-18 10:25,11.13,11.11,+0.07,+0.63,145300,1617791,25438764,282578190;1744943160,04-18 10:26,11.14,11.11,+0.08,+0.72,168700,1878962,25607464,284457152;1744943220,04-18 10:27,11.14,11.11,+0.08,+0.72,343200,3820046,25950664,288277198;1744943280,04-18 10:28,11.13,11.11,+0.07,+0.63,242700,2701364,26193364,290978562;1744943340,04-18 10:29,11.13,11.11,+0.07,+0.63,166500,1853867,26359864,292832429;1744943400,04-18 10:30,11.13,11.11,+0.07,+0.63,70100,780328,26429964,293612757;1744943460,04-18 10:31,11.13,11.11,+0.07,+0.63,55100,613353,26485064,294226110;1744943520,04-18 10:32,11.13,11.11,+0.07,+0.63,101100,1125547,26586164,295351657;1744943580,04-18 10:33,11.13,11.11,+0.07,+0.63,157700,1755908,26743864,297107565;1744943640,04-18 10:34,11.14,11.11,+0.08,+0.72,188800,2102869,26932664,299210434;1744943700,04-18 10:35,11.14,11.11,+0.08,+0.72,475900,5301191,27408564,304511625;1744943760,04-18 10:36,11.14,11.11,+0.08,+0.72,373357,4159131,27781921,308670756;1744943820,04-18 10:37,11.14,11.11,+0.08,+0.72,940200,10481793,28722121,319152549;1744943880,04-18 10:38,11.14,11.11,+0.08,+0.72,503700,5611242,29225821,324763791;1744943940,04-18 10:39,11.14,11.11,+0.08,+0.72,136300,1518077,29362121,326281868;1744944000,04-18 10:40,11.15,11.11,+0.09,+0.81,271900,3029342,29634021,329311210;1744944060,04-18 10:41,11.14,11.11,+0.08,+0.72,85100,948265,29719121,330259475;1744944120,04-18 10:42,11.14,11.11,+0.08,+0.72,64500,718603,29783621,330978078;1744944180,04-18 10:43,11.13,11.11,+0.07,+0.63,386400,4304532,30170021,335282610;1744944240,04-18 10:44,11.13,11.11,+0.07,+0.63,196500,2187957,30366521,337470567;1744944300,04-18 10:45,11.13,11.11,+0.07,+0.63,194800,2170046,30561321,339640613;1744944360,04-18 10:46,11.14,11.11,+0.08,+0.72,246500,2746149,30807821,342386762;1744944420,04-18 10:47,11.14,11.11,+0.08,+0.72,84000,935885,30891821,343322647;1744944480,04-18 10:48,11.14,11.11,+0.08,+0.72,56000,624044,30947821,343946691;1744944540,04-18 10:49,11.15,11.11,+0.09,+0.81,81100,903553,31028921,344850244;1744944600,04-18 10:50,11.15,11.11,+0.09,+0.81,28600,318741,31057521,345168985;1744944660,04-18 10:51,11.15,11.11,+0.09,+0.81,501000,5585098,31558521,350754083;1744944720,04-18 10:52,11.15,11.12,+0.09,+0.81,1088482,12136465,32647003,362890548;1744944780,04-18 10:53,11.15,11.12,+0.09,+0.81,90254,1006576,32737257,363897124;1744944840,04-18 10:54,11.16,11.12,+0.10,+0.90,127400,1421101,32864657,365318225;1744944900,04-18 10:55,11.15,11.12,+0.09,+0.81,114000,1271758,32978657,366589983;1744944960,04-18 10:56,11.16,11.12,+0.10,+0.90,165300,1843465,33143957,368433448;1744945020,04-18 10:57,11.15,11.12,+0.09,+0.81,753100,8403355,33897057,376836803;1744945080,04-18 10:58,11.16,11.12,+0.10,+0.90,61300,683783,33958357,377520586;1744945140,04-18 10:59,11.16,11.12,+0.10,+0.90,349200,3895845,34307557,381416431;1744945200,04-18 11:00,11.16,11.12,+0.10,+0.90,357100,3984710,34664657,385401141;1744945260,04-18 11:01,11.16,11.12,+0.10,+0.90,399800,4460691,35064457,389861832;1744945320,04-18 11:02,11.16,11.12,+0.10,+0.90,1295900,14474046,36360357,404335878;1744945380,04-18 11:03,11.17,11.12,+0.11,+0.99,362458,4048586,36722815,408384464;1744945440,04-18 11:04,11.17,11.12,+0.11,+0.99,613900,6860170,37336715,415244634;1744945500,04-18 11:05,11.18,11.12,+0.12,+1.08,429600,4801954,37766315,420046588;1744945560,04-18 11:06,11.16,11.12,+0.10,+0.90,205400,2294423,37971715,422341011;1744945620,04-18 11:07,11.17,11.12,+0.11,+0.99,76200,850710,38047915,423191721;1744945680,04-18 11:08,11.15,11.12,+0.09,+0.81,344200,3841227,38392115,427032948;1744945740,04-18 11:09,11.15,11.12,+0.09,+0.81,99500,1109740,38491615,428142688;1744945800,04-18 11:10,11.15,11.12,+0.09,+0.81,78500,875301,38570115,429017989;1744945860,04-18 11:11,11.16,11.12,+0.10,+0.90,342200,3818389,38912315,432836378;1744945920,04-18 11:12,11.16,11.12,+0.10,+0.90,86300,962740,38998615,433799118;1744945980,04-18 11:13,11.15,11.12,+0.09,+0.81,69300,772866,39067915,434571984;1744946040,04-18 11:14,11.15,11.12,+0.09,+0.81,65900,735210,39133815,435307194;1744946100,04-18 11:15,11.15,11.12,+0.09,+0.81,59400,662503,39193215,435969697;1744946160,04-18 11:16,11.14,11.12,+0.08,+0.72,379000,4225515,39572215,440195212;1744946220,04-18 11:17,11.14,11.12,+0.08,+0.72,97100,1081987,39669315,441277199;1744946280,04-18 11:18,11.15,11.12,+0.09,+0.81,154200,1718127,39823515,442995326;1744946340,04-18 11:19,11.14,11.12,+0.08,+0.72,330900,3686505,40154415,446681831;1744946400,04-18 11:20,11.14,11.12,+0.08,+0.72,92300,1028072,40246715,447709903;1744946460,04-18 11:21,11.14,11.12,+0.08,+0.72,139000,1547615,40385715,449257518;1744946520,04-18 11:22,11.13,11.12,+0.07,+0.63,102300,1139224,40488015,450396742;1744946580,04-18 11:23,11.14,11.12,+0.08,+0.72,71700,798676,40559715,451195418;1744946640,04-18 11:24,11.13,11.12,+0.07,+0.63,80600,897377,40640315,452092795;1744946700,04-18 11:25,11.13,11.12,+0.07,+0.63,40900,455373,40681215,452548168;1744946760,04-18 11:26,11.14,11.12,+0.08,+0.72,252700,2814874,40933915,455363042;1744946820,04-18 11:27,11.14,11.12,+0.08,+0.72,50500,562759,40984415,455925801;1744946880,04-18 11:28,11.15,11.12,+0.09,+0.81,73600,820399,41058015,456746200;1744946940,04-18 11:29,11.14,11.12,+0.08,+0.72,22300,248470,41080315,456994670;1744947000,04-18 11:30,11.15,11.12,+0.09,+0.81,123400,1375776,41203715,458370446;1744952460,04-18 13:01,11.17,11.12,+0.11,+0.99,1172100,13077216,42375815,471447662;1744952520,04-18 13:02,11.16,11.13,+0.10,+0.90,604200,6745254,42980015,478192916;1744952580,04-18 13:03,11.16,11.13,+0.10,+0.90,139100,1551319,43119115,479744235;1744952640,04-18 13:04,11.15,11.13,+0.09,+0.81,157700,1759558,43276815,481503793;1744952700,04-18 13:05,11.16,11.13,+0.10,+0.90,355800,3970219,43632615,485474012;1744952760,04-18 13:06,11.15,11.13,+0.09,+0.81,90100,1005018,43722715,486479030;1744952820,04-18 13:07,11.16,11.13,+0.10,+0.90,122000,1360499,43844715,487839529;1744952880,04-18 13:08,11.15,11.13,+0.09,+0.81,235500,2625978,44080215,490465507;1744952940,04-18 13:09,11.14,11.13,+0.08,+0.72,184500,2055547,44264715,492521054;1744953000,04-18 13:10,11.15,11.13,+0.09,+0.81,142400,1586446,44407115,494107500;1744953060,04-18 13:11,11.14,11.13,+0.08,+0.72,111600,1243638,44518715,495351138;1744953120,04-18 13:12,11.14,11.13,+0.08,+0.72,147800,1647066,44666515,496998204;1744953180,04-18 13:13,11.15,11.13,+0.09,+0.81,77800,866846,44744315,497865050;1744953240,04-18 13:14,11.14,11.13,+0.08,+0.72,88200,982624,44832515,498847674;1744953300,04-18 13:15,11.14,11.13,+0.08,+0.72,101500,1130747,44934015,499978421;1744953360,04-18 13:16,11.15,11.13,+0.09,+0.81,94600,1053932,45028615,501032353;1744953420,04-18 13:17,11.14,11.13,+0.08,+0.72,163300,1819222,45191915,502851575;1744953480,04-18 13:18,11.15,11.13,+0.09,+0.81,91200,1016038,45283115,503867613;1744953540,04-18 13:19,11.15,11.13,+0.09,+0.81,140000,1560023,45423115,505427636;1744953600,04-18 13:20,11.16,11.13,+0.10,+0.90,461100,5141117,45884215,510568753;1744953660,04-18 13:21,11.16,11.13,+0.10,+0.90,59800,666896,45944015,511235649;1744953720,04-18 13:22,11.15,11.13,+0.09,+0.81,127600,1423174,46071615,512658823;1744953780,04-18 13:23,11.15,11.13,+0.09,+0.81,114300,1274813,46185915,513933636;1744953840,04-18 13:24,11.16,11.13,+0.10,+0.90,200500,2237106,46386415,516170742;1744953900,04-18 13:25,11.15,11.13,+0.09,+0.81,110800,1235985,46497215,517406727;1744953960,04-18 13:26,11.16,11.13,+0.10,+0.90,47300,527487,46544515,517934214;1744954020,04-18 13:27,11.16,11.13,+0.10,+0.90,197700,2204670,46742215,520138884;1744954080,04-18 13:28,11.15,11.13,+0.09,+0.81,56600,631310,46798815,520770194;1744954140,04-18 13:29,11.15,11.13,+0.09,+0.81,85600,954733,46884415,521724927;1744954200,04-18 13:30,11.15,11.13,+0.09,+0.81,84900,946703,46969315,522671630;1744954260,04-18 13:31,11.15,11.13,+0.09,+0.81,60300,672075,47029615,523343705;1744954320,04-18 13:32,11.15,11.13,+0.09,+0.81,131500,1466001,47161115,524809706;1744954380,04-18 13:33,11.15,11.13,+0.09,+0.81,73600,820529,47234715,525630235;1744954440,04-18 13:34,11.16,11.13,+0.10,+0.90,139400,1554325,47374115,527184560;1744954500,04-18 13:35,11.15,11.13,+0.09,+0.81,91600,1021650,47465715,528206210;1744954560,04-18 13:36,11.15,11.13,+0.09,+0.81,25500,284412,47491215,528490622;1744954620,04-18 13:37,11.15,11.13,+0.09,+0.81,49900,556566,47541115,529047188;1744954680,04-18 13:38,11.16,11.13,+0.10,+0.90,29400,327902,47570515,529375090;1744954740,04-18 13:39,11.15,11.13,+0.09,+0.81,39900,445007,47610415,529820097;1744954800,04-18 13:40,11.15,11.13,+0.09,+0.81,59100,659068,47669515,530479165;1744954860,04-18 13:41,11.16,11.13,+0.10,+0.90,974000,10869245,48643515,541348410;1744954920,04-18 13:42,11.16,11.13,+0.10,+0.90,164800,1838963,48808315,543187373;1744954980,04-18 13:43,11.15,11.13,+0.09,+0.81,46000,513215,48854315,543700588;1744955040,04-18 13:44,11.16,11.13,+0.10,+0.90,23000,256623,48877315,543957211;1744955100,04-18 13:45,11.16,11.13,+0.10,+0.90,465400,5189373,49342715,549146584;1744955160,04-18 13:46,11.16,11.13,+0.10,+0.90,30900,344743,49373615,549491327;1744955220,04-18 13:47,11.16,11.13,+0.10,+0.90,70100,782178,49443715,550273505;1744955280,04-18 13:48,11.15,11.13,+0.09,+0.81,39500,440514,49483215,550714019;1744955340,04-18 13:49,11.16,11.13,+0.10,+0.90,50000,557671,49533215,551271690;1744955400,04-18 13:50,11.16,11.13,+0.10,+0.90,70600,787781,49603815,552059471;1744955460,04-18 13:51,11.16,11.13,+0.10,+0.90,59600,665058,49663415,552724529;1744955520,04-18 13:52,11.17,11.13,+0.11,+0.99,556100,6206162,50219515,558930691;1744955580,04-18 13:53,11.17,11.13,+0.11,+0.99,160200,1789106,50379715,560719797;1744955640,04-18 13:54,11.17,11.13,+0.11,+0.99,116800,1304450,50496515,562024247;1744955700,04-18 13:55,11.16,11.13,+0.10,+0.90,922600,10296537,51419115,572320784;1744955760,04-18 13:56,11.15,11.13,+0.09,+0.81,370600,4132877,51789715,576453661;1744955820,04-18 13:57,11.15,11.13,+0.09,+0.81,74200,827942,51863915,577281603;1744955880,04-18 13:58,11.16,11.13,+0.10,+0.90,60700,677126,51924615,577958729;1744955940,04-18 13:59,11.16,11.13,+0.10,+0.90,102300,1141026,52026915,579099755;1744956000,04-18 14:00,11.16,11.13,+0.10,+0.90,137600,1535469,52164515,580635224;1744956060,04-18 14:01,11.15,11.13,+0.09,+0.81,343800,3833149,52508315,584468373;1744956120,04-18 14:02,11.14,11.13,+0.08,+0.72,87100,970721,52595415,585439094;1744956180,04-18 14:03,11.14,11.13,+0.08,+0.72,72700,810228,52668115,586249322;1744956240,04-18 14:04,11.14,11.13,+0.08,+0.72,57300,638646,52725415,586887968;1744956300,04-18 14:05,11.15,11.13,+0.09,+0.81,100300,1118101,52825715,588006069;1744956360,04-18 14:06,11.15,11.13,+0.09,+0.81,342100,3813832,53167815,591819901;1744956420,04-18 14:07,11.15,11.13,+0.09,+0.81,54100,603117,53221915,592423018;1744956480,04-18 14:08,11.15,11.13,+0.09,+0.81,70500,785895,53292415,593208913;1744956540,04-18 14:09,11.15,11.13,+0.09,+0.81,75100,837304,53367515,594046217;1744956600,04-18 14:10,11.16,11.13,+0.10,+0.90,186100,2075024,53553615,596121241;1744956660,04-18 14:11,11.15,11.13,+0.09,+0.81,247700,2762361,53801315,598883602;1744956720,04-18 14:12,11.15,11.13,+0.09,+0.81,136900,1526462,53938215,600410064;1744956780,04-18 14:13,11.15,11.13,+0.09,+0.81,95300,1062561,54033515,601472625;1744956840,04-18 14:14,11.15,11.13,+0.09,+0.81,52000,579904,54085515,602052529;1744956900,04-18 14:15,11.15,11.13,+0.09,+0.81,123100,1373170,54208615,603425699;1744956960,04-18 14:16,11.16,11.13,+0.10,+0.90,70000,780544,54278615,604206243;1744957020,04-18 14:17,11.15,11.13,+0.09,+0.81,187400,2089276,54466015,606295519;1744957080,04-18 14:18,11.16,11.13,+0.10,+0.90,174000,1939973,54640015,608235492;1744957140,04-18 14:19,11.15,11.13,+0.09,+0.81,262100,2922099,54902115,611157591;1744957200,04-18 14:20,11.16,11.13,+0.10,+0.90,110300,1229984,55012415,612387575;1744957260,04-18 14:21,11.15,11.13,+0.09,+0.81,155100,1729241,55167515,614116816;1744957320,04-18 14:22,11.15,11.13,+0.09,+0.81,56500,629677,55224015,614746493;1744957380,04-18 14:23,11.14,11.13,+0.08,+0.72,36900,411364,55260915,615157857;1744957440,04-18 14:24,11.15,11.13,+0.09,+0.81,60500,674437,55321415,615832294;1744957500,04-18 14:25,11.15,11.13,+0.09,+0.81,206400,2300980,55527815,618133274;1744957560,04-18 14:26,11.15,11.13,+0.09,+0.81,65200,726928,55593015,618860202;1744957620,04-18 14:27,11.15,11.13,+0.09,+0.81,176300,1965676,55769315,620825878;1744957680,04-18 14:28,11.16,11.13,+0.10,+0.90,45100,503197,55814415,621329075;1744957740,04-18 14:29,11.15,11.13,+0.09,+0.81,89700,1000546,55904115,622329621;1744957800,04-18 14:30,11.15,11.13,+0.09,+0.81,272900,3043151,56177015,625372772;1744957860,04-18 14:31,11.15,11.13,+0.09,+0.81,88500,986893,56265515,626359665;1744957920,04-18 14:32,11.14,11.13,+0.08,+0.72,293500,3272511,56559015,629632176;1744957980,04-18 14:33,11.15,11.13,+0.09,+0.81,107600,1199138,56666615,630831314;1744958040,04-18 14:34,11.14,11.13,+0.08,+0.72,138400,1542032,56805015,632373346;1744958100,04-18 14:35,11.15,11.13,+0.09,+0.81,63100,703402,56868115,633076748;1744958160,04-18 14:36,11.14,11.13,+0.08,+0.72,129400,1441946,56997515,634518694;1744958220,04-18 14:37,11.14,11.13,+0.08,+0.72,267200,2979138,57264715,637497832;1744958280,04-18 14:38,11.14,11.13,+0.08,+0.72,100500,1119852,57365215,638617684;1744958340,04-18 14:39,11.14,11.13,+0.08,+0.72,39500,440130,57404715,639057814;1744958400,04-18 14:40,11.14,11.13,+0.08,+0.72,581800,6485858,57986515,645543672;1744958460,04-18 14:41,11.14,11.13,+0.08,+0.72,99500,1109190,58086015,646652862;1744958520,04-18 14:42,11.14,11.13,+0.08,+0.72,104600,1165387,58190615,647818249;1744958580,04-18 14:43,11.15,11.13,+0.09,+0.81,319400,3561038,58510015,651379287;1744958640,04-18 14:44,11.16,11.13,+0.10,+0.90,858300,9576801,59368315,660956088;1744958700,04-18 14:45,11.16,11.13,+0.10,+0.90,1372900,15328026,60741215,676284114;1744958760,04-18 14:46,11.17,11.13,+0.11,+0.99,820400,9159753,61561615,685443867;1744958820,04-18 14:47,11.15,11.13,+0.09,+0.81,758200,8467531,62319815,693911398;1744958880,04-18 14:48,11.17,11.13,+0.11,+0.99,730800,8161697,63050615,702073095;1744958940,04-18 14:49,11.17,11.13,+0.11,+0.99,809100,9036728,63859715,711109823;1744959000,04-18 14:50,11.17,11.14,+0.11,+0.99,515600,5758694,64375315,716868517;1744959060,04-18 14:51,11.18,11.14,+0.12,+1.08,888500,9929364,65263815,726797881;1744959120,04-18 14:52,11.17,11.14,+0.11,+0.99,1154700,12908337,66418515,739706218;1744959180,04-18 14:53,11.18,11.14,+0.12,+1.08,1500000,16768690,67918515,756474908;1744959240,04-18 14:54,11.18,11.14,+0.12,+1.08,954500,10667054,68873015,767141962;1744959300,04-18 14:55,11.17,11.14,+0.11,+0.99,776900,8681588,69649915,775823550;1744959360,04-18 14:56,11.18,11.14,+0.12,+1.08,1061200,11858659,70711115,787682209;1744959420,04-18 14:57,11.19,11.14,+0.13,+1.18,1155800,12925638,71866915,800607847;1744959480,04-18 14:58,11.18,11.14,+0.12,+1.08,20000,223736,71886915,800831583;1744959540,04-18 14:59,11.18,11.14,+0.12,+1.08,0,0,71886915,800831583;1744959600,04-18 15:00,11.18,11.14,+0.12,+1.08,822900,9200022,72709815,810031605"
+        }
+      ],
+      "maxPoints": "241",
+      "cx": [
+        "09:30",
+        "11:30/13:00",
+        "15:00"
+      ],
+      "cxData": [
+        "09:30",
+        "13:01",
+        "15:00"
+      ]
+    },
+    "tag_list": [
+      {
+        "desc": "Level1基础行情",
+        "imageUrl": "http://t10.baidu.com/it/u=1280803610,2567440904&fm=179&app=35&f=PNG?w=48&h=48&s=10D38A764E08A332531FCECD0300309F"
+      },
+      {
+        "desc": "深圳交易所",
+        "imageUrl": "http://t10.baidu.com/it/u=3194826341,4141941059&fm=179&app=35&f=PNG?w=48&h=48&s=2D978A5E4E2E1734462F27AD0300E00A"
+      },
+      {
+        "desc": "深港通标的股票",
+        "imageUrl": "http://t10.baidu.com/it/u=484491646,3844806078&fm=179&app=35&f=PNG?w=48&h=48&s=58D38A54E6449D3254DE5AD90300C0BC"
+      },
+      {
+        "desc": "融资融券标的",
+        "imageUrl": "http://t11.baidu.com/it/u=2925487871,1240424237&fm=179&app=35&f=PNG?w=48&h=48&s=58538A548E088D3204DBAAC90300F0BF",
+        "ext": "04月17日 融资余额：48.68亿 融券余额：780.39万"
+      }
+    ],
+    "foreign_key": "CNYHKD,CNYUSD",
+    "releaseDate": "1991-04-03",
+    "financeReport": {
+      "text": "预计于2025-04-19披露2025第一季报"
+    },
+    "accOpenData": {
+      "is_ad": "1",
+      "logo": "http://t12.baidu.com/it/u=2758839656,807343896&fm=58&app=72&f=PNG?w=120&h=120&s=7CB18A54742B830714AFB2E90300F01D",
+      "title": "上/深/北交所实时开户",
+      "rdetail": "",
+      "sdetail": "",
+      "urlType": "tc",
+      "button": "开户",
+      "labels": [
+        "头部券商",
+        "安全交易",
+        "超低佣金"
+      ],
+      "url": "http://pqa9p2.smartapps.baidu.com/pages/open-account-list/open-account-list?_swebfr=21&appKey=EbYDmUrYmMYe0O11Nt95wCFRbFUv6IGw&query=abcdef&tabIndex=0",
+      "ad_params": {
+        "pageNo": "",
+        "pageSize": "",
+        "srcId": "",
+        "tn": "",
+        "relation": "",
+        "src": "",
+        "source": "",
+        "query": "000001"
+      },
+      "url_xcx_params": {
+        "xcx_appkey": "EbYDmUrYmMYe0O11Nt95wCFRbFUv6IGw",
+        "xcx_path": "/pages/open-account-list/open-account-list",
+        "xcx_from": "1081000900000000",
+        "xcx_url": "",
+        "xcx_query": "tabIndex=0"
+      },
+      "ignore_click": "",
+      "mappID": ""
+    },
+    "isKc": "",
+    "useWS": "1",
+    "chartTabs": [
+      {
+        "text": "分时",
+        "type": "min",
+        "isK": "",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_minute_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&finClientType=pc"
+      },
+      {
+        "text": "五日",
+        "type": "five",
+        "isK": "",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_fiveday_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&finClientType=pc"
+      },
+      {
+        "text": "日K",
+        "type": "dayK",
+        "isK": "1",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=day&finClientType=pc"
+      },
+      {
+        "text": "周K",
+        "type": "weekK",
+        "isK": "1",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=week&finClientType=pc"
+      },
+      {
+        "text": "月K",
+        "type": "monthK",
+        "isK": "1",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=month&finClientType=pc"
+      },
+      {
+        "text": "季K",
+        "type": "quarterK",
+        "isK": "1",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=quarter&finClientType=pc"
+      },
+      {
+        "text": "年K",
+        "type": "yearK",
+        "isK": "1",
+        "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=year&finClientType=pc"
+      },
+      {
+        "text": "更多",
+        "type": "",
+        "isK": "",
+        "asyncUrl": "",
+        "options": [
+          {
+            "text": "1分",
+            "type": "1minK",
+            "isK": "1",
+            "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=min1"
+          },
+          {
+            "text": "5分",
+            "type": "5minK",
+            "isK": "1",
+            "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=min5"
+          },
+          {
+            "text": "15分",
+            "type": "15minK",
+            "isK": "1",
+            "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=min15"
+          },
+          {
+            "text": "30分",
+            "type": "30minK",
+            "isK": "1",
+            "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=min30"
+          },
+          {
+            "text": "60分",
+            "type": "60minK",
+            "isK": "1",
+            "asyncUrl": "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&pointType=string&group=quotation_kline_ab&query=000001&code=000001&market_type=ab&newFormat=1&name=平安银行&is_kc=0&ktype=min60"
+          }
+        ]
+      }
+    ],
+    "financeType": "stock",
+    "noticeMsgList": [
+      "预计于2025-04-19披露2025第一季报"
+    ]
+  }
+}
 
-  .append("| RangeGain = ").append(etsMapForRangeSortGain.get(stockId));
+alter table stock add column peratio VARCHAR(12);
+alter table stock add column lyr VARCHAR(12);
+alter table stock add column totalShareCapital VARCHAR(12);
+alter table stock add column currencyValue VARCHAR(12);
+alter table stock add column priceSaleRatio VARCHAR(12);
+alter table stock add column bvRatio VARCHAR(12);
+
+alter table stock add column total_share_capital VARCHAR(12);
+alter table stock add column currency_value VARCHAR(12);
+alter table stock add column price_sale_ratio VARCHAR(12);
+alter table stock add column bv_ratio VARCHAR(12);
+
+

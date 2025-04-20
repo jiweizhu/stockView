@@ -1,5 +1,6 @@
 package com.example.notification.http;
 
+import com.example.notification.baidu.vo.BdPanKouInfoVO;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.vo.CNDailyVO;
@@ -57,6 +58,11 @@ public class RestRequest {
     private static final String Baidu_IndustryIndicators_Url = "https://finance.pae.baidu.com/vapi/v2/blocks?pn=0&rn=150&market=ab&typeCode=HY&finClientType=pc";
     // For baidu indicators end
 
+    // get from bd for stock common data
+    //https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&all=1&code=300193&query=300193&eprop=min&stock_type=ab&chartType=minute&group=quotation_minute_ab&finClientType=pc
+    private static final String Bd_StockCommonData_URL = "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&all=1&code=$code&query=$code&eprop=min&stock_type=ab&chartType=minute&group=quotation_minute_ab&finClientType=pc";
+
+
     //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930693&startDate=20241008
     private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
 
@@ -88,18 +94,51 @@ public class RestRequest {
         return blockList;
     }
 
+    public BdPanKouInfoVO queryBaiduCommonDataAndSave(String code) {
+        String url = Bd_StockCommonData_URL.replace("$code", code);
+        BdPanKouInfoVO bdPanKouInfoVO = new BdPanKouInfoVO();
+        Map ret = restTemplate.getForObject(url, Map.class);
+        Map result = (Map) ret.get("Result");
+        Map newMarketData = (Map) result.get("pankouinfos");
+        List<Map> blocks = (List) newMarketData.get("list");
+        System.out.println("blocks = " + blocks);
+
+        for (Map node : blocks) {
+            String ename = node.get("ename").toString();
+            String value = node.get("value").toString();
+
+            switch (ename) {
+                case "peratio":
+                    bdPanKouInfoVO.setPeratio(value);
+                    break;
+                case "lyr":
+                    bdPanKouInfoVO.setLyr(value);
+                    break;
+                case "totalShareCapital":
+                    bdPanKouInfoVO.setTotalShareCapital(value);
+                    break;
+                case "currencyValue":
+                    bdPanKouInfoVO.setCurrencyValue(value);
+                    break;
+                case "priceSaleRatio":
+                    bdPanKouInfoVO.setPriceSaleRatio(value);
+                    break;
+                case "bvRatio":
+                    bdPanKouInfoVO.setBvRatio(value);
+                    break;
+            }
+        }
+        logger.info("Exit queryBaiduCommonData ============ code=={},", code);
+        return bdPanKouInfoVO;
+    }
+
     public List<IndicatorDayVO> queryBaiduIndustriesKline(String code, String kType, String startDay) {
         String url = BaiduIndustry_KLine_Url.replace("$code", code).replace("$ktype", kType).replace("$startTime", startDay);
-        if(code.equals("sh000300")){
-            url=  BaiduIndustry_Quotation_Url.replace("$startTime", startDay);
+        if (code.equals("sh000300")) {
+            url = BaiduIndustry_Quotation_Url.replace("$startTime", startDay);
         }
         List blockList = new ArrayList();
         try {
-            //========test data start ============
-//            String str = "{\"ResultCode\":0,\"ResultNum\":0,\"QueryID\":\"15878606086767837875\",\"Result\":{\"newMarketData\":{\"headers\":[\"时间戳\",\"时间\",\"开盘\",\"收盘\",\"成交量\",\"最高\",\"最低\",\"成交额\",\"涨跌额\",\"涨跌幅\",\"换手率\",\"昨收\",\"ma5均价\",\"ma5成交量\",\"ma10均价\",\"ma10成交量\",\"ma20均价\",\"ma20成交量\"],\"keys\":[\"timestamp\",\"time\",\"open\",\"close\",\"volume\",\"high\",\"low\",\"amount\",\"range\",\"ratio\",\"turnoverratio\",\"preClose\",\"ma5avgprice\",\"ma5volume\",\"ma10avgprice\",\"ma10volume\",\"ma20avgprice\",\"ma20volume\"],\"marketData\":\"1722528000,2024-08-02,386.06,404.72,377905688,413.49,382.64,1153733000.00,+19.61,+5.09,8.66,385.11,--,--,--,--,--,--;1723132800,2024-08-09,402.03,408.97,556910074,423.45,396.40,1759742000.00,+4.25,+1.05,12.76,404.72,--,--,--,--,--,--;1723737600,2024-08-16,408.64,396.71,384204638,408.64,395.92,1178719000.00,-12.26,-3.00,8.81,408.97,--,--,--,--,--,--;1724342400,2024-08-23,395.68,394.27,504846472,405.82,388.37,1512805000.00,-2.44,-0.62,11.57,396.71,--,--,--,--,--,--;1724947200,2024-08-30,393.58,409.08,548006805,416.67,383.86,1632110000.00,+14.81,+3.76,12.57,394.27,402.75,474374735,--,--,--,--;1725552000,2024-09-06,407.81,394.25,507392485,409.82,393.62,1437271000.00,-14.83,-3.63,11.63,409.08,400.66,500272095,--,--,--,--;1726156800,2024-09-13,392.14,396.67,537687022,408.72,388.56,1387736000.00,+2.42,+0.61,12.33,394.25,398.20,496427484,--,--,--,--;1726761600,2024-09-20,396.15,405.74,337427922,409.34,388.11,1030068000.00,+9.07,+2.29,7.74,396.67,400.00,487072141,--,--,--,--;1727366400,2024-09-27,403.03,454.03,860103865,456.87,400.11,2605300000.00,+48.29,+11.90,19.70,405.74,411.95,558123620,--,--,--,--;1727625600,2024-09-30,467.54,496.20,375108730,499.46,457.09,1352175000.00,+42.17,+9.29,8.60,454.03,429.38,523544005,416.06,498959370,--,--;1728576000,2024-10-11,549.36,456.00,1062141793,549.36,450.36,4123613000.00,-40.20,-8.10,24.34,496.20,441.73,634493866,421.19,567382981,--,--;1729180800,2024-10-18,458.35,459.77,613548953,469.16,448.96,2211738000.00,+3.77,+0.83,14.06,456.00,454.35,649666253,426.27,573046868,--,--;1729785600,2024-10-25,465.52,490.89,821725498,493.99,465.25,3113329000.00,+31.12,+6.77,18.82,459.77,471.38,746525768,435.69,616798954,--,--;1730390400,2024-11-01,491.22,518.19,1261964550,534.68,486.99,4533437000.00,+27.30,+5.56,28.91,490.89,484.21,826897905,448.08,692510762,--,--;1730995200,2024-11-08,516.33,598.14,2603343630,620.03,502.55,10255950000.00,+79.95,+15.43,59.66,518.19,504.60,1272544885,466.99,898044445,--,--;1731600000,2024-11-15,584.46,538.99,1705291980,590.71,538.99,7043106000.00,-59.15,-9.89,39.07,598.14,521.20,1401174922,481.46,1017834394,--,--;1732204800,2024-11-22,542.73,528.30,1038577579,557.18,524.20,4054383000.00,-10.69,-1.98,23.79,538.99,534.90,1486180647,494.62,1067923450,--,--;1732809600,2024-11-29,534.47,582.02,1514934529,584.29,534.46,6162136000.00,+53.72,+10.17,34.73,528.30,553.13,1624822454,512.25,1185674111,--,--;1733414400,2024-12-06,585.02,612.02,1912799209,622.63,579.70,7875750000.00,+30.00,+5.15,43.83,582.02,571.89,1754989385,528.05,1290943645,--,--;1733673600,2024-12-09,608.81,618.57,433270600,625.07,605.48,1912399000.00,+6.55,+1.07,9.93,612.02,575.98,1320974779,540.29,1296759832,478.18,897859601\"}}}";
-//            Map ret = objectMapper.readValue(str, Map.class);
-            //========test data end ============
-
             Map ret = restTemplate.getForObject(url, Map.class);
             Map result = (Map) ret.get("Result");
             Map newMarketData = (Map) result.get("newMarketData");
@@ -266,7 +305,7 @@ public class RestRequest {
 
             JsonNode bodyNode = rootNode.at("/Result/0/DisplayData/resultData/tplData/result/content/tabs/0/content/heavyStock/body");
             if (bodyNode.isArray()) {
-               return bodyNode;
+                return bodyNode;
             }
             logger.info("=====Warning ======queryEtfInfoFromBd==not found ETF info from Baidu==etfId={}", etfId);
             return null;

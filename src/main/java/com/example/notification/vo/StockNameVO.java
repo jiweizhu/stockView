@@ -25,6 +25,26 @@ public class StockNameVO {
     private String marketValue;
 
 
+    //滚动市盈率（TTM）为：当前市值除以最近4个季度净利润之和
+    @Column(name = "peratio")
+    private String peratio;
+    //市盈(静)
+    @Column(name = "lyr")
+    private String lyr;
+    //总股本
+    @Column(name = "totalShareCapital")
+    private String totalShareCapital;
+    //流通股本
+    @Column(name = "currencyValue")
+    private String currencyValue;
+    //市销率
+    @Column(name = "priceSaleRatio")
+    private String priceSaleRatio;
+    //市净率
+    @Column(name = "bvRatio")
+    private String bvRatio;
+
+
     // sort type number
     // 400 profit>0 & profitGain > 0
     // 300 profit>0 & profitGain < 0

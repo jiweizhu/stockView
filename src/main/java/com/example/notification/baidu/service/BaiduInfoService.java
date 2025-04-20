@@ -3,6 +3,7 @@ package com.example.notification.baidu.service;
 import com.example.notification.baidu.respVo.FinancialRespVO;
 import com.example.notification.baidu.respVo.IndexDropRangeRespVO;
 import com.example.notification.baidu.vo.BdFinancialNetVO;
+import com.example.notification.baidu.vo.BdPanKouInfoVO;
 import com.example.notification.baidu.vo.IndicatorDayVO;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.businessVo.StockBisVO;
@@ -1314,5 +1315,24 @@ public class BaiduInfoService {
             return;
         }
         entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ").executeUpdate();
+    }
+
+    public Object stockCommonData() throws InterruptedException {
+        //get from bd set market value etc.
+        logger.info("======Enter method BaiduInfoService stockCommonData========");
+        List<String> stockIds = stockDao.findStockIds();
+        if(Utils.isWinSystem()){
+            stockIds = new ArrayList<>();
+            stockIds.add("sh600487");
+        }
+        for (String stockId : stockIds) {
+            Thread.sleep(500);//slow to avoid too many request
+            BdPanKouInfoVO retVo = restRequest.queryBaiduCommonDataAndSave(stockId.substring(2));
+            StockNameVO stockNameVO = stockDao.findById(stockId).get();
+            BeanUtils.copyProperties(retVo, stockNameVO);
+            stockDao.save(stockNameVO);
+        }
+        logger.info("======End method BaiduInfoService stockCommonData========");
+        return null;
     }
 }

@@ -38,6 +38,13 @@ public class BaiDuController {
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
+    @RequestMapping(value = {"/bd/getFromBd/commonData"})
+    @ResponseBody
+    public Object commonData() throws InterruptedException {
+        logger.info("======Enter method commonData========");
+        return baiduInfoService.stockCommonData();
+    }
+
     @RequestMapping(value = {"/bd/rangeSort/view"})
     @ResponseBody
     public Object rangeSortQuery() {

@@ -80,6 +80,8 @@ public class Timer {
 
             baiduInfoService.calculateDropRange();
 
+            baiduInfoService.stockCommonData();
+
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
