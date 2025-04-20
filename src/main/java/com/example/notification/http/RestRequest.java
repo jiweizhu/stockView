@@ -94,41 +94,43 @@ public class RestRequest {
         return blockList;
     }
 
-    public BdPanKouInfoVO queryBaiduCommonDataAndSave(String code) {
+    public BdPanKouInfoVO queryBaiduCommonData(String code) {
         String url = Bd_StockCommonData_URL.replace("$code", code);
         BdPanKouInfoVO bdPanKouInfoVO = new BdPanKouInfoVO();
-        Map ret = restTemplate.getForObject(url, Map.class);
-        Map result = (Map) ret.get("Result");
-        Map newMarketData = (Map) result.get("pankouinfos");
-        List<Map> blocks = (List) newMarketData.get("list");
-        System.out.println("blocks = " + blocks);
+        try {
+            Map ret = restTemplate.getForObject(url, Map.class);
+            Map result = (Map) ret.get("Result");
+            Map newMarketData = (Map) result.get("pankouinfos");
+            List<Map> blocks = (List) newMarketData.get("list");
 
-        for (Map node : blocks) {
-            String ename = node.get("ename").toString();
-            String value = node.get("value").toString();
+            for (Map node : blocks) {
+                String ename = node.get("ename").toString();
+                String value = node.get("value").toString();
 
-            switch (ename) {
-                case "peratio":
-                    bdPanKouInfoVO.setPeratio(value);
-                    break;
-                case "lyr":
-                    bdPanKouInfoVO.setLyr(value);
-                    break;
-                case "totalShareCapital":
-                    bdPanKouInfoVO.setTotalShareCapital(value);
-                    break;
-                case "currencyValue":
-                    bdPanKouInfoVO.setCurrencyValue(value);
-                    break;
-                case "priceSaleRatio":
-                    bdPanKouInfoVO.setPriceSaleRatio(value);
-                    break;
-                case "bvRatio":
-                    bdPanKouInfoVO.setBvRatio(value);
-                    break;
+                switch (ename) {
+                    case "peratio":
+                        bdPanKouInfoVO.setPeratio(value);
+                        break;
+                    case "lyr":
+                        bdPanKouInfoVO.setLyr(value);
+                        break;
+                    case "totalShareCapital":
+                        bdPanKouInfoVO.setTotalShareCapital(value);
+                        break;
+                    case "currencyValue":
+                        bdPanKouInfoVO.setCurrencyValue(value);
+                        break;
+                    case "priceSaleRatio":
+                        bdPanKouInfoVO.setPriceSaleRatio(value);
+                        break;
+                    case "bvRatio":
+                        bdPanKouInfoVO.setBvRatio(value);
+                        break;
+                }
             }
+        } catch (Exception e) {
+            logger.error("Fail to queryBaiduCommonData.============ Please have a check: https://finance.pae.baidu.com/vapi/v2/stock/pankouinfos?stockCode=$code ", e);
         }
-        logger.info("Exit queryBaiduCommonData ============ code=={},", code);
         return bdPanKouInfoVO;
     }
 

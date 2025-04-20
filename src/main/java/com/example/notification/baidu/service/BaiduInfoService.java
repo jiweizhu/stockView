@@ -1321,13 +1321,17 @@ public class BaiduInfoService {
         //get from bd set market value etc.
         logger.info("======Enter method BaiduInfoService stockCommonData========");
         List<String> stockIds = stockDao.findStockIds();
-        if(Utils.isWinSystem()){
+        if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sh600487");
         }
         for (String stockId : stockIds) {
+            if (!stockId.startsWith("s")) {
+                //just handle stock
+                continue;
+            }
             Thread.sleep(500);//slow to avoid too many request
-            BdPanKouInfoVO retVo = restRequest.queryBaiduCommonDataAndSave(stockId.substring(2));
+            BdPanKouInfoVO retVo = restRequest.queryBaiduCommonData(stockId.substring(2));
             StockNameVO stockNameVO = stockDao.findById(stockId).get();
             BeanUtils.copyProperties(retVo, stockNameVO);
             stockDao.save(stockNameVO);
