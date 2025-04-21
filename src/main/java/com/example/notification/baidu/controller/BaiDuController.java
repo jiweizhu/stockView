@@ -7,7 +7,6 @@ import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
 import com.example.notification.repository.BdIndicatorDao;
-import com.example.notification.service.ETFViewService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
@@ -38,17 +37,70 @@ public class BaiDuController {
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
+    //=========Start========Get from Net=====================//
     @RequestMapping(value = {"/bd/getFromBd/commonData"})
     @ResponseBody
-    public Object commonData() throws InterruptedException {
-        logger.info("======Enter method commonData========");
-        return baiduInfoService.stockCommonData();
+    public void commonData() throws InterruptedException {
+        logger.info("======Enter BaiDuController commonData========");
+        baiduInfoService.stockCommonData();
     }
+
+
+    @RequestMapping(value = {"/bd/getFromBd/topHolder"})
+    @ResponseBody
+    public void topHolder() throws InterruptedException {
+        logger.info("======Enter BaiDuController topHolder========");
+        baiduInfoService.getTopHolderFromNet();
+    }
+
+    @RequestMapping(value = {"/bd/getFromBd/queryBaiduIncomeDataFromNetForAllStocks"})
+    @ResponseBody
+    public void queryBaiduIncomeDataFromNetForAllStocks() throws InterruptedException {
+        logger.info("======Enter BaiDuController queryBaiduIncomeDataFromNetForAllStocks========");
+        baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
+    }
+
+    @RequestMapping(value = {"/bd/init/getFromNetAndStore"})
+    @ResponseBody
+    public ResponseEntity getFromNetAndStore() {
+        baiduInfoService.getFromNetAndStoreDay(250);
+//        baiduInfoService.getFromNetAndStoreWeek(false);
+        return ResponseEntity.ofNullable("finish getFromNetAndStore");
+    }
+    //=========End========Get from Net=====================//
+
+
+    //=========Start========handle data internal=====================//
+
+    // when got new indicator dropRange record, need to sort range for stock
+    @RequestMapping(value = {"/bd/calculateStockDropRange"})
+    @ResponseBody
+    public Object calculateStockDropRange() {
+        logger.info("======Enter BaiDuController calculateStockDropRange========");
+        baiduInfoService.calculateStockDropRange();
+        return "successfully";
+    }
+    @RequestMapping(value = {"/bd/calculateRangeSort"})
+    @ResponseBody
+    public ResponseEntity calculateRangeSort() {
+        baiduInfoService.calculateRangeSort();
+        return ResponseEntity.ofNullable("finish calculateRangeSort");
+    }
+
+    @RequestMapping(value = {"/bd/updateFinancialReportSum"})
+    @ResponseBody
+    public ResponseEntity updateFinancialReportSum() {
+        baiduInfoService.updateFinancialReportSum();
+        return ResponseEntity.ofNullable("finish updateFinancialReportSum");
+    }
+
+    //========End=========handle data internal=====================//
+
 
     @RequestMapping(value = {"/bd/rangeSort/view"})
     @ResponseBody
     public Object rangeSortQuery() {
-        logger.info("======Enter method rangeSortQuery========");
+        logger.info("======Enter BaiDuController rangeSortQuery========");
         List<RangeSortRespVO> retList = new ArrayList<>();
         baiduInfoService.rangeSortQuery().forEach(vo -> {
             RangeSortRespVO respVO = new RangeSortRespVO();
@@ -64,14 +116,14 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/queryIndexDropRangeAll"})
     @ResponseBody
     public Object queryIndexDropRangeAll() {
-        logger.info("======Enter method queryIndexDropRangeAll========");
+        logger.info("======Enter BaiDuController queryIndexDropRangeAll========");
         return baiduInfoService.queryIndexDropRangeAll();
     }
 
     @RequestMapping(value = {"/bd/queryIndexDropRangeByIndicator"})
     @ResponseBody
     public Object queryIndexDropRangeByIndicator() {
-        logger.info("======Enter method queryIndexDropRangeByIndicator========");
+        logger.info("======Enter BaiDuController queryIndexDropRangeByIndicator========");
         String targetFile = Controller.getTargetFile();
         return baiduInfoService.queryIndexDropRangeByIndicator(targetFile);
     }
@@ -79,14 +131,14 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/dropRange/stocksView/{stockId_startDay}"})
     @ResponseBody
     public Object dropRangeStocksView(@PathVariable String stockId_startDay) {
-        logger.info("======Enter method dropRangeStocksView====stockId_startDay={}", stockId_startDay);
+        logger.info("======Enter BaiDuController dropRangeStocksView====stockId_startDay={}", stockId_startDay);
         return baiduInfoService.dropRangeStocksView(stockId_startDay);
     }
 
     @RequestMapping(value = {"/bd/dropRange/{indicatorId_rangId}"})
     @ResponseBody
     public Object dropRangeStocksSort(@PathVariable String indicatorId_rangId) {
-        logger.info("======Enter method dropRangeStocksSort========{}", indicatorId_rangId);
+        logger.info("======Enter BaiDuController dropRangeStocksSort========{}", indicatorId_rangId);
         String[] split = indicatorId_rangId.split("_");
         Controller.setTargetFile(split[0]);
         return baiduInfoService.dropRangeStocksSort(split[1]);
@@ -96,7 +148,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/DropRange/{stockId}"})
     @ResponseBody
     public Object queryIndexDropRangeByIndex(@PathVariable String stockId) {
-        logger.info("======Enter method queryIndexDropRange========");
+        logger.info("======Enter BaiDuController queryIndexDropRange========");
         return baiduInfoService.queryIndexDropRange(stockId);
     }
 
@@ -105,22 +157,11 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/calculateDropRange"})
     @ResponseBody
     public Object calculateDropRange() {
-        logger.info("======Enter method calculateDropRange========");
+        logger.info("======Enter BaiDuController calculateDropRange========");
         baiduInfoService.calculateDropRange();
         baiduInfoService.calculateStockDropRange();
         return "successfully";
     }
-
-
-    // when got new indicator dropRange record, need to sort range for stock
-    @RequestMapping(value = {"/bd/calculateStockDropRange"})
-    @ResponseBody
-    public Object calculateStockDropRange() {
-        logger.info("======Enter method calculateStockDropRange========");
-        baiduInfoService.calculateStockDropRange();
-        return "successfully";
-    }
-
 
     @RequestMapping(value = {"/bd/financialList/{stockId}"})
     @ResponseBody
@@ -185,7 +226,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/indicatorStocksView"})
     @ResponseBody
     public ResponseEntity indicatorStocksView(@PathVariable String indicatorId) {
-        logger.info("Enter method indicatorStocksView=========");
+        logger.info("Enter BaiDuController indicatorStocksView=========");
         Object body = baiduInfoService.indicatorStocksView(indicatorId);
         return ResponseEntity.ofNullable(body);
     }
@@ -204,52 +245,14 @@ public class BaiDuController {
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 
-    @RequestMapping(value = {"/bd/init/getFromNetAndStore"})
-    @ResponseBody
-    public ResponseEntity getFromNetAndStore() {
-        baiduInfoService.getFromNetAndStoreDay(250);
-//        baiduInfoService.getFromNetAndStoreWeek(false);
-        return ResponseEntity.ofNullable("finish getFromNetAndStore");
-    }
-
-    @RequestMapping(value = {"/bd/calculateRangeSort"})
-    @ResponseBody
-    public ResponseEntity calculateRangeSort() {
-        baiduInfoService.calculateRangeSort();
-        return ResponseEntity.ofNullable("finish calculateRangeSort");
-    }
-
-
-    @RequestMapping(value = {"/bd/updateFinancialReportSum"})
-    @ResponseBody
-    public ResponseEntity updateFinancialReportSum() {
-        baiduInfoService.updateFinancialReportSum();
-        return ResponseEntity.ofNullable("finish updateFinancialReportSum");
-    }
 
 
     // manually update config data
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
-    public ResponseEntity updateIndicatorBelongStocks() {
+    public ResponseEntity updateManually() {
         baiduInfoService.getFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
-    }
-
-
-    @Autowired
-    private ETFViewService etfViewService;
-
-    //test api
-    @RequestMapping(value = {"/bd/test"})
-    @ResponseBody
-    public ResponseEntity test() throws Exception {
-        baiduInfoService.calculateDropRange();
-//        Object body = kLineMarketClosedService.deleteDayHistoryData();
-//        etfViewService.generateReportEveryDay();
-
-//        baiduInfoService.findStocksAmplitudeDuringIndicatorDown();
-        return ResponseEntity.ok("SuccessFully done! ");
     }
 
 

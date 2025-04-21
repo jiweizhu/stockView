@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public interface BdFinacialDao extends JpaRepository<BdFinancialVO, BdFinancialKey>, JpaSpecificationExecutor<BdFinancialVO>, Serializable {
@@ -17,6 +18,12 @@ public interface BdFinacialDao extends JpaRepository<BdFinancialVO, BdFinancialK
 
     @Query(value = "SELECT * FROM bd_financial where gross_income is null limit 5000 ", nativeQuery = true)
     List<BdFinancialVO> findByStockIdLimit();
+
+    @Query(value = "SELECT stock_id FROM bd_financial where last_updated_time < ?1 group by stock_id", nativeQuery = true)
+    List<String> findNotYetUpdated(Date day);
+
+    @Query(value = "SELECT * FROM bd_financial where stock_id = ?1 and report_day = ?2 ", nativeQuery = true)
+    BdFinancialVO findByStockIdAndDay(String stock_id, Date day);
 
     @Query(value = "SELECT * FROM bd_financial where stock_id = ?1  order by report_day desc limit 2 ", nativeQuery = true)
     List<BdFinancialVO> findLast2ByStockId(String stock_id);

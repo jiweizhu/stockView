@@ -82,6 +82,7 @@ public class ETFViewService {
 //        if (!ifMarketOpenToday) {
 //            return;
 //        }
+        logger.info("======Enter ETFViewService generateReportEveryDay========");
         //just need to get all stocks from stock table, and then get today's kline price to store in db and calculate avg data
         kLineMarketClosedService.getHistoryPriceOnLineAndStoreInDb(MARKETDAYCLOSEDJOB_QUERY_PRICE_DAY);
         Thread.sleep(25000);

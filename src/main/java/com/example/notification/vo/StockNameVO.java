@@ -21,9 +21,6 @@ public class StockNameVO {
     @Column(name = "stockName")
     private String stockName;
 
-    @Column(name = "market_value")
-    private String marketValue;
-
 
     //滚动市盈率（TTM）为：当前市值除以最近4个季度净利润之和
     @Column(name = "peratio")

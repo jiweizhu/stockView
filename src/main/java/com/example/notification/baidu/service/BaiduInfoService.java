@@ -255,7 +255,8 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
-            nameDiv.append("</b></a>").append("| RangeGain = ").append(stock.getCustomerRange());
+            nameDiv.append("</b></a>").append(stock.getCurrencyValue())
+                    .append("| RangeGain = ").append(stock.getCustomerRange());
             tdHtml.append(nameDiv);
 
             StringBuilder dayDiv = new StringBuilder("<div>");
@@ -915,11 +916,11 @@ public class BaiduInfoService {
 
     private static String changeReportDay(String reportDay) {
         if (reportDay.contains("一季报")) {
-            reportDay = reportDay.replace("一季报", SEASON_DAY_0401);
+            reportDay = reportDay.replace("一季报", SEASON_DAY_0331);
         } else if (reportDay.contains("三季报")) {
-            reportDay = reportDay.replace("三季报", SEASON_DAY_0901);
+            reportDay = reportDay.replace("三季报", SEASON_DAY_0930);
         } else if (reportDay.contains("中报")) {
-            reportDay = reportDay.replace("中报", SEASON_DAY_0701);
+            reportDay = reportDay.replace("中报", SEASON_DAY_0630);
         } else {
             reportDay = reportDay.replace("年报", SEASON_DAY_1231);
         }
@@ -927,32 +928,26 @@ public class BaiduInfoService {
     }
 
 
-    public void queryBaiduIncomeDataFromNetForAllStocks() {
-        List<StockNameVO> all = stockDao.findAll();
-        if (Utils.isWinSystem()) {
-            //for local test
-            List<String> addList = new ArrayList<>();
-            addList.add("sh600498");
-            addList.add("sh600487");
-            addList.add("sh600522");
-            addList.add("sh603083");
-            addList.add("sz002313");
-            addList.add("sz000063");
-            all = new ArrayList<>();
-            for (String str : addList) {
-                all.add(new StockNameVO(str, str));
-            }
-        }
-        all.forEach(vo -> {
+    public void queryBaiduIncomeDataFromNetForAllStocks() throws InterruptedException {
+        Calendar calendar = Calendar.getInstance();
+
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        //last_updated_time 在前一天前的， 找出来update
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+
+        long previousDayInMillis = calendar.getTimeInMillis();
+
+        Timestamp previousDayTimestamp = new Timestamp(previousDayInMillis);
+        List<String> notYetUpdated = bdFinacialDao.findNotYetUpdated(previousDayTimestamp);
+        for (String id : notYetUpdated) {
             try {
-                if (!vo.getStockId().startsWith("s") || vo.getStockName().toLowerCase().contains("etf")) {
-                    return;
-                }
-                queryBaiduIncomeDataFromNet(vo.getStockId());
+                Thread.sleep(1000);
+                queryBaiduIncomeDataFromNet(id);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }
     }
 
     public void queryBaiduIncomeDataFromNet(String stockId) throws JsonProcessingException {
@@ -960,11 +955,16 @@ public class BaiduInfoService {
         if (jsonNode != null && jsonNode.isArray()) {
             for (JsonNode node : jsonNode) {
                 BdFinancialNetVO bdFinancialVO = objectMapper.treeToValue(node, BdFinancialNetVO.class);
-                BdFinancialVO target = new BdFinancialVO();
-                target.setStockId(stockId);
                 String reportDay = bdFinancialVO.getText();
                 reportDay = changeReportDay(reportDay);
-                target.setReportDay(reportDay);
+
+                //if target exists, update it
+                BdFinancialVO target = bdFinacialDao.findByStockIdAndDay(stockId, Date.valueOf(reportDay));
+                if (target == null) {
+                    target = new BdFinancialVO();
+                    target.setStockId(stockId);
+                    target.setReportDay(reportDay);
+                }
                 String content = objectMapper.writeValueAsString(bdFinancialVO.getContent());
                 target.setContent(content);
 
@@ -1309,17 +1309,19 @@ public class BaiduInfoService {
     private EntityManager entityManager;
 
     public void updateZ1ToToday() {
+        logger.info("======Enter BaiduInfoService updateZ1ToToday========");
         RangeSortIDVO z1Day = rangeSortIdDao.findZ1Day();
         Date date = Date.valueOf(LocalDate.now());
         if (z1Day.getDayEnd().toString().equals(date.toString())) {
             return;
         }
         entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ").executeUpdate();
+        logger.info("======End BaiduInfoService updateZ1ToToday========");
     }
 
-    public Object stockCommonData() throws InterruptedException {
+    public void stockCommonData() throws InterruptedException {
         //get from bd set market value etc.
-        logger.info("======Enter method BaiduInfoService stockCommonData========");
+        logger.info("======Enter BaiduInfoService stockCommonData========");
         List<String> stockIds = stockDao.findStockIds();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
@@ -1330,13 +1332,45 @@ public class BaiduInfoService {
                 //just handle stock
                 continue;
             }
-            Thread.sleep(500);//slow to avoid too many request
+            Thread.sleep(1000);//slow to avoid too many request
             BdPanKouInfoVO retVo = restRequest.queryBaiduCommonData(stockId.substring(2));
             StockNameVO stockNameVO = stockDao.findById(stockId).get();
             BeanUtils.copyProperties(retVo, stockNameVO);
+            stockNameVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
             stockDao.save(stockNameVO);
         }
-        logger.info("======End method BaiduInfoService stockCommonData========");
-        return null;
+        logger.info("======End BaiduInfoService stockCommonData========");
     }
+
+    public void getTopHolderFromNet() throws InterruptedException {
+        //get from bd and save in bd_financial
+        logger.info("======Enter BaiduInfoService getTopHolderFromNet========");
+        List<String> stockIds = stockDao.findStockIds();
+        if (Utils.isWinSystem()) {
+            stockIds = new ArrayList<>();
+            stockIds.add("sh600487");
+        }
+        for (String stockId : stockIds) {
+            if (!stockId.startsWith("s")) {
+                //just handle stock
+                continue;
+            }
+            Thread.sleep(1000);//slow to avoid too many request
+            Map<String, String> retVo = restRequest.queryBaiduHolderData(stockId.substring(2));
+            String day = retVo.get("day");
+            Date recordDay = Date.valueOf(day);
+            BdFinancialVO byStockId = bdFinacialDao.findByStockIdAndDay(stockId, recordDay);
+            if (byStockId == null) {
+                //insert a new record
+                byStockId = new BdFinancialVO();
+                byStockId.setStockId(stockId);
+                byStockId.setReportDay(day);
+            }
+            byStockId.setTopHolders(retVo.get("ret"));
+            byStockId.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+            bdFinacialDao.save(byStockId);
+        }
+        logger.info("======End BaiduInfoService getTopHolderFromNet========");
+    }
+
 }

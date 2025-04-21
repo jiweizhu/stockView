@@ -62,9 +62,9 @@ public class Constants {
     }
 
     //season
-    public static String SEASON_DAY_0401 = "0401";
-    public static String SEASON_DAY_0701 = "0701";
-    public static String SEASON_DAY_0901 = "0901";
+    public static String SEASON_DAY_0331 = "0331";
+    public static String SEASON_DAY_0630 = "0630";
+    public static String SEASON_DAY_0930 = "0930";
     public static String SEASON_DAY_1231 = "1231";
 
 

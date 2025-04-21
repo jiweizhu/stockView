@@ -4,86 +4,21 @@
       {
         "body": [
           [
-            "利息净收入",
-            "-7.52%$$$1",
-            "187.96亿"
+            "其中:营业收入",
+            "+137.97%$$$3",
+            "5.82亿"
           ],
           [
-            "其中:利息收入",
-            "+0.16%$$$3",
-            "382.41亿"
-          ],
-          [
-            "其中:利息支出",
-            "+8.90%$$$3",
-            "194.45亿"
-          ],
-          [
-            "手续费及佣金净收入",
-            "+27.70%$$$3",
-            "29.18亿"
-          ],
-          [
-            "投资净收益",
-            "+114.66%$$$3",
-            "15.52亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=投资净收益"
-          ],
-          [
-            "其中:对联营合营企业的投资收益",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "公允价值变动净收益",
-            "+106.98%$$$3",
-            "5.34亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=公允价值变动净收益"
-          ],
-          [
-            "净敞口套期收益",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "汇兑收益",
-            "+4400.00%$$$7",
-            "1.35亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=汇兑收益"
-          ],
-          [
-            "资产处置收益",
-            "+88.89%$$$3",
-            "-100.00万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=资产处置收益"
-          ],
-          [
-            "其他收益",
-            "+1000.00%$$$3",
-            "1100万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=其他收益"
-          ],
-          [
-            "其他业务收入",
-            "+120.00%$$$3",
-            "5500万"
-          ],
-          [
-            "营业收入特殊项目",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "营业收入调整项目",
+            "其他营业收入",
             "--$$$2",
             "--"
           ]
         ],
         "header": [
           "一、总营收",
-          "+1.65%$$$1",
-          "240.00亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=总营收"
+          "+137.97%$$$1",
+          "5.82亿",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=总营收"
         ]
       }
     ]
@@ -93,58 +28,116 @@
       {
         "body": [
           [
-            "营业税金及附加",
-            "+8.94%$$$3",
-            "2.56亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=营业税金及附加"
+            "其中:营业成本",
+            "+126.68%$$$3",
+            "5.16亿",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业成本"
           ],
           [
-            "业务及管理费",
-            "+16.68%$$$3",
-            "68.21亿"
+            "其他营业成本",
+            "--$$$2",
+            "--"
+          ],
+          [
+            "营业税金及附加",
+            "+145.51%$$$3",
+            "64.30万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业税金及附加"
+          ],
+          [
+            "销售费用",
+            "+134.88%$$$3",
+            "400.37万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=销售费用"
+          ],
+          [
+            "管理费用",
+            "+27.34%$$$3",
+            "1494万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=管理费用"
           ],
           [
             "财务费用",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=财务费用"
+            "+203.65%$$$3",
+            "2041万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=财务费用"
           ],
           [
             "研发费用",
             "--$$$2",
             "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=研发费用"
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=研发费用"
           ],
           [
             "信用减值损失",
-            "-10.28%$$$1",
-            "93.53亿"
-          ],
-          [
-            "资产减值损失",
-            "-11.76%$$$1",
-            "3000万"
-          ],
-          [
-            "其他业务成本",
-            "+0.00%$$$2",
-            "800.00万"
-          ],
-          [
-            "营业支出特殊项目",
             "--$$$2",
             "--"
           ],
           [
-            "营业支出调整项目",
+            "资产减值损失",
             "--$$$2",
             "--"
           ]
         ],
         "header": [
-          "二、营业支出",
-          "-0.48%$$$-1",
-          "164.68亿"
+          "二、营业总成本",
+          "+124.14%$$$1",
+          "5.56亿",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业总成本"
+        ]
+      }
+    ]
+  },
+  {
+    "data": [
+      {
+        "body": [
+          [
+            "公允价值变动净收益",
+            "--$$$2",
+            "--",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=公允价值变动净收益"
+          ],
+          [
+            "投资净收益",
+            "--$$$2",
+            "--",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=投资净收益"
+          ],
+          [
+            "净敞口套期收益",
+            "--$$$2",
+            "--"
+          ],
+          [
+            "其中:对联营合营企业的投资收益",
+            "--$$$2",
+            "--"
+          ],
+          [
+            "汇兑收益",
+            "--$$$2",
+            "--",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=汇兑收益"
+          ],
+          [
+            "资产处置收益",
+            "--$$$2",
+            "-9.61万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=资产处置收益"
+          ],
+          [
+            "其他收益",
+            "-99.95%$$$1",
+            "4561.26",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=其他收益"
+          ]
+        ],
+        "header": [
+          "三、非经营性净收益",
+          "-100.44%$$$-1",
+          "-23.50万",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=非经营性净收益"
         ]
       }
     ]
@@ -155,32 +148,22 @@
         "body": [
           [
             "加:营业外收入",
-            "+11.90%$$$3",
-            "4700万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=营业外收入"
+            "-76.66%$$$1",
+            "190.64万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业外收入"
           ],
           [
             "减:营业外支出",
-            "+37.50%$$$3",
-            "3300万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=营业外支出"
-          ],
-          [
-            "加:影响利润总额的其他科目",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "加:影响利润总额的调整项目",
-            "--$$$2",
-            "--"
+            "-96.70%$$$1",
+            "59.67万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业外支出"
           ]
         ],
         "header": [
-          "三、营业利润",
-          "+6.64%$$$1",
-          "75.32亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=营业利润"
+          "四、营业利润",
+          "-48.61%$$$-1",
+          "2529万",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业利润"
         ]
       }
     ]
@@ -190,31 +173,22 @@
       {
         "body": [
           [
-            "减:所得税",
-            "+11.66%$$$3",
-            "18.19亿"
+            "减:所得税费用",
+            "-79.82%$$$1",
+            "573.61万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=所得税费用"
           ],
           [
             "加:未确认的投资损失",
             "--$$$2",
             "--"
-          ],
-          [
-            "加:影响净利润的其他科目",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "加:影响净利润的调整项目",
-            "--$$$2",
-            "--"
           ]
         ],
         "header": [
-          "四、利润总额",
-          "+6.57%$$$1",
-          "75.46亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=利润总额"
+          "五、利润总额",
+          "-32.29%$$$-1",
+          "2660万",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=利润总额"
         ]
       }
     ]
@@ -225,22 +199,22 @@
         "body": [
           [
             "归属于母公司所有者的净利润",
-            "+5.06%$$$3",
-            "56.26亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=归属于母公司所有者的净利润"
+            "+14.37%$$$3",
+            "1243万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的净利润"
           ],
           [
             "少数股东损益",
-            "+4.12%$$$3",
-            "1.01亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=少数股东损益"
+            "+12978347.00%$$$3",
+            "843.59万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=少数股东损益"
           ]
         ],
         "header": [
-          "五、合并净利润",
-          "+5.04%$$$1",
-          "57.27亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=合并净利润"
+          "六、合并净利润",
+          "+92.00%$$$1",
+          "2086万",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=合并净利润"
         ]
       }
     ]
@@ -251,26 +225,21 @@
         "body": [
           [
             "归属于母公司所有者的其他综合收益总额",
-            "-324.28%$$$1",
-            "-5.45亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=归属于母公司所有者的其他综合收益总额"
+            "--$$$2",
+            "--",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的其他综合收益总额"
           ],
           [
             "归属于少数股东的其他综合收益总额",
             "--$$$2",
             "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=归属于少数股东的其他综合收益总额"
-          ],
-          [
-            "加:影响综合收益总额的调整项目",
-            "--$$$2",
-            "--"
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于少数股东的其他综合收益总额"
           ]
         ],
         "header": [
-          "六、其他综合收益",
-          "-324.28%$$$-1",
-          "-5.45亿"
+          "七、其他综合收益",
+          "--$$$0",
+          ""
         ]
       }
     ]
@@ -281,27 +250,22 @@
         "body": [
           [
             "归属于母公司所有者的综合收益总额",
-            "-9.24%$$$1",
-            "50.81亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=归属于母公司所有者的综合收益总额"
+            "+14.37%$$$3",
+            "1243万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的综合收益总额"
           ],
           [
             "归属于少数股东的综合收益总额",
-            "+4.12%$$$3",
-            "1.01亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=归属于少数股东的综合收益总额"
-          ],
-          [
-            "加:影响母公司综合收益总额的调整项目",
-            "--$$$2",
-            "--"
+            "+12978347.00%$$$3",
+            "843.59万",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于少数股东的综合收益总额"
           ]
         ],
         "header": [
-          "七、综合收益总额",
-          "-9.01%$$$-1",
-          "51.82亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=综合收益总额"
+          "八、综合收益总额",
+          "+92.00%$$$1",
+          "2086万",
+          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=综合收益总额"
         ]
       }
     ]
@@ -313,15 +277,15 @@
         "body": [
           [
             "基本每股收益",
-            "+3.45%$$$3",
-            "0.30",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=基本每股收益"
+            "+14.41%$$$3",
+            "0.05",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=基本每股收益"
           ],
           [
             "稀释每股收益",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600015&name=&market=ab&tag=稀释每股收益"
+            "+14.41%$$$3",
+            "0.05",
+            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=稀释每股收益"
           ]
         ]
       }

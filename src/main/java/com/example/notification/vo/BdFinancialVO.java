@@ -37,4 +37,11 @@ public class BdFinancialVO {
     @Column(name = "last_updated_time")
     private Timestamp lastUpdatedTime;
 
+    @Column(name = "holder_num")
+    private String holderNum;
+
+    @Column(name = "top_holders")
+    private String topHolders;
+
+
 }

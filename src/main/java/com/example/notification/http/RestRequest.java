@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class RestRequest {
@@ -62,6 +59,12 @@ public class RestRequest {
     //https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&all=1&code=300193&query=300193&eprop=min&stock_type=ab&chartType=minute&group=quotation_minute_ab&finClientType=pc
     private static final String Bd_StockCommonData_URL = "https://finance.pae.baidu.com/vapi/v1/getquotation?srcid=5353&all=1&code=$code&query=$code&eprop=min&stock_type=ab&chartType=minute&group=quotation_minute_ab&finClientType=pc";
 
+    // get from bd for stock holder data 10大流通股东
+    //https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=002792&market=ab&company_code=170602&inner_code=16894&listedSector=1&group=holder_equity_detail&hold_type=2&finClientType=pc
+    //https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=000001&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail
+    //https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=000001&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail&hold_type=1&hold_date=2024-12-31%2000:00:00&finClientType=pc
+    private static final String Bd_StockHolder_Day_URL = "https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=$code&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail&hold_type=1&hold_date=$day&finClientType=pc";
+    private static final String Bd_StockHolder_Last_URL = "https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=000001&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail";
 
     //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930693&startDate=20241008
     private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
@@ -133,6 +136,29 @@ public class RestRequest {
         }
         return bdPanKouInfoVO;
     }
+
+    public Map<String, String> queryBaiduHolderData(String code) {
+        String url = Bd_StockHolder_Last_URL.replace("$code", code);
+        Map<String, String> retMap = new HashMap<>();
+        try {
+            Map ret = restTemplate.getForObject(url, Map.class);
+            Map result = (Map) ret.get("Result");
+            List tagList = (List) result.get("tags");
+            Map map = (Map) (tagList.get(0));
+            String day = map.get("text").toString();
+
+            Map content = (Map) result.get("content");
+            String s = objectMapper.writeValueAsString(content);
+            retMap.put("day", day);
+            retMap.put("ret", s);
+            return retMap;
+
+        } catch (Exception e) {
+            logger.error("Fail to queryBaiduCommonData.============ Please have a check: https://finance.pae.baidu.com/vapi/v2/stock/pankouinfos?stockCode=$code ", e);
+        }
+        return null;
+    }
+
 
     public List<IndicatorDayVO> queryBaiduIndustriesKline(String code, String kType, String startDay) {
         String url = BaiduIndustry_KLine_Url.replace("$code", code).replace("$ktype", kType).replace("$startTime", startDay);

@@ -55,8 +55,9 @@ gross_income VARCHAR(12),
 gross_income_gain DECIMAL(10,2),
 gross_profit VARCHAR(12),
 gross_profit_gain DECIMAL(10,2),
-holders int;
 last_updated_time TIMESTAMP ,
+holder_num VARCHAR(12),
+top_holders TEXT,
 PRIMARY KEY(stock_id,report_day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
