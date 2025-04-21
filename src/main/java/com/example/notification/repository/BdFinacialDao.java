@@ -8,12 +8,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 public interface BdFinacialDao extends JpaRepository<BdFinancialVO, BdFinancialKey>, JpaSpecificationExecutor<BdFinancialVO>, Serializable {
 
-    @Query(value = "SELECT * FROM bd_financial where stock_id = ?1 order by report_day desc limit 11", nativeQuery = true)
+    @Query(value = "SELECT  *, DATE_FORMAT(report_day, '%Y%m%d') AS reportDay FROM bd_financial where stock_id = ?1 order by report_day desc limit 11", nativeQuery = true)
     List<BdFinancialVO> findByStockId(String stock_id);
 
     @Query(value = "SELECT * FROM bd_financial where gross_income is null limit 5000 ", nativeQuery = true)
@@ -28,7 +28,6 @@ public interface BdFinacialDao extends JpaRepository<BdFinancialVO, BdFinancialK
     @Query(value = "SELECT * FROM bd_financial where stock_id = ?1  order by report_day desc limit 2 ", nativeQuery = true)
     List<BdFinancialVO> findLast2ByStockId(String stock_id);
 
-    @Query(value = "SELECT * FROM bd_financial " +
-            "where stock_id = ?1  order by report_day desc limit 1 ", nativeQuery = true)
+    @Query(value = "SELECT * FROM bd_financial where stock_id = ?1  order by report_day desc limit 1 ", nativeQuery = true)
     BdFinancialVO findLastByStockId(String stock_id);
 }

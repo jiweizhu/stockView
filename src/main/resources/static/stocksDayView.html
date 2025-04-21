@@ -101,7 +101,34 @@
            const grossIncomeData = tableData.map(item => item.grossIncomeGain);
            const grossProfitData = tableData.map(item => item.grossProfitGain);
 
+            const lastIndex = reportDays.length - 1;
+            const lastReportDay = reportDays[lastIndex];
+            let titleConfig = {
+                text: '默认',
+                left: 'right',
+                top: 'top',
+                textStyle: {
+                    color: 'black' // 默认颜色
+                }
+            };
+
+            if (lastReportDay && typeof lastReportDay === 'string') {
+                if (lastReportDay.includes('03-31')) {
+                    titleConfig.text = '一季';
+                    titleConfig.textStyle.color = 'red';
+                } else if (lastReportDay.includes('06-30')) {
+                    titleConfig.text = '二季';
+                    titleConfig.textStyle.color = 'blue';
+                } else if (lastReportDay.includes('09-30')) {
+                    titleConfig.text = '三季';
+                    titleConfig.textStyle.color = 'green';
+                } else if (lastReportDay.includes('12-31')) {
+                    titleConfig.text = '四季';
+                    titleConfig.textStyle.color = 'grey';
+                }
+            };
            let option = {
+                title: titleConfig,
                tooltip: {
                    trigger: 'axis',
                    formatter: function (params) {

@@ -7,11 +7,11 @@ public class FinancialRespVO {
     private String stockId;
     private String reportDay;
     private String grossIncome;
-    private double grossIncomeGain;
+    private Double grossIncomeGain;
     private String grossProfit;
-    private double grossProfitGain;
+    private Double grossProfitGain;
 
-    public FinancialRespVO(String stockId, String reportDay, String grossIncome, double grossIncomeGain, String grossProfit, double grossProfitGain) {
+    public FinancialRespVO(String stockId, String reportDay, String grossIncome, Double grossIncomeGain, String grossProfit, Double grossProfitGain) {
         this.stockId = stockId;
         this.reportDay = reportDay;
         this.grossIncome = grossIncome;

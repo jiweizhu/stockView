@@ -80,13 +80,16 @@ public class BaiDuController {
         baiduInfoService.calculateStockDropRange();
         return "successfully";
     }
+
+    //RangeSort for BdIndicators
     @RequestMapping(value = {"/bd/calculateRangeSort"})
     @ResponseBody
-    public ResponseEntity calculateRangeSort() {
+    public ResponseEntity calculateRangeSortForBdIndicators() {
         baiduInfoService.calculateRangeSort();
         return ResponseEntity.ofNullable("finish calculateRangeSort");
     }
 
+    //report how many stocks up or down in each season
     @RequestMapping(value = {"/bd/updateFinancialReportSum"})
     @ResponseBody
     public ResponseEntity updateFinancialReportSum() {

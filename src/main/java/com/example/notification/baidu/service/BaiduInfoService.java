@@ -152,9 +152,19 @@ public class BaiduInfoService {
         all.forEach(vo -> {
             IndexDropRangeRespVO indicatorVO = new IndexDropRangeRespVO();
             BeanUtils.copyProperties(vo, indicatorVO);
-            indicatorVO.setDropPercent(vo.getDropPercent().doubleValue());
+            double dropPercent = vo.getDropPercent().doubleValue();
+            indicatorVO.setDropPercent(dropPercent);
             indicatorVO.setIndicatorName(getIndexNameById(vo.getIndicatorId()));
-            indicatorVO.setStockIds(vo.getStockIds());
+
+            String stockIds = vo.getStockIds();
+            //font stockids
+            String[] split = stockIds.split(",");
+            StringBuilder sb = new StringBuilder();
+            for (String str : split) {
+                String[] nameVal = str.split("_");
+                sb.append(nameVal[1]).append("(").append(nameVal[2]).append(");");
+            }
+            indicatorVO.setStockIds(sb.toString());
             list.add(indicatorVO);
         });
         return list;
@@ -255,20 +265,27 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
-            nameDiv.append("</b></a>").append(stock.getCurrencyValue())
-                    .append("| RangeGain = ").append(stock.getCustomerRange());
+            nameDiv.append("</b></a>")
+                    .append("<span style=font-size:15px >").append(stock.getCurrencyValue()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");
             tdHtml.append(nameDiv);
 
+            //add 5Day 10Day trend
             StringBuilder dayDiv = new StringBuilder("<div>");
             StringBuilder fiveDaySpan = new StringBuilder();
             fiveDaySpan.append("<span style=\"background-color:").append(fiveBackGroudColor).append("\">").append("5Day(" + stock.getUpwardDaysFive()).append("|").append(stock.getGainPercentFive()).append(")").append("(" + stock.getFlipUpwardDaysFive()).append("|").append(stock.getFlipGainPercentFive() + ")").append("</span>");
-
 
             StringBuilder tenDaySpan = new StringBuilder();
             tenDaySpan.append("<span style=\"background-color:").append(tenBackGroudColor).append("\">").append("10Day(" + stock.getUpwardDaysTen()).append("|").append(stock.getGainPercentTen()).append(")").append("(" + stock.getFlipUpwardDaysTen()).append("|").append(stock.getFlipGainPercentTen() + ")");
             tenDaySpan.append("</span>");
             dayDiv.append(fiveDaySpan).append(tenDaySpan).append("</div>");
             tdHtml.append(dayDiv);
+
+            //add holders sign: if 社保等...持有
+            //todo
+            StringBuilder holderDiv = new StringBuilder("<div>");
+//            buildHolderDiv(holderDiv, stock);
+            holderDiv.append("</div>");
+            tdHtml.append(holderDiv);
 
             //add income graph
             StringBuilder incomeHtml = new StringBuilder();
@@ -289,6 +306,20 @@ public class BaiduInfoService {
         StringBuilder retHtml = getRetHtml(false);
 
         return retHtml.toString();
+    }
+
+    private void buildHolderDiv(StringBuilder holderDiv, StockBisVO stock) {
+        BdFinancialVO byStockId = bdFinacialDao.findLastByStockId(stock.getStockId());
+        if (byStockId == null || !StringUtils.hasLength(byStockId.getTopHolders())) {
+            return;
+        }
+        try {
+            JsonNode jsonNode = objectMapper.readTree(byStockId.getTopHolders());
+            System.out.println("jsonNode = " + jsonNode);
+        } catch (JsonProcessingException e) {
+            logger.error("Error buildHolderDiv===========", e);
+
+        }
     }
 
     private List<StockBisVO> peekGuoQi(List<StockBisVO> profitUp) {
@@ -939,10 +970,22 @@ public class BaiduInfoService {
         long previousDayInMillis = calendar.getTimeInMillis();
 
         Timestamp previousDayTimestamp = new Timestamp(previousDayInMillis);
-        List<String> notYetUpdated = bdFinacialDao.findNotYetUpdated(previousDayTimestamp);
-        for (String id : notYetUpdated) {
+//        List<String> stockIds = bdFinacialDao.findNotYetUpdated(previousDayTimestamp);
+
+        List<String> stockIds = stockDao.findStockIds();
+        if (Utils.isWinSystem()) {
+            stockIds = new ArrayList<>();
+            stockIds.add("sh600487");
+            stockIds.add("sz000063");
+            stockIds.add("sh600498");
+            stockIds.add("sh600522");
+        }
+        for (String id : stockIds) {
+            if (!id.startsWith("s")) {
+                continue;
+            }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 queryBaiduIncomeDataFromNet(id);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -1326,6 +1369,9 @@ public class BaiduInfoService {
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sh600487");
+            stockIds.add("sz000063");
+            stockIds.add("sh600498");
+            stockIds.add("sh600522");
         }
         for (String stockId : stockIds) {
             if (!stockId.startsWith("s")) {
@@ -1349,6 +1395,9 @@ public class BaiduInfoService {
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sh600487");
+            stockIds.add("sz000063");
+            stockIds.add("sh600498");
+            stockIds.add("sh600522");
         }
         for (String stockId : stockIds) {
             if (!stockId.startsWith("s")) {

@@ -1,294 +1,72 @@
 [
   {
-    "data": [
-      {
-        "body": [
-          [
-            "其中:营业收入",
-            "+137.97%$$$3",
-            "5.82亿"
-          ],
-          [
-            "其他营业收入",
-            "--$$$2",
-            "--"
-          ]
-        ],
-        "header": [
-          "一、总营收",
-          "+137.97%$$$1",
-          "5.82亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=总营收"
-        ]
-      }
-    ]
+    "holder": "中国平安保险(集团)股份有限公司-集团本级-自有资金",
+    "holdNum": "96.19亿",
+    "holdPer": "49.56%",
+    "holdChange": "未变",
+    "status": "0"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "其中:营业成本",
-            "+126.68%$$$3",
-            "5.16亿",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业成本"
-          ],
-          [
-            "其他营业成本",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "营业税金及附加",
-            "+145.51%$$$3",
-            "64.30万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业税金及附加"
-          ],
-          [
-            "销售费用",
-            "+134.88%$$$3",
-            "400.37万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=销售费用"
-          ],
-          [
-            "管理费用",
-            "+27.34%$$$3",
-            "1494万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=管理费用"
-          ],
-          [
-            "财务费用",
-            "+203.65%$$$3",
-            "2041万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=财务费用"
-          ],
-          [
-            "研发费用",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=研发费用"
-          ],
-          [
-            "信用减值损失",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "资产减值损失",
-            "--$$$2",
-            "--"
-          ]
-        ],
-        "header": [
-          "二、营业总成本",
-          "+124.14%$$$1",
-          "5.56亿",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业总成本"
-        ]
-      }
-    ]
+    "holder": "中国平安人寿保险股份有限公司-自有资金",
+    "holdNum": "11.86亿",
+    "holdPer": "6.11%",
+    "holdChange": "未变",
+    "status": "0"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "公允价值变动净收益",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=公允价值变动净收益"
-          ],
-          [
-            "投资净收益",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=投资净收益"
-          ],
-          [
-            "净敞口套期收益",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "其中:对联营合营企业的投资收益",
-            "--$$$2",
-            "--"
-          ],
-          [
-            "汇兑收益",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=汇兑收益"
-          ],
-          [
-            "资产处置收益",
-            "--$$$2",
-            "-9.61万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=资产处置收益"
-          ],
-          [
-            "其他收益",
-            "-99.95%$$$1",
-            "4561.26",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=其他收益"
-          ]
-        ],
-        "header": [
-          "三、非经营性净收益",
-          "-100.44%$$$-1",
-          "-23.50万",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=非经营性净收益"
-        ]
-      }
-    ]
+    "holder": "香港中央结算有限公司",
+    "holdNum": "6.58亿",
+    "holdPer": "3.39%",
+    "holdChange": "减持8877万股",
+    "status": "-1"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "加:营业外收入",
-            "-76.66%$$$1",
-            "190.64万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业外收入"
-          ],
-          [
-            "减:营业外支出",
-            "-96.70%$$$1",
-            "59.67万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业外支出"
-          ]
-        ],
-        "header": [
-          "四、营业利润",
-          "-48.61%$$$-1",
-          "2529万",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=营业利润"
-        ]
-      }
-    ]
+    "holder": "中国平安人寿保险股份有限公司-传统-普通保险产品",
+    "holdNum": "4.40亿",
+    "holdPer": "2.27%",
+    "holdChange": "未变",
+    "status": "0"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "减:所得税费用",
-            "-79.82%$$$1",
-            "573.61万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=所得税费用"
-          ],
-          [
-            "加:未确认的投资损失",
-            "--$$$2",
-            "--"
-          ]
-        ],
-        "header": [
-          "五、利润总额",
-          "-32.29%$$$-1",
-          "2660万",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=利润总额"
-        ]
-      }
-    ]
+    "holder": "中国证券金融股份有限公司",
+    "holdNum": "4.29亿",
+    "holdPer": "2.21%",
+    "holdChange": "未变",
+    "status": "0"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "归属于母公司所有者的净利润",
-            "+14.37%$$$3",
-            "1243万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的净利润"
-          ],
-          [
-            "少数股东损益",
-            "+12978347.00%$$$3",
-            "843.59万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=少数股东损益"
-          ]
-        ],
-        "header": [
-          "六、合并净利润",
-          "+92.00%$$$1",
-          "2086万",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=合并净利润"
-        ]
-      }
-    ]
+    "holder": "中国工商银行股份有限公司-华泰柏瑞沪深300交易型开放式指数证券投资基金",
+    "holdNum": "1.59亿",
+    "holdPer": "0.82%",
+    "holdChange": "减持871.40万股",
+    "status": "-1"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "归属于母公司所有者的其他综合收益总额",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的其他综合收益总额"
-          ],
-          [
-            "归属于少数股东的其他综合收益总额",
-            "--$$$2",
-            "--",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于少数股东的其他综合收益总额"
-          ]
-        ],
-        "header": [
-          "七、其他综合收益",
-          "--$$$0",
-          ""
-        ]
-      }
-    ]
+    "holder": "中国建设银行股份有限公司-易方达沪深300交易型开放式指数发起式证券投资基金",
+    "holdNum": "1.11亿",
+    "holdPer": "0.57%",
+    "holdChange": "减持461.57万股",
+    "status": "-1"
   },
   {
-    "data": [
-      {
-        "body": [
-          [
-            "归属于母公司所有者的综合收益总额",
-            "+14.37%$$$3",
-            "1243万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于母公司所有者的综合收益总额"
-          ],
-          [
-            "归属于少数股东的综合收益总额",
-            "+12978347.00%$$$3",
-            "843.59万",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=归属于少数股东的综合收益总额"
-          ]
-        ],
-        "header": [
-          "八、综合收益总额",
-          "+92.00%$$$1",
-          "2086万",
-          "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=综合收益总额"
-        ]
-      }
-    ]
+    "holder": "中国工商银行股份有限公司-华夏沪深300交易型开放式指数证券投资基金",
+    "holdNum": "7528万",
+    "holdPer": "0.39%",
+    "holdChange": "减持153.03万股",
+    "status": "-1"
   },
   {
-    "name": "每股收益",
-    "data": [
-      {
-        "body": [
-          [
-            "基本每股收益",
-            "+14.41%$$$3",
-            "0.05",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=基本每股收益"
-          ],
-          [
-            "稀释每股收益",
-            "+14.41%$$$3",
-            "0.05",
-            "https://finance.pae.baidu.com/tango/search?srcid=51171&code=600083&name=&market=ab&tag=稀释每股收益"
-          ]
-        ]
-      }
-    ]
+    "holder": "中国银行股份有限公司-嘉实沪深300交易型开放式指数证券投资基金",
+    "holdNum": "7001万",
+    "holdPer": "0.36%",
+    "holdChange": "减持276.63万股",
+    "status": "-1"
+  },
+  {
+    "holder": "深圳中电投资有限公司",
+    "holdNum": "6252万",
+    "holdPer": "0.32%",
+    "holdChange": "未变",
+    "status": "0"
   }
 ]

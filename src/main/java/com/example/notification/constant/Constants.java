@@ -62,10 +62,10 @@ public class Constants {
     }
 
     //season
-    public static String SEASON_DAY_0331 = "0331";
-    public static String SEASON_DAY_0630 = "0630";
-    public static String SEASON_DAY_0930 = "0930";
-    public static String SEASON_DAY_1231 = "1231";
+    public static String SEASON_DAY_0331 = "-03-31";
+    public static String SEASON_DAY_0630 = "-06-30";
+    public static String SEASON_DAY_0930 = "-09-30";
+    public static String SEASON_DAY_1231 = "-12-31";
 
 
     public static Integer getRangeSize() {
