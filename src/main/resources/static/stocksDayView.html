@@ -91,7 +91,7 @@
   }
 </script>
 <script>
-    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+    const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '43.139.165.209';
         async function createInComeChart(span) {
            let chart = echarts.init(span);
            const response = await fetch(`http://${serverIp}:8888/bd/financialList/` + span.id.replace('income_', ''));

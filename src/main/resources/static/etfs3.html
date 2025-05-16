@@ -29,7 +29,7 @@ document.getElementById('getDivs').addEventListener('click', getDivs);
 
 document.addEventListener('DOMContentLoaded', function () {
    function loadTableData() {
-      fetch('http://124.71.19.6:8888/etfs/3')
+      fetch('http://43.139.165.209:8888/etfs/3')
          .then(response => response.text())
          .then(data => {
             const dataContainer = document.getElementById('myTable');
@@ -52,7 +52,7 @@ spans.forEach(span => {
 
 async function createChart(divId) {
 
-  const data = await fetch('http://124.71.19.6:8888/stock/'+divId.replace('span_', ''))
+  const data = await fetch('http://43.139.165.209:8888/stock/'+divId.replace('span_', ''))
     .then(response => response.json());
 
     Highcharts.stockChart(divId, {

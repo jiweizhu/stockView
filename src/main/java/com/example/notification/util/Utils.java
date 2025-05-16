@@ -69,7 +69,7 @@ public class Utils {
         }
         String ipAddress = localHost.getHostAddress();
         if (!Utils.isWinSystem()) {
-            return "124.71.19.6";
+            return "43.139.165.209";
         }
         return "localhost";
     }

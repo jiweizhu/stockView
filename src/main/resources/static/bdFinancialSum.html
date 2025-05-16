@@ -31,7 +31,7 @@
 
     $(function () {
         // 动态加载数据
-        const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '124.71.19.6';
+        const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '43.139.165.209';
 
         fetch(`http://${serverIp}:8888/bd/financialSum`)
             .then(response => response.json())

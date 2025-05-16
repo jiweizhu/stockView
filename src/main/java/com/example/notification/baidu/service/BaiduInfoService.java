@@ -761,6 +761,7 @@ public class BaiduInfoService {
     //  1.extract html part from business logic
     //  2. BusinessVo for sorting
     public String buildHtmlForBd(List<StockNameVO> industryEtfs, Boolean returnFiveSort, boolean isWeek) {
+        logger.info("====Enter==BaiduInfoService buildHtmlForBd=====");
         if (isWeek) {
             LinkedList<StockNameVO> sortedList = new LinkedList();
             industryEtfs.forEach(vo -> {
@@ -913,13 +914,16 @@ public class BaiduInfoService {
 
 
     public List<FinancialRespVO> readBdFinancialDataFromDbByStockId(String stockId) {
-
+        logger.info("====Enter==BaiduInfoService readBdFinancialDataFromDbByStockId=====");
         List<FinancialRespVO> ret = new ArrayList<>();
         if (stockId.startsWith("s")) {
             List<BdFinancialVO> byStockId = bdFinacialDao.findByStockId(stockId).stream().sorted(Comparator.comparing(BdFinancialVO::getReportDay)).toList();
             //read data
             byStockId.forEach(vo -> {
                 String reportDay = vo.getReportDay();
+                if (vo.getGrossIncomeGain() == null || vo.getGrossProfitGain() == null) {
+                    return;
+                }
                 FinancialRespVO newVo = new FinancialRespVO(stockId, reportDay, vo.getGrossIncome(), vo.getGrossIncomeGain(), vo.getGrossProfit(), vo.getGrossProfitGain());
                 ret.add(newVo);
             });
@@ -1358,7 +1362,7 @@ public class BaiduInfoService {
         if (z1Day.getDayEnd().toString().equals(date.toString())) {
             return;
         }
-        entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ").executeUpdate();
+        entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ;").executeUpdate();
         logger.info("======End BaiduInfoService updateZ1ToToday========");
     }
 

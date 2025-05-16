@@ -378,7 +378,7 @@ public class ETFViewService {
         //2. pick yangQi and guoQi at top
         List<StockBisVO> profitUp = new ArrayList<>();
         List<StockBisVO> profitDown = new ArrayList<>();
-        List<StockBisVO> list = bisList.stream().map(vo -> {
+        List<StockBisVO> list = bisList.stream().filter(Objects::nonNull).map(vo -> {
             if (vo.getFinancialType() == null) {
                 vo.setFinancialType(PROFIT_TYPE_100);
             }
