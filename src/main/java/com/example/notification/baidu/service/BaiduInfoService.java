@@ -39,6 +39,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.*;
 
@@ -454,7 +455,7 @@ public class BaiduInfoService {
 
     //backwards to calculate drop range,
     // so, if 10avg is falling, then continue to count backwards
-    public void calculateDropRange() {
+    public void calculateBdIndicatorDropRange() {
         logger.info("====Enter==method calculateDropRange=====");
         List<String> ids = bdIndicatorDao.findIds();
         if (Utils.isWinSystem()) {
@@ -964,27 +965,37 @@ public class BaiduInfoService {
 
 
     public void queryBaiduIncomeDataFromNetForAllStocks() throws InterruptedException {
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTimeInMillis(System.currentTimeMillis());
-
-        //last_updated_time 在前一天前的， 找出来update
-        calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-        long previousDayInMillis = calendar.getTimeInMillis();
-
-        Timestamp previousDayTimestamp = new Timestamp(previousDayInMillis);
-//        List<String> stockIds = bdFinacialDao.findNotYetUpdated(previousDayTimestamp);
-
-        List<String> stockIds = stockDao.findStockIds();
-        if (Utils.isWinSystem()) {
-            stockIds = new ArrayList<>();
-            stockIds.add("sh600487");
-            stockIds.add("sz000063");
-            stockIds.add("sh600498");
-            stockIds.add("sh600522");
+        bdFinacialDao.cleanData();
+        //need to filter data if the latest already exist
+        //1.check if today is outer financial report day:
+        // like if today exceeds 20250331, then only query stock which has no first season report
+        LocalDate today = LocalDate.now();
+        String year = String.valueOf(today.getYear());
+        String month = String.valueOf(today.getMonthValue());
+        String dayOfMonth = String.valueOf(today.getDayOfMonth());
+        Integer todayInt = Integer.parseInt(month + dayOfMonth);
+        List<String> stockIdsToUpdataFinacialReport = new ArrayList<>();
+        for (int i = 0; i < integerLists.size() - 1; i++) {
+            if (integerLists.get(i) < todayInt && todayInt < integerLists.get(i + 1)) {
+                //query this seasonNum financial report!
+                String seasonReportDay = getSeasonDayMap().get(integerLists.get(i));
+                //find stock which has no season report yet, then to query again
+                Set<String> reportUpdatedStockIds = new HashSet<>(bdFinacialDao.findStockIdsNoSeasonReport(Date.valueOf(year + seasonReportDay)));
+                stockIdsToUpdataFinacialReport = new HashSet<>(stockDao.findStockIds()).stream()
+                        .filter(element -> !reportUpdatedStockIds.contains(element)).filter(element -> element.startsWith("s"))
+                        .collect(Collectors.toList());
+                logger.info("====queryBaiduIncomeDataFromNetForAllStocks======size={} =stockIdsToUpdataFinacialReport:{}", stockIdsToUpdataFinacialReport.size(), stockIdsToUpdataFinacialReport);
+                break;
+            }
         }
-        for (String id : stockIds) {
+
+        if (Utils.isWinSystem()) {
+            //local test
+            stockIdsToUpdataFinacialReport = new ArrayList<>();
+            stockIdsToUpdataFinacialReport.add("sz605599");
+        }
+
+        for (String id : stockIdsToUpdataFinacialReport) {
             if (!id.startsWith("s")) {
                 continue;
             }
@@ -1007,7 +1018,7 @@ public class BaiduInfoService {
 
                 //if target exists, update it
                 BdFinancialVO target = bdFinacialDao.findByStockIdAndDay(stockId, Date.valueOf(reportDay));
-                if (target == null) {
+                if (target == null || target.getGrossIncomeGain() == null || target.getGrossProfitGain() == null) {
                     target = new BdFinancialVO();
                     target.setStockId(stockId);
                     target.setReportDay(reportDay);
@@ -1362,13 +1373,13 @@ public class BaiduInfoService {
         if (z1Day.getDayEnd().toString().equals(date.toString())) {
             return;
         }
-        entityManager.createNativeQuery("update range_sort_id set day_end = CURDATE() where range_id = 'z1' ;").executeUpdate();
+        rangeSortIdDao.updateZ1DayToToday();
         logger.info("======End BaiduInfoService updateZ1ToToday========");
     }
 
-    public void stockCommonData() throws InterruptedException {
+    public void updateStockBasicDataFromBd() throws InterruptedException {
         //get from bd set market value etc.
-        logger.info("======Enter BaiduInfoService stockCommonData========");
+        logger.info("======Enter BaiduInfoService updateStockBasicDataFromBd========");
         List<String> stockIds = stockDao.findStockIds();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
@@ -1383,13 +1394,13 @@ public class BaiduInfoService {
                 continue;
             }
             Thread.sleep(1000);//slow to avoid too many request
-            BdPanKouInfoVO retVo = restRequest.queryBaiduCommonData(stockId.substring(2));
+            BdPanKouInfoVO retVo = restRequest.queryStockBasicDataFromBd(stockId.substring(2));
             StockNameVO stockNameVO = stockDao.findById(stockId).get();
             BeanUtils.copyProperties(retVo, stockNameVO);
             stockNameVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
             stockDao.save(stockNameVO);
         }
-        logger.info("======End BaiduInfoService stockCommonData========");
+        logger.info("======End BaiduInfoService updateStockBasicDataFromBd========");
     }
 
     public void getTopHolderFromNet() throws InterruptedException {

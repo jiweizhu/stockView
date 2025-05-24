@@ -3,8 +3,10 @@ package com.example.notification.repository;
 
 import com.example.notification.vo.IntradayPriceKey;
 import com.example.notification.vo.IntradayPriceVO;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.io.Serializable;
@@ -18,9 +20,13 @@ public interface IntraDayPriceDao extends JpaRepository<IntradayPriceVO, Intrada
     @Query(value = "SELECT * FROM intraday_price where stock_id = ?1 order by day desc, minute desc limit 1 ", nativeQuery = true)
     IntradayPriceVO findLastestPriceById(String stock_id);
 
+    @Modifying
+    @Transactional
     @Query(value = "DELETE FROM intraday_price where DAY < ?1 ", nativeQuery = true)
     void removeOneWeekAgoData(String day);
 
+    @Modifying
+    @Transactional
     @Query(value = "DELETE FROM intraday_price where DAY = ?1 ", nativeQuery = true)
     void clearTodayIntraPrice(String day);
 

@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Constants {
     private static final Logger logger = LoggerFactory.getLogger(Constants.class);
@@ -67,6 +69,29 @@ public class Constants {
     public static String SEASON_DAY_0930 = "-09-30";
     public static String SEASON_DAY_1231 = "-12-31";
 
+    public static Integer SEASON_ONE_DAY = 331;
+    public static Integer SEASON_TWO_DAY = 630;
+    public static Integer SEASON_THREE_DAY = 930;
+    public static Integer SEASON_FOUR_DAY = 1231;
+
+    static Map<Integer, String> integers = new HashMap<>();
+    public static List<Integer> integerLists = new ArrayList<>();
+
+    static {
+        integers.put(SEASON_ONE_DAY, SEASON_DAY_0331);
+        integers.put(SEASON_TWO_DAY, SEASON_DAY_0630);
+        integers.put(SEASON_THREE_DAY, SEASON_DAY_0930);
+        integers.put(SEASON_FOUR_DAY, SEASON_DAY_1231);
+
+        integerLists.add(SEASON_ONE_DAY);
+        integerLists.add(SEASON_TWO_DAY);
+        integerLists.add(SEASON_THREE_DAY);
+        integerLists.add(SEASON_FOUR_DAY);
+    }
+
+    public static Map<Integer, String> getSeasonDayMap() {
+        return integers;
+    }
 
     public static Integer getRangeSize() {
         return rangeSize;

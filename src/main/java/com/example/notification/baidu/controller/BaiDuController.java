@@ -42,7 +42,7 @@ public class BaiDuController {
     @ResponseBody
     public void commonData() throws InterruptedException {
         logger.info("======Enter BaiDuController commonData========");
-        baiduInfoService.stockCommonData();
+        baiduInfoService.updateStockBasicDataFromBd();
     }
 
 
@@ -161,7 +161,7 @@ public class BaiDuController {
     @ResponseBody
     public Object calculateDropRange() {
         logger.info("======Enter BaiDuController calculateDropRange========");
-        baiduInfoService.calculateDropRange();
+        baiduInfoService.calculateBdIndicatorDropRange();
         baiduInfoService.calculateStockDropRange();
         return "successfully";
     }
@@ -254,7 +254,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateManually() {
-        baiduInfoService.getFromNetAndStoreWeek(false);
+        baiduInfoService.updateZ1ToToday();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

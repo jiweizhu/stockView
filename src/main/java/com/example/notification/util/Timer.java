@@ -78,9 +78,11 @@ public class Timer {
 //            kLineMarketClosedService.deleteWkHistoryData(2);
 //            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(3);
 
-            baiduInfoService.calculateDropRange();
+            baiduInfoService.calculateBdIndicatorDropRange();
 
-            baiduInfoService.stockCommonData();
+            baiduInfoService.updateStockBasicDataFromBd();
+
+            baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);

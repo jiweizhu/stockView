@@ -97,7 +97,7 @@ public class RestRequest {
         return blockList;
     }
 
-    public BdPanKouInfoVO queryBaiduCommonData(String code) {
+    public BdPanKouInfoVO queryStockBasicDataFromBd(String code) {
         String url = Bd_StockCommonData_URL.replace("$code", code);
         BdPanKouInfoVO bdPanKouInfoVO = new BdPanKouInfoVO();
         try {
@@ -131,6 +131,13 @@ public class RestRequest {
                         break;
                 }
             }
+
+            Map basicData = (Map) result.get("basicinfos");
+            if (basicData != null && basicData.get("name") != null) {
+                String stockName = basicData.get("name").toString();
+                bdPanKouInfoVO.setStockName(stockName);
+            }
+
         } catch (Exception e) {
             logger.error("Fail to queryBaiduCommonData.============ Please have a check: https://finance.pae.baidu.com/vapi/v2/stock/pankouinfos?stockCode=$code ", e);
         }

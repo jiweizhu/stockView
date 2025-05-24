@@ -16,4 +16,6 @@ public class BdPanKouInfoVO {
     private String priceSaleRatio;
     //市净率
     private String bvRatio;
+
+    private String stockName;
 }
