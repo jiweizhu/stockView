@@ -118,7 +118,7 @@ public class Utils {
         }
         BigDecimal result = new BigDecimal(a)
                 .multiply(new BigDecimal(100)) // 转换为百分比
-                .divide(new BigDecimal(b), 2, RoundingMode.HALF_UP);
+                .divide(new BigDecimal(b), 0, RoundingMode.HALF_UP);
         return result + "%";
     }
 

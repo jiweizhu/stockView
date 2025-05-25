@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -266,8 +267,7 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
-            nameDiv.append("</b></a>")
-                    .append("<span style=font-size:15px >").append(stock.getCurrencyValue()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");
+            nameDiv.append("</b></a>").append("<span style=font-size:15px >").append(stock.getCurrencyValue()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");
             tdHtml.append(nameDiv);
 
             //add 5Day 10Day trend
@@ -981,9 +981,7 @@ public class BaiduInfoService {
                 String seasonReportDay = getSeasonDayMap().get(integerLists.get(i));
                 //find stock which has no season report yet, then to query again
                 Set<String> reportUpdatedStockIds = new HashSet<>(bdFinacialDao.findStockIdsNoSeasonReport(Date.valueOf(year + seasonReportDay)));
-                stockIdsToUpdataFinacialReport = new HashSet<>(stockDao.findStockIds()).stream()
-                        .filter(element -> !reportUpdatedStockIds.contains(element)).filter(element -> element.startsWith("s"))
-                        .collect(Collectors.toList());
+                stockIdsToUpdataFinacialReport = new HashSet<>(stockDao.findStockIds()).stream().filter(element -> !reportUpdatedStockIds.contains(element)).filter(element -> element.startsWith("s")).collect(Collectors.toList());
                 logger.info("====queryBaiduIncomeDataFromNetForAllStocks======size={} =stockIdsToUpdataFinacialReport:{}", stockIdsToUpdataFinacialReport.size(), stockIdsToUpdataFinacialReport);
                 break;
             }
@@ -1032,7 +1030,7 @@ public class BaiduInfoService {
                         continue;
                     }
                     String header = tmpNode.get("data").get(0).get("header").toString();
-                    if (header.contains("综合收益总额")) {
+                    if (header.contains("合并净利润")) {
                         //save in db
                         JsonNode jsonNode1 = objectMapper.readTree(header);
                         String gain = jsonNode1.get(1).textValue();
@@ -1223,6 +1221,7 @@ public class BaiduInfoService {
 
 
     public Object queryFinancialSum() {
+        logger.info("========Enter method queryFinancialSum ========");
         List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
         if (Utils.isWinSystem()) {
             indicators = new ArrayList<>();
@@ -1259,8 +1258,8 @@ public class BaiduInfoService {
 
                 String grossGainPercent = Utils.divideReturnPercentString(grossGainAscNum, grossGainSum);
                 String profitGainPercent = Utils.divideReturnPercentString(profitGainAscNum, profitGainSum);
-                lineMap.put("收Up" + reportDay, grossGainPercent);
-                lineMap.put("利Up" + reportDay, profitGainPercent);
+                lineMap.put("收Up" + reportDay, grossGainPercent+"("+vo.getGrossSum()+")");
+                lineMap.put("利Up" + reportDay, profitGainPercent+"("+vo.getProfitSum()+")");
             }
             retJsonList.add(lineMap);
         });
@@ -1281,12 +1280,8 @@ public class BaiduInfoService {
         return reportDay;
     }
 
-    private static void updateStockHolderNum() {
-
-    }
-
-
     public void updateFinancialReportSum() {
+        logger.info("========Enter method updateFinancialReportSum ========");
         List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
         indicators.forEach(vo -> {
             String voStockIds = vo.getStockIds();
@@ -1294,39 +1289,91 @@ public class BaiduInfoService {
                 return;
             }
             String[] stockIds = voStockIds.split(",");
-            Map<String, BdFinancialSumVO> indicatorReportDayMap = new HashMap<>();
+            Map<String, BdFinancialSumVO> indicatorReportDayCountMap = new HashMap<>();
+            Map<String, BigDecimal> indicatorReportDayGrossSumMap = new HashMap<>();
+            Map<String, BigDecimal> indicatorReportDayProfitSumMap = new HashMap<>();
             for (String stockId : stockIds) {
                 List<BdFinancialVO> financialVOList = bdFinacialDao.findByStockId(stockId);
                 financialVOList.forEach(financialVo -> {
-                    BdFinancialSumVO finSumVO = indicatorReportDayMap.get(financialVo.getReportDay());
-                    if (finSumVO == null) {
-                        finSumVO = BdFinancialSumVO.getInitVO();
-                        indicatorReportDayMap.put(financialVo.getReportDay(), finSumVO);
-                        finSumVO.setReportDay(financialVo.getReportDay());
-                        finSumVO.setIndicatorId(vo.getStockId());
+                    String reportDay = financialVo.getReportDay();
+                    BdFinancialSumVO countVo = indicatorReportDayCountMap.get(reportDay);
+                    if (countVo == null) {
+                        countVo = BdFinancialSumVO.getInitVO();
+                        indicatorReportDayCountMap.put(reportDay, countVo);
+                        indicatorReportDayGrossSumMap.put(reportDay, new BigDecimal(0));
+                        indicatorReportDayProfitSumMap.put(reportDay, new BigDecimal(0));
+                        countVo.setReportDay(reportDay);
+                        countVo.setIndicatorId(vo.getStockId());
                     }
+
+                    BigDecimal grossSum = indicatorReportDayGrossSumMap.get(reportDay);
+                    BigDecimal add = grossSum.add(convertWanToYi(financialVo.getGrossIncome()));
+                    indicatorReportDayGrossSumMap.put(reportDay, add);
+
+                    BigDecimal profitSum = indicatorReportDayProfitSumMap.get(reportDay);
+                    BigDecimal profit = profitSum.add(convertWanToYi(financialVo.getGrossProfit()));
+                    indicatorReportDayProfitSumMap.put(reportDay, profit);
+
                     if (financialVo.getGrossProfitGain() != null && financialVo.getGrossProfitGain() > 0) {
-                        finSumVO.setGrossGainAscNum(finSumVO.getGrossGainAscNum() + 1);
-                        finSumVO.setGrossGainAscIds(finSumVO.getGrossGainAscIds() + "," + stockId);
+                        countVo.setGrossGainAscNum(countVo.getGrossGainAscNum() + 1);
+                        countVo.setGrossGainAscIds(countVo.getGrossGainAscIds() + "," + stockId);
                     } else {
-                        finSumVO.setGrossGainDescNum(finSumVO.getGrossGainDescNum() + 1);
-                        finSumVO.setGrossGainDescIds(finSumVO.getGrossGainDescIds() + "," + stockId);
+                        countVo.setGrossGainDescNum(countVo.getGrossGainDescNum() + 1);
+                        countVo.setGrossGainDescIds(countVo.getGrossGainDescIds() + "," + stockId);
                     }
                     if (financialVo.getGrossIncomeGain() != null && financialVo.getGrossIncomeGain() > 0) {
-                        finSumVO.setProfitGainAscNum(finSumVO.getProfitGainAscNum() + 1);
-                        finSumVO.setProfitGainAscIds(finSumVO.getProfitGainAscIds() + "," + stockId);
+                        countVo.setProfitGainAscNum(countVo.getProfitGainAscNum() + 1);
+                        countVo.setProfitGainAscIds(countVo.getProfitGainAscIds() + "," + stockId);
                     } else {
-                        finSumVO.setProfitGainDescNum(finSumVO.getProfitGainDescNum() + 1);
-                        finSumVO.setProfitGainDescIds(finSumVO.getProfitGainDescIds() + "," + stockId);
+                        countVo.setProfitGainDescNum(countVo.getProfitGainDescNum() + 1);
+                        countVo.setProfitGainDescIds(countVo.getProfitGainDescIds() + "," + stockId);
                     }
-                    finSumVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
-                    bdFinancialSumDao.save(finSumVO);
+
                 });
             }
+            indicatorReportDayCountMap.keySet().forEach(reportDay -> {
+                BdFinancialSumVO bdFinancialSumVO = indicatorReportDayCountMap.get(reportDay);
+                if (bdFinancialSumVO == null) {
+                    return;
+                }
+                bdFinancialSumVO.setGrossSum(new DecimalFormat("0.00").format(indicatorReportDayGrossSumMap.get(reportDay)));
+                bdFinancialSumVO.setProfitSum(new DecimalFormat("0.00").format(indicatorReportDayProfitSumMap.get(reportDay)));
+                bdFinancialSumVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+                bdFinancialSumDao.save(bdFinancialSumVO);
+            });
         });
+        logger.info("========Exist method updateFinancialReportSum ========");
+    }
+
+    public static BigDecimal convertWanToYi(String wanString) {
+        if (wanString == null || wanString.trim().isEmpty()) {
+            return null;
+        }
+
+        boolean isWan = true;
+        if (!wanString.contains("万")) {
+            isWan = false;
+        }
+        String cleanedString = wanString.trim().replace("万", "").replace("亿","");
+        try {
+            BigDecimal valueInWan = new BigDecimal(cleanedString);
+            if (isWan) {
+                BigDecimal valueInYi = valueInWan.divide(new BigDecimal("10000"), 2, BigDecimal.ROUND_HALF_UP);
+                return valueInYi;
+            }
+            return valueInWan;
+        } catch (NumberFormatException e) {
+            logger.info("Error parsing number: " + e);
+            return null;
+        }
+    }
+
+    private static String str2Sum(BdFinancialVO financialVo, BdFinancialSumVO countVo) {
+        return countVo.getGrossSum() + financialVo.getGrossIncome();
     }
 
     public Object updateStockfinancialType() {
+        logger.info("========Enter method updateStockfinancialType ========");
         List<String> stockIds = stockDao.findStockIds();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();

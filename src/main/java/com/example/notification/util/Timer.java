@@ -70,8 +70,8 @@ public class Timer {
     public void updateEveryWeek() {
         try {
             logger.info("====cron==start updateEveryWeek=====");
-            //for bd indicator from baidu
-            baiduInfoService.getFromNetAndStoreWeek(false);
+            //(20250501)week data not updated  from baidu, pause to query
+//            baiduInfoService.getFromNetAndStoreWeek(false);
 
             //for stock from Tencent
             //202250401 baidu has no wk data from 20250401
@@ -84,6 +84,7 @@ public class Timer {
 
             baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
+            baiduInfoService.updateFinancialReportSum();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }

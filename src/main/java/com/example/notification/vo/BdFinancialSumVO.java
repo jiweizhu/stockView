@@ -19,6 +19,12 @@ public class BdFinancialSumVO {
     @Column(name = "report_day")
     private String reportDay;
 
+    @Column(name = "profit_sum")
+    private String profitSum;
+
+    @Column(name = "gross_sum")
+    private String grossSum;
+
     @Column(name = "profit_gain_asc_num")
     private Integer profitGainAscNum;
 
