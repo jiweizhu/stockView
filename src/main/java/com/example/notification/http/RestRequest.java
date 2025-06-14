@@ -129,6 +129,9 @@ public class RestRequest {
                     case "bvRatio":
                         bdPanKouInfoVO.setBvRatio(value);
                         break;
+                    case "capitalization":
+                        bdPanKouInfoVO.setCapitalization(value);
+                        break;
                 }
             }
 

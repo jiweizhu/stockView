@@ -267,7 +267,7 @@ public class BaiduInfoService {
             if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
-            nameDiv.append("</b></a>").append("<span style=font-size:15px >").append(stock.getCurrencyValue()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");
+            nameDiv.append("</b></a>").append("<span style=font-size:15px >").append(stock.getCapitalization() == null ? stock.getCurrencyValue() : stock.getCapitalization()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");
             tdHtml.append(nameDiv);
 
             //add 5Day 10Day trend
@@ -1258,8 +1258,8 @@ public class BaiduInfoService {
 
                 String grossGainPercent = Utils.divideReturnPercentString(grossGainAscNum, grossGainSum);
                 String profitGainPercent = Utils.divideReturnPercentString(profitGainAscNum, profitGainSum);
-                lineMap.put("收Up" + reportDay, grossGainPercent+"("+vo.getGrossSum()+")");
-                lineMap.put("利Up" + reportDay, profitGainPercent+"("+vo.getProfitSum()+")");
+                lineMap.put("收Up" + reportDay, grossGainPercent + "(" + vo.getGrossSum() + ")");
+                lineMap.put("利Up" + reportDay, profitGainPercent + "(" + vo.getProfitSum() + ")");
             }
             retJsonList.add(lineMap);
         });
@@ -1354,7 +1354,7 @@ public class BaiduInfoService {
         if (!wanString.contains("万")) {
             isWan = false;
         }
-        String cleanedString = wanString.trim().replace("万", "").replace("亿","");
+        String cleanedString = wanString.trim().replace("万", "").replace("亿", "");
         try {
             BigDecimal valueInWan = new BigDecimal(cleanedString);
             if (isWan) {

@@ -67,6 +67,9 @@ public class StockBisVO {
     //市净率
     private String bvRatio;
 
+    //总市值
+    private String capitalization;
+
 
     //this is used to sort the stock list, for html show
     private Integer sortColumn = 0;

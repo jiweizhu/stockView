@@ -18,4 +18,7 @@ public class BdPanKouInfoVO {
     private String bvRatio;
 
     private String stockName;
+    
+    //总市值
+    private String capitalization;
 }

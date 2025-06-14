@@ -42,6 +42,10 @@ public class StockNameVO {
     private String bvRatio;
 
 
+    //总市值
+    @Column(name = "capitalization")
+    private String capitalization;
+
     // sort type number
     // 400 profit>0 & profitGain > 0
     // 300 profit>0 & profitGain < 0
