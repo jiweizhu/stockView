@@ -49,8 +49,20 @@ public class BdFinancialSumVO {
     @Column(name = "gross_gain_desc_ids")
     private String grossGainDescIds;
 
+    //gain range 0-10%, has 10 stocks, gain range 10-20%, has 5 stocks
+    //gain<-50%, -40%,... gain> 40%, 50%
+    @Column(name = "gross_gain_count_distribution")
+    private String grossGainCountDistribution;
+
+
+    @Column(name = "profit_gain_count_distribution")
+    private String profitGainCountDistribution;
+
     @Column(name = "last_updated_time")
     private Timestamp lastUpdatedTime;
+
+
+
 
 
     public static BdFinancialSumVO getInitVO(){

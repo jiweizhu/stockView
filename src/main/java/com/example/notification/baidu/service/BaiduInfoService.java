@@ -1128,7 +1128,7 @@ public class BaiduInfoService {
         }
     }
 
-    public void getFromNetAndStoreWeek(boolean isInitData) {
+    public void updateBdIndicatorWkFromNetAndStoreWeek(boolean isInitData) {
         logger.info("====Enter==method getFromNetAndStoreWeek=====");
         List<String> ids = bdIndicatorDao.findIds();
         ids.add("sh000300");
@@ -1280,6 +1280,7 @@ public class BaiduInfoService {
         return reportDay;
     }
 
+
     public void updateFinancialReportSum() {
         logger.info("========Enter method updateFinancialReportSum ========");
         List<BdIndicatorVO> indicators = bdIndicatorDao.findAll();
@@ -1292,6 +1293,9 @@ public class BaiduInfoService {
             Map<String, BdFinancialSumVO> indicatorReportDayCountMap = new HashMap<>();
             Map<String, BigDecimal> indicatorReportDayGrossSumMap = new HashMap<>();
             Map<String, BigDecimal> indicatorReportDayProfitSumMap = new HashMap<>();
+            //init to put 10 span -50% to 50%
+            Map<String, List<Integer>> grossGainCountDistMap = new HashMap<>();
+            Map<String, List<Integer>> profitGainCountDistMap = new HashMap<>();
             for (String stockId : stockIds) {
                 List<BdFinancialVO> financialVOList = bdFinacialDao.findByStockId(stockId);
                 financialVOList.forEach(financialVo -> {
@@ -1302,9 +1306,21 @@ public class BaiduInfoService {
                         indicatorReportDayCountMap.put(reportDay, countVo);
                         indicatorReportDayGrossSumMap.put(reportDay, new BigDecimal(0));
                         indicatorReportDayProfitSumMap.put(reportDay, new BigDecimal(0));
+                        ArrayList<Integer> grossCountList = new ArrayList<>(10);
+                        for (int i = 0; i < 10; i++) {
+                            grossCountList.add(0);
+                        }
+                        grossGainCountDistMap.put(reportDay, grossCountList);
+                        ArrayList<Integer> profitCountList = new ArrayList<>(10);
+                        for (int i = 0; i < 10; i++) {
+                            profitCountList.add(0);
+                        }
+                        profitGainCountDistMap.put(reportDay, profitCountList);
                         countVo.setReportDay(reportDay);
                         countVo.setIndicatorId(vo.getStockId());
                     }
+
+                    handleCountDist(grossGainCountDistMap, profitGainCountDistMap, reportDay, financialVo);
 
                     BigDecimal grossSum = indicatorReportDayGrossSumMap.get(reportDay);
                     BigDecimal add = grossSum.add(convertWanToYi(financialVo.getGrossIncome()));
@@ -1338,11 +1354,55 @@ public class BaiduInfoService {
                 }
                 bdFinancialSumVO.setGrossSum(new DecimalFormat("0.00").format(indicatorReportDayGrossSumMap.get(reportDay)));
                 bdFinancialSumVO.setProfitSum(new DecimalFormat("0.00").format(indicatorReportDayProfitSumMap.get(reportDay)));
+                bdFinancialSumVO.setGrossGainCountDistribution(grossGainCountDistMap.get(reportDay).stream()
+                        .map(String::valueOf)
+                        .collect(java.util.stream.Collectors.joining(",")));
+                bdFinancialSumVO.setProfitGainCountDistribution(profitGainCountDistMap.get(reportDay).stream().map(String::valueOf)
+                        .collect(java.util.stream.Collectors.joining(",")));
                 bdFinancialSumVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
                 bdFinancialSumDao.save(bdFinancialSumVO);
             });
         });
         logger.info("========Exist method updateFinancialReportSum ========");
+    }
+
+    private void handleCountDist(Map<String, List<Integer>> grossMap, Map<String, List<Integer>> profitMap, String reportDay, BdFinancialVO financialVo) {
+        processPercentage(grossMap.get(reportDay), financialVo.getGrossIncomeGain());
+        processPercentage(profitMap.get(reportDay), financialVo.getGrossProfitGain());
+    }
+
+    public static void processPercentage(List<Integer> resultList, Double percentageValue) {
+        // 1. 除以10
+        double dividedValue = percentageValue / 10.0;
+
+        // 2. 直接取整（截断小数部分）
+        int intValue = (int) dividedValue;
+
+        // 3. 判断结果并更新对应区间的计数
+        int index;
+        if (intValue <= -4) { // 对应原始值 <= -40%
+            index = 0;
+        } else if (intValue == -3) { // 对应原始值 -40% < value <= -30%
+            index = 1;
+        } else if (intValue == -2) { // 对应原始值 -30% < value <= -20%
+            index = 2;
+        } else if (intValue == -1) { // 对应原始值 -20% < value <= -10%
+            index = 3;
+        } else if (intValue == 0) {  // 对应原始值 -10% < value <= 0%
+            index = 4;
+        } else if (intValue == 1) {  // 对应原始值 0% < value <= 10%
+            index = 5;
+        } else if (intValue == 2) {  // 对应原始值 10% < value <= 20%
+            index = 6;
+        } else if (intValue == 3) {  // 对应原始值 20% < value <= 30%
+            index = 7;
+        } else if (intValue == 4) {  // 对应原始值 30% < value <= 40%
+            index = 8;
+        } else { //  对应原始值 > 50%
+            index = 9;
+        }
+
+        resultList.set(index, resultList.get(index) + 1);
     }
 
     public static BigDecimal convertWanToYi(String wanString) {

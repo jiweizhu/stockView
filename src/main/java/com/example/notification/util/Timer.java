@@ -71,12 +71,11 @@ public class Timer {
         try {
             logger.info("====cron==start updateEveryWeek=====");
             //(20250501)week data not updated  from baidu, pause to query
-//            baiduInfoService.getFromNetAndStoreWeek(false);
+//            baiduInfoService.updateBdIndicatorWkFromNetAndStoreWeek(false);
 
             //for stock from Tencent
-            //202250401 baidu has no wk data from 20250401
-//            kLineMarketClosedService.deleteWkHistoryData(2);
-//            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(3);
+            kLineMarketClosedService.deleteWkHistoryData(2);
+            kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(10);
 
             baiduInfoService.calculateBdIndicatorDropRange();
 
@@ -118,19 +117,6 @@ public class Timer {
             logger.info("Start cron job baiduInfoService.calculateIndicatorsAvg=====");
             baiduInfoService.calculateIndicatorsAvg();
             logger.info("End cron job baiduInfoService.calculateIndicatorsAvg=====");
-        } catch (Exception e) {
-            logger.error("==== Timer run error! ===== Detail is: ", e);
-        }
-    }
-
-
-
-    //  real time query, every 15min
-//    @Scheduled(cron = "30 0/15 9-15 * * ?")
-    public void realTimeQuery() {
-        try {
-            logger.info("===== Start realTimeQuery ====");
-            kLineService.realTimeQuery();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
