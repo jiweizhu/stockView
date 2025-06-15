@@ -40,7 +40,7 @@ public class BaiDuController {
     //=========Start========Get from Net=====================//
     @RequestMapping(value = {"/bd/getFromBd/commonData"})
     @ResponseBody
-    public void commonData() throws InterruptedException {
+    public void updateCommonData() throws InterruptedException {
         logger.info("======Enter BaiDuController commonData========");
         baiduInfoService.updateStockBasicDataFromBd();
     }
