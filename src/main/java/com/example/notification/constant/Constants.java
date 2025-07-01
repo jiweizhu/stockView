@@ -56,7 +56,7 @@ public class Constants {
     // favorite stock
     public static int FAVORITE_STOCK = 100;
 
-    public static Integer rangeSize = 700;
+    public static Integer rangeSize = 820;
     public static Integer rangeWkSize = 580;
 
     public static Integer getRangeWkSize() {
