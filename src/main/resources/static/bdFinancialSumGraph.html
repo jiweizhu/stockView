@@ -15,36 +15,28 @@
     <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
     <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
     <style>
-        * {
-          margin: 0;
-          padding: 0;
-        }
+        * { margin: 0; padding: 0; }
         .index-container {
             width: 400px;
             height: 600px;
             margin-bottom: 2px;
             background-color: #FFFFCC;
         }
-        th, td {
-          text-align: left;
-          padding: 10px;
-        }
+        th, td { text-align: left; padding: 10px; }
         .toggleButton {
-            background-color: grey; /* 设置按钮背景颜色 */
-            color: black; /* 按钮文字颜色 */
-            padding: 10px 15px; /* 内边距 */
-            border: none; /* 去掉边框 */
-            border-radius: 5px; /* 圆角 */
-            cursor: pointer; /* 鼠标悬浮样式 */
-            text-align: center; /* 居中 */
-            text-decoration: none; /* 去掉下划线 */
+            background-color: grey;
+            color: black;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-
-<table border="1" id="mainTable">
-</table>
+<table border="1" id="mainTable"></table>
 <button id="toggleWk" class="easyui-linkbutton">toggleWk</button>
 <button class="toggleButton" id="toggle_300">Toggle 300K</button>
 <table border="1" id="myTable"></table>
@@ -52,215 +44,101 @@
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '43.139.165.209';
 </script>
-</body>
-</html>
 
 <script>
-    var isWeekly = false;
     document.addEventListener('DOMContentLoaded', function () {
-           function loadTableData() {
-              fetch(`http://${serverIp}:8888/bd/indicatorsView/false`)
-                 .then(response => response.text())
-                 .then(data => {
-                    const dataContainer = document.getElementById('myTable');
-                    dataContainer.innerHTML = data;
-                 })
-                 .catch(error => {
-                    console.error('Error fetching data:', error);
-                 })
-           }
+        function loadTableData() {
+            fetch(`http://${serverIp}:8888/bd/indicatorsView/false`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('myTable').innerHTML = data;
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
 
-     loadTableData();
+        loadTableData();
 
-    async function getDivs() {
-       const spans = document.querySelectorAll('div[id^="span_"]');
-        spans.forEach(span => {
-           createETFChart(span); // Pass each span element to the function
+        setTimeout(() => {
+            const spans = document.querySelectorAll('div[id^="span_"]');
+            spans.forEach(span => {
+                createETFChart(span);
+            });
+        }, 1500);
+    });
+
+ async function createETFChart(span) {
+    const myChart = echarts.init(span);
+    const response = await fetch(`http://${serverIp}:8888/bd/grossDistribute/` + span.id.replace('span_', ''));
+    const apiData = await response.json();
+
+    // 补全年份并排序
+    const riverData = [];
+    const sortedDates = Object.keys(apiData).sort((a, b) => new Date('20' + a) - new Date('20' + b));
+    const categories = apiData[sortedDates[0]].map((_, i) => `T${i + 1}`);
+
+    sortedDates.forEach(date => {
+        const fullDate = '20' + date; // 把 "24-09-30" → "2024-09-30"
+        const values = apiData[date];
+        values.forEach((value, idx) => {
+            riverData.push([fullDate, value, categories[idx]]);
         });
-        // bindEvents(); // Uncomment if you have this function defined elsewhere
-    }
+    });
 
-    // Delay calling getDivs to ensure dynamic spans are loaded, if any
-    setTimeout(function() {
-          getDivs();
-    }, 1500);
-
-    }); // End of DOMContentLoaded
-
-
-    async function createETFChart(span) {
-
-var myChart = echarts.init(span);
-var option;
-
-const apiData = await fetch(`http://${serverIp}:8888/bd/grossDistribute/` + span.id.replace('span_', '')).then(response => response.json());
-
-// 1. 处理并排序日期
-const sortedDates = Object.keys(apiData).sort((a, b) => {
-    const parseDate = (dateStr) => {
-        const parts = dateStr.split('-');
-        const year = parseInt(parts[0]) < 50 ? 2000 + parseInt(parts[0]) : 1900 + parseInt(parts[0]);
-        return new Date(`${year}-${parts[1]}-${parts[2]}`);
-    };
-    return parseDate(a).getTime() - parseDate(b).getTime();
-});
-
-// 2. 转换数据结构
-const newRawData = [];
-const numberOfCategories = apiData[sortedDates[0]] ? apiData[sortedDates[0]].length : 0;
-for (let i = 0; i < numberOfCategories; i++) newRawData.push([]);
-
-sortedDates.forEach(date => {
-    const values = apiData[date];
-    if (values && values.length === numberOfCategories) {
-        for (let i = 0; i < numberOfCategories; i++) {
-            newRawData[i].push(values[i]);
-        }
-    }
-});
-const rawData = newRawData;
-
-// 3. 计算每列总和
-const totalData = [];
-for (let i = 0; i < rawData[0].length; ++i) {
-    let sum = 0;
-    for (let j = 0; j < rawData.length; ++j) {
-        sum += rawData[j][i];
-    }
-    totalData.push(sum);
-}
-
-// 4. 设置图表基本参数
-const grid = { left: 50, right: 30, top: 70, bottom: 60 };
-const color = ['#5470c6', '#91cc75', '#fac858', '#ee6666', '#73c0de', '#3ba272', '#fc8452', '#9a60b4', '#ea7ccc', '#5f60e0'];
-
-const seriesNames = Array.from({ length: numberOfCategories }, (_, i) => `T${i + 1}`);
-const series = seriesNames.map((name, sid) => ({
-    name,
-    type: 'bar',
-    stack: 'total',
-    barWidth: '60%',
-    itemStyle: {
-        color: color[sid % color.length]
-    },
-    label: {
-        show: true,
-        position: 'inside',
-        color: '#fff',
-        fontSize: 10,
-        formatter: (params) => {
-            const total = totalData[params.dataIndex];
-            if (!total) return '';
-            const percent = (params.value / total * 100).toFixed(1);
-            return percent > 3 ? `${percent}%` : '';
-        }
-    },
-    emphasis: {
-        focus: 'series'
-    },
-    data: rawData[sid],
-    z: sid + 1
-}));
-
-// 5. 可选的连接层 graphic（平滑过渡）
-const elements = [];
-if (rawData.length > 0 && rawData[0].length > 0 && myChart) {
-    const gridWidth = myChart.getWidth() - grid.left - grid.right;
-    const gridHeight = myChart.getHeight() - grid.top - grid.bottom;
-    const categoryWidth = gridWidth / rawData[0].length;
-    const barPadding = categoryWidth * 0.2;
-
-    for (let j = 1, jlen = rawData[0].length; j < jlen; ++j) {
-        const leftX = grid.left + categoryWidth * j - barPadding;
-        const rightX = leftX + barPadding * 2;
-        let leftY = grid.top + gridHeight;
-        let rightY = leftY;
-        for (let i = 0; i < series.length; ++i) {
-            const points = [];
-            const leftBarHeight = (totalData[j - 1] <= 0 || rawData[i][j - 1] === undefined) ? 0 : (rawData[i][j - 1] / totalData[j - 1]) * gridHeight;
-            const rightBarHeight = (totalData[j] <= 0 || rawData[i][j] === undefined) ? 0 : (rawData[i][j] / totalData[j]) * gridHeight;
-
-            points.push([leftX, leftY]);
-            points.push([leftX, leftY - leftBarHeight]);
-            points.push([rightX, rightY - rightBarHeight]);
-            points.push([rightX, rightY]);
-            points.push([leftX, leftY]);
-
-            leftY -= leftBarHeight;
-            rightY -= rightBarHeight;
-
-            elements.push({
-                type: 'polygon',
-                shape: { points },
-                style: {
-                    fill: color[i % color.length],
-                    opacity: 0.25
+    const option = {
+        backgroundColor: '#fefedc',
+        title: {
+            left: 'center',
+            top: 10,
+            textStyle: {
+                fontSize: 18,
+                fontWeight: 'bold'
+            }
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: '#aaa',
+                    width: 1,
+                    type: 'dashed'
                 }
-            });
-        }
-    }
+            },
+            formatter: function (params) {
+                const date = params[0].data[0];
+                let content = `${date}<br/>`;
+                params.forEach(p => {
+                    content += `${p.marker}${p.seriesName}: ${p.data[1]}<br/>`;
+                });
+                return content;
+            }
+        },
+        legend: {
+            data: categories,
+            top: 5
+        },
+        singleAxis: {
+            top: 60,
+            bottom: 60,
+            type: 'time',
+            axisLabel: { rotate: 45 },
+            axisPointer: {
+                animation: true,
+                label: { show: true }
+            }
+        },
+        series: [{
+            type: 'themeRiver',
+            data: riverData,
+            emphasis: {
+                focus: 'series'
+            }
+        }]
+    };
+
+    myChart.setOption(option);
 }
 
-// 6. 设置完整 Option
-option = {
-    backgroundColor: '#fefedc',
-    title: {
-        text: '各类别分布占比变化图',
-        left: 'center',
-        top: 10,
-        textStyle: {
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: '#333'
-        }
-    },
-    tooltip: {
-        trigger: 'axis',
-        axisPointer: { type: 'shadow' },
-        formatter: function (params) {
-            let tooltipContent = params[0].name + '<br/>';
-            let total = 0;
-            params.forEach(item => total += item.value);
-            params.forEach(item => {
-                const percentage = (item.value / total * 100).toFixed(2);
-                tooltipContent += item.marker + item.seriesName + ': ' + item.value + ' (' + percentage + '%)<br/>';
-            });
-            return tooltipContent;
-        }
-    },
-    legend: {
-        data: seriesNames,
-        type: 'scroll',
-        orient: 'horizontal',
-        bottom: 5
-    },
-    grid,
-    xAxis: {
-        type: 'category',
-        data: sortedDates,
-        axisLabel: {
-            rotate: 45,
-            fontSize: 12
-        }
-    },
-    yAxis: {
-        type: 'value',
-        min: 0,
-        max: 1,
-        axisLabel: {
-            formatter: value => (value * 100).toFixed(0) + '%'
-        }
-    },
-    series,
-    graphic: {
-        elements
-    }
-};
-
-// 7. 渲染图表
-myChart.setOption(option);
-
-
-
-    }
 </script>
+</body>
+</html>
