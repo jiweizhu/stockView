@@ -10,6 +10,7 @@ import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.util.Utils;
 import com.example.notification.vo.BdIndicatorVO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -184,6 +185,12 @@ public class BaiDuController {
         return baiduInfoService.queryFinancialSum();
     }
 
+    @RequestMapping(value = {"/bd/grossDistribute/{indicatorId}"})
+    @ResponseBody
+    public Object grossDistribute(@PathVariable String indicatorId) throws JsonProcessingException {
+        return baiduInfoService.grossDistribute(indicatorId);
+    }
+
     @RequestMapping(value = {"/bd/real"})
     @ResponseBody
     public Object getBaiduIndustriesRealInfo() throws Exception {
@@ -249,12 +256,11 @@ public class BaiDuController {
     }
 
 
-
     // manually update config data
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateManually() {
-        baiduInfoService.updateZ1ToToday();
+        baiduInfoService.updateBdIndicatorWkFromNetAndStoreWeek(false);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

@@ -256,8 +256,6 @@ public class Controller {
     @ResponseBody
     public String manuallyUpdate() {
         logger.info("Enter method manuallyUpdate ====");
-        kLineMarketClosedService.deleteWkHistoryData(2);
-        kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(10);
         return "result";
     }
 

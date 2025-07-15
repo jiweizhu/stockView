@@ -1219,6 +1219,34 @@ public class BaiduInfoService {
         return rangeSortIdDao.findAll();
     }
 
+    public Object grossDistribute(String indicatorId) throws JsonProcessingException {
+        logger.info("========Enter method financialDistribute =======indicatorId={}", indicatorId);
+        if (Utils.isWinSystem()) {
+            indicatorId = "730200";
+        }
+        indicatorId = indicatorId.split("_")[0];
+        List<BdFinancialSumVO> voList = bdFinancialSumDao.findByIndicatorId(indicatorId);
+        String stockIdsByIndicatorId = bdIndicatorDao.findStockIdsByIndicatorId(indicatorId);
+        if (!StringUtils.hasLength(stockIdsByIndicatorId)) {
+            logger.info("=====Error====Not found by findStockIdsByIndicatorId=={}", indicatorId);
+            return null;
+        }
+        Map<String, Object> lineMap = new HashMap<>();
+
+        for (BdFinancialSumVO vo : voList) {
+            List<Integer> integerList = new ArrayList<>();
+            String reportDay = vo.getReportDay();
+            reportDay = changeReportDayToChinese(reportDay);
+            Map<String, Object> tmpMap = objectMapper.readValue(vo.getGrossGainCountDistribution(), Map.class);
+            List<Integer> countList = tmpMap.keySet().stream().map(Integer::parseInt).sorted().toList();
+            countList.forEach(count -> {
+                int length = tmpMap.get(count.toString()).toString().split(",").length;
+                integerList.add(length);
+            });
+            lineMap.put(reportDay, integerList);
+        }
+        return lineMap;
+    }
 
     public Object queryFinancialSum() {
         logger.info("========Enter method queryFinancialSum ========");
@@ -1538,5 +1566,6 @@ public class BaiduInfoService {
         }
         logger.info("======End BaiduInfoService getTopHolderFromNet========");
     }
+
 
 }

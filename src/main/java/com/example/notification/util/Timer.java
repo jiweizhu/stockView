@@ -70,11 +70,10 @@ public class Timer {
     public void updateEveryWeek() {
         try {
             logger.info("====cron==start updateEveryWeek=====");
-            //(20250501)week data not updated  from baidu, pause to query
-//            baiduInfoService.updateBdIndicatorWkFromNetAndStoreWeek(false);
+            kLineMarketClosedService.deleteWkHistoryData(2);
+            baiduInfoService.updateBdIndicatorWkFromNetAndStoreWeek(false);
 
             //for stock from Tencent
-            kLineMarketClosedService.deleteWkHistoryData(2);
             kLineMarketClosedService.getWeekHistoryPriceAndStoreInDb(10);
 
             baiduInfoService.calculateBdIndicatorDropRange();

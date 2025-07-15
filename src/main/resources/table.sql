@@ -166,6 +166,47 @@ stock_ids TEXT,
 last_updated_time TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE  easy_indicator(
+board_id VARCHAR(12) primary key,
+board_name VARCHAR(20),
+upward_days_five INT,
+gain_percent_five DECIMAL(10,2),
+flip_upward_days_five INT,
+flip_gain_percent_five DECIMAL(10,2),
+flip_day_five DATE,
+flip_end_day_five DATE,
+upward_days_ten INT,
+gain_percent_ten DECIMAL(10,2),
+flip_upward_days_ten INT,
+flip_gain_percent_ten DECIMAL(10,2),
+flip_day_ten DATE,
+flip_end_day_ten DATE,
+stock_ids TEXT,
+last_updated_time TIMESTAMP
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE easy_band_daily (
+    BOARD_CODE VARCHAR(50) ,
+    ORIGINALCODE VARCHAR(50) COMMENT '原始代码',
+    TRADE_DATE DATE NOT NULL COMMENT '交易日期',
+    PE_TTM DOUBLE COMMENT '市盈率TTM',
+    PE_LAR DOUBLE COMMENT '市盈率LAR',
+    PB_MRQ DOUBLE COMMENT '市净率MRQ',
+    PCF_OCF_TTM DOUBLE COMMENT '市现率OCF_TTM',
+    PS_TTM DOUBLE COMMENT '市销率TTM',
+    PEG_CAR DOUBLE COMMENT 'PEG比率CAR',
+    TOTAL_MARKET_CAP DOUBLE COMMENT '总市值',
+    MARKET_CAP_VAG DOUBLE COMMENT '流通市值',
+    NOTLIMITED_MARKETCAP_A DOUBLE COMMENT '非限售A股市值',
+    NOMARKETCAP_A_VAG DOUBLE COMMENT '非限售A股流通市值',
+    TOTAL_SHARES BIGINT COMMENT '总股本',
+    TOTAL_SHARES_VAG DOUBLE COMMENT '总流通股本',
+    FREE_SHARES_VAG DOUBLE COMMENT '自由流通股本',
+    NUM INT COMMENT '公司数量',
+    LOSS_COUNT INT COMMENT '亏损公司数量',
+    PRIMARY KEY(BOARD_CODE, TRADE_DATE)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE bd_daily_price (
 stock_id VARCHAR(12) NOT NULL,
 day DATE NOT NULL,
