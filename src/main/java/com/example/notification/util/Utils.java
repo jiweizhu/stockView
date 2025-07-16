@@ -242,4 +242,11 @@ public class Utils {
     }
 
 
+   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+public static java.sql.Date stringToDate(String date) {
+    LocalDate localDate = LocalDate.parse(date, DATE_FORMATTER);
+    return java.sql.Date.valueOf(localDate);
+}
+
 }

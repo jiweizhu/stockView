@@ -16,6 +16,7 @@ issues:
 =================================
 
 need to do:
+7.行业估值显示数据修复，有几个没显示，另外，方法是获取所有数据并update,需要增加判断只update近期的（一周一次就好）。
 6. adding stock sortColum, to decouple code sorting with html view.  In future, need extract html code and stock value code building html---- 20250323
 5. top 10 holders if has 社保？！
 4. add 市值 ?

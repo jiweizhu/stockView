@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @Table(name = "bd_indicator")
 public class BdIndicatorVO {
     @Id
-    @Column(name = "indicatorId")
+    @Column(name = "indicator_id")
     private String stockId;
 
     @Column(name = "indicatorName")
@@ -36,10 +36,10 @@ public class BdIndicatorVO {
     @Column(name = "flipGainPercentFive", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal flipGainPercentFive;
 
-    @Column(name = "flipDayFive")
+    @Column(name = "flip_day_five")
     private Date flipDayFive;
 
-    @Column(name = "flipEndDayFive")
+    @Column(name = "flip_end_day_five")
     private Date flipEndDayFive;
 
     @Column(name = "upwardDaysTen")

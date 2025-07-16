@@ -48,6 +48,8 @@ public class StockDailyVO {
 
     @Column(name = "day_gain_of_ten", columnDefinition = "DECIMAL(10,3)")
     private BigDecimal dayGainOfTen;
+    @Column(name = "ttm", columnDefinition = "DECIMAL(10,2)")
+    private Double ttm;
 
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
         this.stockId = stockId;

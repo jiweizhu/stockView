@@ -9,8 +9,8 @@ https://push2his.eastmoney.com/api/qt/stock/kline/get?cb=jQuery35105613772031491
 
 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=90.BK0421&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=102&fqt=1&end=20500101&lmt=120
 
-
-
+https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=%E5%B8%82%E7%9B%88%E7%8E%87(TTM)&code=002384&word=&resource_id=51171&market=ab&tag=%E5%B8%82%E7%9B%88%E7%8E%87(TTM)&chart_select=%E8%BF%91%E4%BA%94%E5%B9%B4&skip_industry=1&finClientType=pc
+https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=%E5%B8%82%E7%9B%88%E7%8E%87(TTM)&code=002384&word=&resource_id=51171&market=ab&tag=%E5%B8%82%E7%9B%88%E7%8E%87(TTM)&chart_select=%E8%BF%91%E4%BA%94%E5%B9%B4&skip_industry=1&finClientType=pc
 ===========================
 fine
 https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=90.BK0421&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61&klt=102&fqt=1&beg=0&end=20500101&smplmt=460&lmt=1000000

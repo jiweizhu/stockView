@@ -287,8 +287,12 @@ day_avg_five DECIMAL(10,3),
 day_avg_ten DECIMAL(10,3),
 day_gain_of_five DECIMAL(10,2),
 day_gain_of_ten DECIMAL(10,2),
+ttm DECIMAL(10,2),
+price_book_ratio DECIMAL(10,2),
+price_sale_ratio DECIMAL(10,2)
 PRIMARY KEY(stock_id, day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+alter table daily_price add column ttm DECIMAL(10,2);
 
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,

@@ -3,6 +3,7 @@ package com.example.notification.baidu.controller;
 import com.example.notification.baidu.respVo.IndicatorRespVO;
 import com.example.notification.baidu.respVo.RangeSortRespVO;
 import com.example.notification.baidu.service.BaiduInfoService;
+import com.example.notification.baidu.service.ValuationService;
 import com.example.notification.baidu.vo.IndicatorVO;
 import com.example.notification.constant.Constants;
 import com.example.notification.controller.Controller;
@@ -255,12 +256,14 @@ public class BaiDuController {
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 
+    @Autowired
+    ValuationService valuationService;
 
     // manually update config data
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateManually() {
-        baiduInfoService.updateBdIndicatorWkFromNetAndStoreWeek(false);
+        valuationService.getFromBdAndUpdateTTM();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
