@@ -256,6 +256,16 @@ public class BaiDuController {
         return ResponseEntity.ok(Arrays.toString(stringList.toArray()));
     }
 
+
+    @RequestMapping(value = {"/bd/fixNullTtm"})
+    @ResponseBody
+    public String fixNullTtm() {
+        logger.info("Enter method fixNullTtm ====");
+        valuationService.fixNullTtm();
+        return "ok";
+    }
+
+
     @Autowired
     ValuationService valuationService;
 
@@ -264,6 +274,7 @@ public class BaiDuController {
     @ResponseBody
     public ResponseEntity updateManually() {
         valuationService.getFromBdAndUpdateTTM();
+        valuationService.getFromBdAndUpdatePBR();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

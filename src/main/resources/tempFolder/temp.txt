@@ -23,3 +23,8 @@ https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=1&invt=2&cb=jQuery3710665
 https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&code=740100&market_type=ab&ktype=week&start_time=2024-07-21
 
 https://finance.pae.baidu.com/vapi/v1/getquotation?pointType=string&group=quotation_block_kline&query=480300&code=480300&market_type=ab&ktype=week
+
+update  daily_price set ttm =null  where stock_id = 'sz000063' and day = '2022-07-20';
+update  daily_price set ttm =null  where stock_id = 'sz000063' and day = '2022-07-19';
+update  daily_price set ttm =null  where stock_id = 'sz000063' and day = '2022-07-18';
+select * from daily_price where stock_id = 'sz000063' and ttm is null;

@@ -51,6 +51,9 @@ public class StockDailyVO {
     @Column(name = "ttm", columnDefinition = "DECIMAL(10,2)")
     private Double ttm;
 
+    @Column(name = "pbr", columnDefinition = "DECIMAL(10,2)")
+    private Double pbr;
+
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
         this.stockId = stockId;
         this.day = Date.valueOf(day);

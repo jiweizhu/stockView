@@ -34,6 +34,10 @@ public class Constants {
     public static int PROFIT_TYPE_400 = 400;
 
 
+    public static String TTM_URL = "TTM_URL";
+    public static String PBR_URL = "PBR_URL";
+
+
     //green   #00FF00
     public static String GREEN_Color = "#00FF00";
 

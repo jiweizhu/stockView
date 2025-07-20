@@ -458,20 +458,30 @@ public class KLineMarketClosedService {
         }
         Collections.reverse(resultList);
         ArrayList<String[]> result = new ArrayList<>();
-        for (StockDailyVO stockNameVO : resultList) {
-            BigDecimal dayAvgFive = stockNameVO.getDayAvgFive();
-            BigDecimal dayAvgTen = stockNameVO.getDayAvgTen();
+        //tempTtm is to fix some ttm is null
+        Double tempTtm = null;
+        for (int i = 0; i < resultList.size(); i++) {
+            StockDailyVO vo = resultList.get(i);
+            BigDecimal dayAvgFive = vo.getDayAvgFive();
+            BigDecimal dayAvgTen = vo.getDayAvgTen();
             if (dayAvgFive == null || dayAvgTen == null) {
                 continue;
             }
             String[] strings = new String[7];
-            Date day = stockNameVO.getDay();
+            Date day = vo.getDay();
             strings[0] = Utils.getFormat(day);
-            strings[1] = stockNameVO.getOpeningPrice().toString();
-            strings[2] = stockNameVO.getClosingPrice().toString();
-            strings[3] = stockNameVO.getIntradayHigh().toString();
-            strings[4] = stockNameVO.getIntradayLow().toString();
-
+            strings[1] = vo.getOpeningPrice().toString();
+            strings[2] = vo.getClosingPrice().toString();
+            strings[3] = vo.getIntradayHigh().toString();
+            Double ttm = vo.getTtm();
+            if (ttm == null && tempTtm != null) {
+                ttm = tempTtm;
+            } else if (ttm != null) {
+                tempTtm = vo.getTtm();
+            } else {
+                ttm = 0.0;
+            }
+            strings[4] = ttm.toString();
             result.add(strings);
         }
         return result;
