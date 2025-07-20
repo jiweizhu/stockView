@@ -2,6 +2,7 @@ package com.example.notification.baidu.service;
 
 import com.example.notification.baidu.respVo.FinancialRespVO;
 import com.example.notification.baidu.respVo.IndexDropRangeRespVO;
+import com.example.notification.baidu.respVo.StockRespVO;
 import com.example.notification.baidu.vo.BdFinancialNetVO;
 import com.example.notification.baidu.vo.BdPanKouInfoVO;
 import com.example.notification.baidu.vo.IndicatorDayVO;
@@ -168,6 +169,20 @@ public class BaiduInfoService {
             }
             indicatorVO.setStockIds(sb.toString());
             list.add(indicatorVO);
+        });
+        return list;
+    }
+
+    public List<StockRespVO> queryStocksEvalByIndicator(String targetFile) {
+        logger.info("====queryStocksEvalByIndicator={}", targetFile);
+        String stockIds = bdIndicatorDao.findStockIdsByIndicatorId(targetFile.split("_")[1]);
+        List<StockRespVO> list = new ArrayList<>();
+        Arrays.stream(stockIds.split(",")).forEach(stockId -> {
+            stockDao.findById(stockId).ifPresent(stockNameVO -> {
+                StockRespVO retVo = new StockRespVO();
+                BeanUtils.copyProperties(stockNameVO, retVo);
+                list.add(retVo);
+            });
         });
         return list;
     }

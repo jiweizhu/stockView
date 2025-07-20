@@ -133,6 +133,16 @@ public class BaiDuController {
         return baiduInfoService.queryIndexDropRangeByIndicator(targetFile);
     }
 
+    // query stocks eval by indicator
+    @RequestMapping(value = {"/bd/queryStocksEvalByIndicator"})
+    @ResponseBody
+    public Object queryStocksEvalByIndicator() {
+        logger.info("======Enter BaiDuController queryStocksEvalByIndicator========");
+        String targetFile = Controller.getTargetFile();
+        return baiduInfoService.queryStocksEvalByIndicator(targetFile);
+    }
+
+
     @RequestMapping(value = {"/bd/dropRange/stocksView/{stockId_startDay}"})
     @ResponseBody
     public Object dropRangeStocksView(@PathVariable String stockId_startDay) {

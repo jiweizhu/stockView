@@ -352,6 +352,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
     });
+    $('#dg1').edatagrid({
+                url: '/bd/queryStocksEvalByIndicator',
+                remoteSort: false,
+                onSave: function(index, row) {
+                    $('#dg1').edatagrid('reload');
+                },
+                view: detailview,
+                autoUpdateDetail: true,
+                sortName: 'peratio',
+                sortOrder: 'asc',
+                detailFormatter: function(rowIndex, rowData) {}
+    });
 });
 
     var data_300;
@@ -638,8 +650,34 @@ async function createETFChart(span) {
     </tr>
     </thead>
 </table>
-<script>
-</script>
+<table class="easyui-datagrid" ctrlSelect="true" id="dg1" pageSize="100"
+       pagination="false" rownumbers="true" singleSelect="true" style="width:300px;height:250px"
+       title="Index Range Sort" toolbar="#toolbar">
+    <thead>
+    <tr>
+        <th align="left" data-options="sortable:true,sorter:strSorter" field="stockName"
+            width="120">
+            stockName
+        </th>
+        <th align="left" data-options="sortable:true,sorter:strSorter" field="capitalization"
+            width="120">
+            总市值
+        </th>
+        <th align="left" data-options="sortable:true,sorter:strSorter" field="peratio"
+            width="120">
+            TTM
+        </th>
+        <th align="left" data-options="sortable:true,sorter:strSorter" field="priceSaleRatio"
+            width="120">
+            市销率
+        </th>
+        <th align="left" data-options="sortable:true,sorter:strSorter" field="bvRatio"
+            width="120">
+            市净率
+        </th>
+    </tr>
+    </thead>
+</table>
 <table border="1" id="myTable"></table>
 </body>
 </html>
