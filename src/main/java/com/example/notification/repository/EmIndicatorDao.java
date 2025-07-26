@@ -14,5 +14,6 @@ public interface EmIndicatorDao extends JpaRepository<EmIndicatorVO, String>, Jp
     @Query(value = "SELECT board_id FROM easy_indicator ", nativeQuery = true)
     List<String> findIds();
 
-
+    @Query(value = "SELECT * FROM easy_indicator order by ttm_percentile ", nativeQuery = true)
+    List<EmIndicatorVO> findAllOrderByTtmPercentileAsc();
 }

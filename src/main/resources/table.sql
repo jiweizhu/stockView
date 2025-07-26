@@ -169,21 +169,15 @@ last_updated_time TIMESTAMP
 CREATE TABLE  easy_indicator(
 board_id VARCHAR(12) primary key,
 board_name VARCHAR(20),
-upward_days_five INT,
-gain_percent_five DECIMAL(10,2),
-flip_upward_days_five INT,
-flip_gain_percent_five DECIMAL(10,2),
-flip_day_five DATE,
-flip_end_day_five DATE,
-upward_days_ten INT,
-gain_percent_ten DECIMAL(10,2),
-flip_upward_days_ten INT,
-flip_gain_percent_ten DECIMAL(10,2),
-flip_day_ten DATE,
-flip_end_day_ten DATE,
+ttm_percentile DECIMAL(10,2),
+ttm_max_rel DECIMAL(10,2),
 stock_ids TEXT,
 last_updated_time TIMESTAMP
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE easy_indicator
+add COLUMN ttm_max_rel DECIMAL(10,2);
+
 
 CREATE TABLE easy_band_daily (
     BOARD_CODE VARCHAR(50) ,

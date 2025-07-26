@@ -6,8 +6,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.Timestamp;
 
 @Data
@@ -25,41 +23,12 @@ public class EmIndicatorVO {
     @Column(name = "stock_ids")
     private String stockIds;
 
-    @Column(name = "upwardDaysFive")
-    private Integer upwardDaysFive = 0;
+    @Column(name = "ttm_percentile")
+    private Double ttmPercentile;
 
-    @Column(name = "gainPercentFive", columnDefinition = "DECIMAL(10,3)")
-    private BigDecimal gainPercentFive;
-
-    @Column(name = "flipUpwardDaysFive")
-    private Integer flipUpwardDaysFive = 0;
-
-    @Column(name = "flipGainPercentFive", columnDefinition = "DECIMAL(10,3)")
-    private BigDecimal flipGainPercentFive;
-
-    @Column(name = "flipDayFive")
-    private Date flipDayFive;
-
-    @Column(name = "flipEndDayFive")
-    private Date flipEndDayFive;
-
-    @Column(name = "upwardDaysTen")
-    private Integer upwardDaysTen = 0;
-
-    @Column(name = "gainPercentTen")
-    private BigDecimal gainPercentTen;
-
-    @Column(name = "flipUpwardDaysTen")
-    private Integer flipUpwardDaysTen = 0;
-
-    @Column(name = "flipDayTen")
-    private Date flipDayTen;
-
-    @Column(name = "flipEndDayTen")
-    private Date flipEndDayTen;
-
-    @Column(name = "flipGainPercentTen", columnDefinition = "DECIMAL(10,3)")
-    private BigDecimal flipGainPercentTen;
+    //在距离最高点相对值为多少
+    @Column(name = "ttm_max_rel")
+    private Double ttmRangePct;
 
     @Column(name = "last_updated_time")
     private Timestamp lastUpdatedTime;

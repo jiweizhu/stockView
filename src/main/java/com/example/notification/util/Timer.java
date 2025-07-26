@@ -1,6 +1,7 @@
 package com.example.notification.util;
 
 import com.example.notification.baidu.service.BaiduInfoService;
+import com.example.notification.easymoney.EasyMoneyService;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
@@ -30,6 +31,9 @@ public class Timer {
 
     @Autowired
     private IntraDayService intraDayService;
+
+    @Autowired
+    private EasyMoneyService easymoneyService;
 
 //    @Scheduled(cron = "0 31 9 ? * MON-FRI")
 //    public void clearIntradayPriceBeforeOpeningMarket() {
@@ -83,6 +87,8 @@ public class Timer {
             baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
             baiduInfoService.updateFinancialReportSum();
+
+            easymoneyService.updateBandDailyDet();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
