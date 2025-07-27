@@ -115,6 +115,36 @@ public class StockNameVO {
     private BigDecimal customerRangeGainPost;
 
 
+    @Column(name = "ttm", columnDefinition = "DECIMAL(10,2)")
+    private Double ttm;
+
+    //近N年全部的百分位
+    @Column(name = "ttm_wave_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double ttmWavePct;
+
+    //近N年相对最高最低的百分位
+    @Column(name = "ttm_range_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double ttmRangePct;
+
+    @Column(name = "pbr", columnDefinition = "DECIMAL(10,2)")
+    private Double pbr;
+
+    @Column(name = "pbr_wave_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double pbrWavePct;
+
+    @Column(name = "pbr_range_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double pbrRangePct;
+
+    @Column(name = "pcf", columnDefinition = "DECIMAL(10,2)")
+    private Double pcf;
+
+    @Column(name = "pcf_wave_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double pcfWavePct;
+
+    @Column(name = "pcf_range_pct", columnDefinition = "DECIMAL(10,2)")
+    private Double pcfRangePct;
+
+
     public StockNameVO() {
     }
 

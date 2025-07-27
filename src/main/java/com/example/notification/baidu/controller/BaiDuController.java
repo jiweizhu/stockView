@@ -275,6 +275,14 @@ public class BaiDuController {
         return "ok";
     }
 
+    @RequestMapping(value = {"/bd/updateStockEvaluationData"})
+    @ResponseBody
+    public String updateStockEvaluationData() {
+        logger.info("Enter method updateStockEvaluationData ====");
+        valuationService.updateStockEvaluationData();
+        return "ok";
+    }
+
 
     @Autowired
     ValuationService valuationService;

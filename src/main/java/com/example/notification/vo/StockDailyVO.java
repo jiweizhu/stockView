@@ -52,31 +52,12 @@ public class StockDailyVO {
     @Column(name = "ttm", columnDefinition = "DECIMAL(10,2)")
     private Double ttm;
 
-    //近三年全部的百分位
-    @Column(name = "ttm_wave_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double ttm_wave_pct;
-
-    //近三年相对最高最低的百分位
-    @Column(name = "ttm_range_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double ttm_range_pct;
-
     @Column(name = "pbr", columnDefinition = "DECIMAL(10,2)")
     private Double pbr;
-
-    @Column(name = "pbr_wave_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double pbr_wave_pct;
-
-    @Column(name = "pbr_range_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double pbr_range_pct;
 
     @Column(name = "pcf", columnDefinition = "DECIMAL(10,2)")
     private Double pcf;
 
-    @Column(name = "pcf_wave_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double pcf_wave_pct;
-
-    @Column(name = "pcf_range_pct", columnDefinition = "DECIMAL(10,2)")
-    private Double pcf_range_pct;
 
     public StockDailyVO(String stockId, String day, String openingPrice, String closingPrice, String intradayHigh, String intradayLow) {
         this.stockId = stockId;
