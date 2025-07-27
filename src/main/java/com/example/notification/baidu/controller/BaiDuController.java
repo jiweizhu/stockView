@@ -285,6 +285,7 @@ public class BaiDuController {
     public ResponseEntity updateManually() {
         valuationService.getFromBdAndUpdateTTM();
         valuationService.getFromBdAndUpdatePBR();
+        valuationService.getFromBdAndUpdatePCF();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

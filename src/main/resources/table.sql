@@ -282,12 +282,19 @@ day_avg_ten DECIMAL(10,3),
 day_gain_of_five DECIMAL(10,2),
 day_gain_of_ten DECIMAL(10,2),
 ttm DECIMAL(10,2),
+ttm_wave_pct DECIMAL(10,2),
+ttm_range_pct DECIMAL(10,2),
 pbr DECIMAL(10,2),
+pbr_wave_pct DECIMAL(10,2),
+pbr_range_pct DECIMAL(10,2),
+pcf DECIMAL(10,2),
+pcf_wave_pct DECIMAL(10,2),
+pcf_range_pct DECIMAL(10,2),
 price_book_ratio DECIMAL(10,2),
 price_sale_ratio DECIMAL(10,2)
 PRIMARY KEY(stock_id, day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
-alter table daily_price add column pbr DECIMAL(10,2);
+alter table daily_price add column  DECIMAL(10,2);
 
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,

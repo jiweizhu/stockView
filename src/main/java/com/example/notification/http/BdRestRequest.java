@@ -28,6 +28,11 @@ public class BdRestRequest {
     //https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市净率&code=000957&word=&resource_id=51171&market=ab&tag=市净率&chart_select=近五年&skip_industry=1&finClientType=pc
     private static String Bd_PBR_URL = "https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市净率&code=$code&word=&resource_id=51171&market=ab&tag=市净率&chart_select=近五年&skip_industry=1&finClientType=pc";
 
+    //PCF_OCF_TTM 市现率
+    //gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市现率&code=000651&word=&resource_id=51171&market=ab&tag=市现率&chart_select=近五年&skip_industry=1&finClientType=pc
+    private static String Bd_PCF_URL = "https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市现率&code=000651&word=&resource_id=51171&market=ab&tag=市现率&chart_select=近五年&skip_industry=1&finClientType=pc";
+
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -102,6 +107,7 @@ public class BdRestRequest {
 
     private static String TTM_URL = "TTM_URL";
     private static String PBR_URL = "PBR_URL";
+    private static String PCF_URL = "PCF_URL";
 
     public List<TTMVo> queryDataFromBd(String stockId, String urlType) {
         logger.info("Enter method queryDataFromBd ===============" + stockId);
@@ -110,6 +116,8 @@ public class BdRestRequest {
             url = Bd_TTM_URL;
         } else if (urlType == PBR_URL) {
             url = Bd_PBR_URL;
+        } else if (urlType == PCF_URL) {
+            url = Bd_PCF_URL;
         }
         url = url.replace("$code", stockId.startsWith("s") ? stockId.substring(2) : stockId);
         String jsonResponse = restTemplate.getForObject(url, String.class);

@@ -19,8 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.example.notification.constant.Constants.PBR_URL;
-import static com.example.notification.constant.Constants.TTM_URL;
+import static com.example.notification.constant.Constants.*;
 
 @Service
 public class ValuationService {
@@ -61,6 +60,14 @@ public class ValuationService {
             e.setStockIds("sz000063");
             stockIdsAndIndicatorId.add(e);
         }
+        updateByLineTTM(stockIdsAndIndicatorId);
+        //todo
+        //calculate rangePct
+        //calculate wavePct
+    }
+
+    @Async
+    private void updateByLineTTM(List<BdIndicatorVO> stockIdsAndIndicatorId) {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
             for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
                 logger.info("getFromBdAndUpdateTTM ===============" + stockId);
@@ -68,8 +75,38 @@ public class ValuationService {
                 for (TTMVo ttmVo : ttmVoList) {
                     String date = ttmVo.getDate();
                     StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
-                    if (stockDailyVO != null) {
+                    if (stockDailyVO != null && stockDailyVO.getTtm() == null) {
                         stockDailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
+                        stockDailyDao.save(stockDailyVO);
+                    }
+                }
+            }
+        }
+    }
+
+    @Async
+    public void getFromBdAndUpdatePCF() {
+        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
+        if (Utils.isWinSystem()) {
+            stockIdsAndIndicatorId = new ArrayList<>();
+            BdIndicatorVO e = new BdIndicatorVO("730200");
+            e.setStockIds("sz000063");
+            stockIdsAndIndicatorId.add(e);
+        }
+        updateLinePCF(stockIdsAndIndicatorId);
+    }
+
+    @Async
+    private void updateLinePCF(List<BdIndicatorVO> stockIdsAndIndicatorId) {
+        for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
+            for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
+                logger.info("getFromBdAndUpdatePCF ===============" + stockId);
+                List<TTMVo> ttmVoList = bdRestRequest.queryDataFromBd(stockId, PCF_URL);
+                for (TTMVo pcfVo : ttmVoList) {
+                    String date = pcfVo.getDate();
+                    StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
+                    if (stockDailyVO != null && stockDailyVO.getPcf() == null) {
+                        stockDailyVO.setPcf(Double.valueOf(pcfVo.getValue()));
                         stockDailyDao.save(stockDailyVO);
                     }
                 }
@@ -87,6 +124,11 @@ public class ValuationService {
             e.setStockIds("sz000063");
             stockIdsAndIndicatorId.add(e);
         }
+        updateLinePBR(stockIdsAndIndicatorId);
+    }
+
+    @Async
+    private void updateLinePBR(List<BdIndicatorVO> stockIdsAndIndicatorId) {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
             for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
                 logger.info("getFromBdAndUpdatePBR ===============" + stockId);
@@ -94,7 +136,7 @@ public class ValuationService {
                 for (TTMVo ttmVo : ttmVoList) {
                     String date = ttmVo.getDate();
                     StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
-                    if (stockDailyVO != null) {
+                    if (stockDailyVO != null && stockDailyVO.getPbr() == null) {
                         stockDailyVO.setPbr(Double.valueOf(ttmVo.getValue()));
                         stockDailyDao.save(stockDailyVO);
                     }
