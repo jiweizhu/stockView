@@ -58,7 +58,7 @@ public class EasyMoneyController {
             ids.add("016020");
         }
         ids.forEach(id -> {
-            easymoneyService.updateBandPercentile(id);
+            easymoneyService.updateBandTTMPercentile(id);
         });
         return "OK";
     }

@@ -68,12 +68,12 @@ public class EasyMoneyService {
             emBandDailyVO.setTradeDate(Date.valueOf(netVo.getTradeDate().split(" ")[0]));
             emBandDailyDao.save(emBandDailyVO);
         }
-        updateBandPercentile(id);
+        updateBandTTMPercentile(id);
     }
 
 
-    @Async
-    public void updateBandPercentile(String id) {
+//    @Async
+    public void updateBandTTMPercentile(String id) {
         logger.info("Enter method updateBandPercentile ===id={}", id);
         //find all daily data and update percentile of ttm, pb, pe, ps, pe_ttm, pe_lar, pb_mrq
         List<EmBandDailyVO> list = emBandDailyDao.findAllByBoardCode(id);
@@ -83,7 +83,7 @@ public class EasyMoneyService {
             ttmList.add(new BigDecimal(netVo.getPeTtm()));
         });
 
-        BigDecimal ttmPercentile = calculatePercentile(ttmList, ttmList.get(ttmList.size() - 1));
+        BigDecimal ttmPercentile = calculateWavePercentile(ttmList, ttmList.get(ttmList.size() - 1));
         EmIndicatorVO emIndicatorVO = emIndicatorDao.findById(id).get();
         emIndicatorVO.setTtmPercentile(ttmPercentile.doubleValue());
         BigDecimal rangePercentile = calculateRangePercentile(ttmList, ttmList.get(ttmList.size() - 1));
@@ -140,17 +140,18 @@ public class EasyMoneyService {
     }
 
 
-    public static BigDecimal calculatePercentile(List<BigDecimal> historicalValuations, BigDecimal todayNet) {
+    public static BigDecimal calculateWavePercentile(List<BigDecimal> historicalValuations, BigDecimal todayNet) {
         if (historicalValuations == null || historicalValuations.isEmpty()) {
             // 如果历史数据为空，无法计算百分位
             return BigDecimal.ZERO;
         }
         // 1. 创建一个可修改的列表副本，并进行排序
-        Collections.sort(historicalValuations); // 升序排序
+        List<BigDecimal> sortedHistoricalValuations = new ArrayList<>(historicalValuations);
+        Collections.sort(sortedHistoricalValuations); // 升序排序
 
         // 2. 统计有多少估值小于或等于 todayNet
         long countLessThanOrEqualToTodayNet = 0;
-        for (BigDecimal valuation : historicalValuations) {
+        for (BigDecimal valuation : sortedHistoricalValuations) {
             // 使用compareTo进行数值比较
             if (valuation.compareTo(todayNet) <= 0) {
                 countLessThanOrEqualToTodayNet++;
@@ -163,7 +164,7 @@ public class EasyMoneyService {
         // 3. 计算百分位
         // 百分位 = (小于等于 todayNet 的数据点数量 / 总数据点数量) * 100
         // 使用 BigDecimal 进行精确计算，避免浮点数误差
-        BigDecimal totalCount = new BigDecimal(historicalValuations.size());
+        BigDecimal totalCount = new BigDecimal(sortedHistoricalValuations.size());
         BigDecimal countLTE = new BigDecimal(countLessThanOrEqualToTodayNet);
 
         // 如果 totalCount 为 0，避免除以零
