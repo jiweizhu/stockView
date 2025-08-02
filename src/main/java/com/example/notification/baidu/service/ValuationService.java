@@ -164,6 +164,9 @@ public class ValuationService {
         }
 
         for (String stockId : stockIds) {
+            if(!stockId.startsWith("sh")|| !stockId.startsWith("sz")){
+                continue;
+            }
             // 查询该股票的所有 daily_price 数据，按日期升序排列
             List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId);
             logger.info("fixNullTtm ===============" + stockId);
@@ -213,6 +216,7 @@ public class ValuationService {
                 });
     }
 
+    @Async
     private void updateStocksLine(String id) {
         logger.info("======Enter updateStockEvaluationData =======id={}", id);
         List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdOrderByDay(id);

@@ -89,6 +89,44 @@
       b = parseFloat(b);
       return a==b?0:(a>b?1:-1);
   }
+
+function indicatorSorter(a, b) {
+    // 处理 "亏损" 的情况，将其视为最小
+    if (a === '亏损' && b !== '亏损') {
+        return -1; // "亏损" 小于任何非 "亏损" 的值
+    }
+    if (b === '亏损' && a !== '亏损') {
+        return 1;  // 任何非 "亏损" 的值大于 "亏损"
+    }
+    if (a === '亏损' && b === '亏损') {
+        return 0;  // 两个 "亏损" 相等
+    }
+
+    // 将字符串转换为浮点数进行比较
+    let numA = parseFloat(a);
+    let numB = parseFloat(b);
+
+    // 处理 NaN（例如空字符串或非纯数字的字符串）
+    // 通常将 NaN 视为比有效数字大或小，这里我们假设无效数据比有效数据大
+    if (isNaN(numA) && !isNaN(numB)) {
+        return 1;
+    }
+    if (!isNaN(numA) && isNaN(numB)) {
+        return -1;
+    }
+    if (isNaN(numA) && isNaN(numB)) {
+        return 0; // 两个都是无效数字，认为相等
+    }
+
+    // 正常数值比较
+    if (numA === numB) {
+        return 0;
+    } else if (numA > numB) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
 </script>
 <script>
     const serverIp = window.location.hostname === 'localhost' ? 'localhost' : '43.139.165.209';
@@ -663,15 +701,15 @@ async function createETFChart(span) {
             width="120">
             总市值
         </th>
-        <th align="left" data-options="sortable:true,sorter:strSorter" field="peratio"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="peratio"
             width="120">
             TTM
         </th>
-        <th align="left" data-options="sortable:true,sorter:strSorter" field="priceSaleRatio"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="priceSaleRatio"
             width="120">
             市销率
         </th>
-        <th align="left" data-options="sortable:true,sorter:strSorter" field="bvRatio"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="bvRatio"
             width="120">
             市净率
         </th>
