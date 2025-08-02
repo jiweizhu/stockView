@@ -14,6 +14,11 @@ public interface StockDao extends JpaRepository<StockNameVO, String>, JpaSpecifi
     @Query(value = "SELECT stock_id FROM stock ", nativeQuery = true)
     List<String> findStockIds();
 
+    //this is real stock ids
+    //if stock_name is null, it means it is an etf or index
+    @Query(value = "SELECT stock_id FROM stock where stock_name is not null", nativeQuery = true)
+    List<String> findStockIdsHasName();
+
     @Query(value = " select * from stock where stock_name like '%ETF' ", nativeQuery = true)
     List<StockNameVO> findEtfIds();
 

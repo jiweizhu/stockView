@@ -164,7 +164,7 @@ public class ValuationService {
         }
 
         for (String stockId : stockIds) {
-            if(!stockId.startsWith("sh")|| !stockId.startsWith("sz")){
+            if (!stockId.startsWith("sh") || !stockId.startsWith("sz")) {
                 continue;
             }
             // 查询该股票的所有 daily_price 数据，按日期升序排列
@@ -202,34 +202,34 @@ public class ValuationService {
 
     //update stock wave/range of ttm, pbr, pcf
     public void updateStockEvaluationData() {
-        List<String> stockIds = stockDao.findStockIds();
+        List<String> stockIds = stockDao.findStockIdsHasName();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sz000063");
         }
         stockIds.stream().filter(vo -> {
-                    String codeId = vo.toLowerCase();
-                    return codeId.startsWith("sh") || codeId.startsWith("sz");
-                })
-                .forEach(id -> {
-                    updateStocksLine(id);
-                });
+            String codeId = vo.toLowerCase();
+            return codeId.startsWith("sh") || codeId.startsWith("sz");
+        }).forEach(id -> {
+            calculatePercentile(id);
+        });
     }
 
     @Async
-    private void updateStocksLine(String id) {
-        logger.info("======Enter updateStockEvaluationData =======id={}", id);
-        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdOrderByDay(id);
+    private void calculatePercentile(String id) {
+        logger.info("======Enter calculatePercentile =======id={}", id);
+        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdWithTTMOrderByDay(id);
         //get all ttm,pbr,pcf from daily data
         List<BigDecimal> ttmList = new ArrayList<>();
         List<BigDecimal> pbrList = new ArrayList<>();
         List<BigDecimal> pcfList = new ArrayList<>();
-        dailyVOS.forEach(vo -> {
+        for (int i = 0; i < dailyVOS.size(); i++) {
+            StockDailyVO vo = dailyVOS.get(i);
             //add all of list ttm
             ttmList.add(new BigDecimal(vo.getTtm()));
             pbrList.add(new BigDecimal(vo.getPbr()));
             pcfList.add(new BigDecimal(vo.getPcf()));
-        });
+        }
         BigDecimal ttmWavePercentile = FormulaUtils.calculateWavePercentile(ttmList, ttmList.get(0));
         BigDecimal ttmRangePercentile = FormulaUtils.calculateRangePercentile(ttmList, ttmList.get(0));
         BigDecimal pbrWavePercentile = FormulaUtils.calculateWavePercentile(ttmList, ttmList.get(0));
