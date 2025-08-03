@@ -116,7 +116,7 @@ public class StockNameVO {
 
 
     @Column(name = "ttm", columnDefinition = "DECIMAL(10,2)")
-    private Double ttm;
+    private Double pe;
 
     //近N年全部的百分位
     @Column(name = "ttm_wave_pct", columnDefinition = "DECIMAL(10,2)")

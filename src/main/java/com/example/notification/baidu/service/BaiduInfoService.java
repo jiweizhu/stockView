@@ -279,7 +279,7 @@ public class BaiduInfoService {
             }
             nameDiv.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
 
-            if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
+            if (!stock.getStockId().startsWith("s") || (stock.getStockName() != null && stock.getStockName().toLowerCase().contains("etf"))) {
                 nameDiv.append("(").append(belongStockNum).append(")");
             }
             nameDiv.append("</b></a>").append("<span style=font-size:15px >").append(stock.getCapitalization() == null ? stock.getCurrencyValue() : stock.getCapitalization()).append("| RangeGain = ").append(stock.getCustomerRange()).append("</span>");

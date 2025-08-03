@@ -1,6 +1,7 @@
 package com.example.notification.util;
 
 import com.example.notification.baidu.service.BaiduInfoService;
+import com.example.notification.baidu.service.ValuationService;
 import com.example.notification.easymoney.EasyMoneyService;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.IntraDayService;
@@ -88,12 +89,32 @@ public class Timer {
 
             baiduInfoService.updateFinancialReportSum();
 
-            easymoneyService.updateBandDailyDet();
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
+        logger.info("====cron==end updateEveryWeek=====");
     }
 
+
+    @Autowired
+    private ValuationService valuationService;
+    //   every updateEvery Friday
+    @Scheduled(cron = "0 0 16 * * 5")
+    public void updateEveryFriday() {
+        try {
+            logger.info("====cron==start updateEveryFriday=====");
+
+
+            easymoneyService.updateBandDailyDet();
+
+            valuationService.getFromBdAndUpdatePEByIndicator();
+            valuationService.getFromBdAndUpdateIndicatorPBR();
+            valuationService.getFromBdAndUpdateIndicatorPCF();
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+        logger.info("====cron==end updateEveryFriday=====");
+    }
 
 
     @Scheduled(cron = "0 10 15 * * ?")

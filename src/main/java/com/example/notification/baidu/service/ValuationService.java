@@ -22,9 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static com.example.notification.constant.Constants.*;
 
@@ -58,8 +56,7 @@ public class ValuationService {
     @Autowired
     private StockDao stockDao;
 
-    @Async
-    public void getFromBdAndUpdateIndicatorTTM() throws InterruptedException {
+    public void getFromBdAndUpdatePEByIndicator() throws InterruptedException {
         List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
         if (Utils.isWinSystem()) {
             stockIdsAndIndicatorId = new ArrayList<>();
@@ -69,27 +66,27 @@ public class ValuationService {
             stockIdsAndIndicatorId.add(e);
         }
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
-            logger.info("getFromBdAndUpdateTTM =======bdIndicatorVO===name={}", bdIndicatorVO.getStockName());
+            logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO.getStockName());
             for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
-                logger.info("getFromBdAndUpdateTTM ===============" + stockId);
+                logger.info("getFromBdAndUpdatePE ===============" + stockId);
                 Thread.sleep(100);
-                List<TTMVo> ttmVoList = bdRestRequest.queryDataFromBd(stockId, TTM_URL);
-                extractedTTM(stockId, ttmVoList);
-            }
-        }
-        //todo
-        //calculate rangePct
-        //calculate wavePct
-    }
-
-    @Async
-    private void extractedTTM(String stockId, List<TTMVo> ttmVoList) {
-        for (TTMVo ttmVo : ttmVoList) {
-            String date = ttmVo.getDate();
-            StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
-            if (stockDailyVO != null && stockDailyVO.getTtm() == null) {
-                stockDailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
-                stockDailyDao.save(stockDailyVO);
+                List<StockDailyVO> dbVoList = stockDailyDao.findDayNullPEByStockId(stockId);
+                if (dbVoList.isEmpty()) {
+                    continue;
+                }
+                Map<String, TTMVo> ttmVoMap = new HashMap<>();
+                List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
+                ttmVoList.forEach(dailyVO -> {
+                    ttmVoMap.put(dailyVO.getDate(), dailyVO);
+                });
+                dbVoList.forEach(dailyVO -> {
+                    String nullDay = dailyVO.getDay().toString();
+                    TTMVo ttmVo = ttmVoMap.get(nullDay);
+                    if (ttmVo != null && dailyVO.getTtm() == null) {
+                        dailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
+                        stockDailyDao.save(dailyVO);
+                    }
+                });
             }
         }
     }
@@ -122,7 +119,7 @@ public class ValuationService {
             logger.info("getFromBdAndUpdatePCF ===skip update======stockId={}=name={}", stockId, holdingService.getStockIdOrNameByMap(stockId));
             return;
         }
-        List<TTMVo> ttmVoList = bdRestRequest.queryDataFromBd(stockId, PCF_URL);
+        List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PCF_URL);
         for (TTMVo pcfVo : ttmVoList) {
             String date = pcfVo.getDate();
             StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
@@ -133,7 +130,6 @@ public class ValuationService {
         }
     }
 
-    @Async
     public void getFromBdAndUpdateIndicatorPBR() {
         logger.info("Enter method getFromBdAndUpdatePBR ====");
         List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
@@ -147,7 +143,7 @@ public class ValuationService {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
             for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
                 logger.info("getFromBdAndUpdatePBR ===============" + stockId);
-                List<TTMVo> ttmVoList = bdRestRequest.queryDataFromBd(stockId, PBR_URL);
+                List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PBR_URL);
                 extractedPBR(stockId, ttmVoList);
             }
         }
@@ -243,8 +239,15 @@ public class ValuationService {
             String codeId = vo.toLowerCase();
             return codeId.startsWith("s") && !codeId.contains("st");
         }).forEach(id -> {
-            calculatePercentile(id);
+            updatePct(id);
         });
+    }
+
+    @Async
+    private void updatePct(String id) {
+        calculatePCFPercentile(id);
+        calculatePEPercentile(id);
+        calculatePBRPercentile(id);
     }
 
     @Autowired
@@ -254,8 +257,8 @@ public class ValuationService {
     private Integer easymoneyRangeCount;
 
     @Async
-    private void calculatePercentile(String id) {
-        logger.info("======Enter calculatePercentile =======id={}", id);
+    private void calculatePBRPercentile(String id) {
+        logger.info("======Enter calculatePBRPercentile =======id={}", id);
         //every friday to update
         //first to update daily_price price, then update daily_price ttm/pcf, then calculatePercentile
         StockDailyVO lastDayVo = stockDailyDao.findLastOneDayPriceByStockId(id);
@@ -268,39 +271,71 @@ public class ValuationService {
             return;
         }
         //start to  calculate
-        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdWithTTMOrderByDay(id, easymoneyRangeCount);
+        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdOrderByDay(id, easymoneyRangeCount);
         if (dailyVOS.isEmpty()) {
             String stockIdOrNameByMap = holdingService.getStockIdOrNameByMap(id);
-            logger.info("======Enter calculatePercentile =======id={}, name = {}, no data", id, stockIdOrNameByMap);
+            logger.info("======Enter calculatePBRPercentile =======id={}, name = {}, no data", id, stockIdOrNameByMap);
             return;
         }
         //get all ttm,pbr,pcf from daily data
-        List<BigDecimal> ttmList = new ArrayList<>();
         List<BigDecimal> pbrList = new ArrayList<>();
+        for (int i = 0; i < dailyVOS.size(); i++) {
+            StockDailyVO vo = dailyVOS.get(i);
+            if (vo.getTtm() == null || vo.getPbr() == null || vo.getPcf() == null) {
+                String name = holdingService.getStockIdOrNameByMap(id);
+                logger.info("======Enter calculatePBRPercentile =======id={}, name = {}, day ={} has no data", id, name, vo.getDay());
+                return;
+            }
+            //add all of list ttm
+            pbrList.add(new BigDecimal(vo.getPbr()));
+        }
+        BigDecimal pbrWavePercentile = null;
+        BigDecimal pbrRangePercentile = null;
+        if (!pbrList.isEmpty()) {
+            pbrWavePercentile = FormulaUtils.calculateWavePercentile(pbrList, pbrList.get(0));
+            pbrRangePercentile = FormulaUtils.calculateRangePercentile(pbrList, pbrList.get(0));
+        }
+
+        StockNameVO stockVo = stockDao.findById(id).get();
+        stockVo.setPbr(pbrList.get(0) == null ? null : pbrList.get(0).doubleValue());
+        stockVo.setPbrWavePct(pbrWavePercentile.doubleValue());
+        stockVo.setPbrRangePct(pbrRangePercentile.doubleValue());
+        logger.info("======Enter calculatePBRPercentile =====insert data ==id={}, name = {}", id, holdingService.getStockIdOrNameByMap(id));
+        stockVo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        stockDao.save(stockVo);
+    }
+
+    private void calculatePCFPercentile(String id) {
+        logger.info("======Enter calculatePCFPercentile =======id={}", id);
+        //every friday to update
+        //first to update daily_price price, then update daily_price ttm/pcf, then calculatePercentile
+        StockDailyVO lastDayVo = stockDailyDao.findLastOneDayPriceByStockId(id);
+        //if updated, skip to  update
+        String lastOpeningDay = Utils.getLastOpeningDay();
+        if (lastDayVo.getDay().toString().equals(lastOpeningDay)
+                && lastDayVo.getTtm() != null
+                && lastDayVo.getPbr() != null && lastDayVo.getPcf() != null) {
+            //skip to update
+            return;
+        }
+        //start to  calculate
+        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdOrderByDay(id, easymoneyRangeCount);
+        if (dailyVOS.isEmpty()) {
+            String stockIdOrNameByMap = holdingService.getStockIdOrNameByMap(id);
+            logger.info("======Enter calculatePCFPercentile =======id={}, name = {}, no data", id, stockIdOrNameByMap);
+            return;
+        }
+        //get all ttm,pbr,pcf from daily data
         List<BigDecimal> pcfList = new ArrayList<>();
         for (int i = 0; i < dailyVOS.size(); i++) {
             StockDailyVO vo = dailyVOS.get(i);
             if (vo.getTtm() == null || vo.getPbr() == null || vo.getPcf() == null) {
                 String name = holdingService.getStockIdOrNameByMap(id);
-                logger.info("======Enter calculatePercentile =======id={}, name = {}, day ={} has no data", id, name, vo.getDay());
+                logger.info("======Enter calculatePCFPercentile =======id={}, name = {}, day ={} has no data", id, name, vo.getDay());
                 return;
             }
             //add all of list ttm
-            ttmList.add(new BigDecimal(vo.getTtm()));
-            pbrList.add(new BigDecimal(vo.getPbr()));
             pcfList.add(new BigDecimal(vo.getPcf()));
-        }
-        BigDecimal ttmWavePercentile = null;
-        BigDecimal ttmRangePercentile = null;
-        if (!ttmList.isEmpty()) {
-            ttmWavePercentile = FormulaUtils.calculateWavePercentile(ttmList, ttmList.get(0));
-            ttmRangePercentile = FormulaUtils.calculateRangePercentile(ttmList, ttmList.get(0));
-        }
-        BigDecimal pbrWavePercentile = null;
-        BigDecimal pbrRangePercentile = null;
-        if (!pcfList.isEmpty()) {
-            pbrWavePercentile = FormulaUtils.calculateWavePercentile(pbrList, pbrList.get(0));
-            pbrRangePercentile = FormulaUtils.calculateRangePercentile(pbrList, pbrList.get(0));
         }
 
         BigDecimal pcfWavePercentile = null;
@@ -310,16 +345,58 @@ public class ValuationService {
             pcfRangePercentile = FormulaUtils.calculateRangePercentile(pcfList, pcfList.get(0));
         }
         StockNameVO stockVo = stockDao.findById(id).get();
-        stockVo.setTtm(ttmList.get(0) == null ? null : ttmList.get(0).doubleValue());
-        stockVo.setPbr(pbrList.get(0) == null ? null : pbrList.get(0).doubleValue());
         stockVo.setPcf(pcfList.get(0) == null ? null : pcfList.get(0).doubleValue());
-        stockVo.setPbrWavePct(pbrWavePercentile.doubleValue());
-        stockVo.setPbrRangePct(pbrRangePercentile.doubleValue());
         stockVo.setPcfWavePct(pcfWavePercentile.doubleValue());
         stockVo.setPcfRangePct(pcfRangePercentile.doubleValue());
+        logger.info("======Enter calculatePCFPercentile =====insert data ==id={}, name = {}", id, holdingService.getStockIdOrNameByMap(id));
+        stockVo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        stockDao.save(stockVo);
+    }
+
+
+
+    private void calculatePEPercentile(String id) {
+        logger.info("======Enter calculatePEPercentile =======id={}", id);
+        //every friday to update
+        //first to update daily_price price, then update daily_price ttm/pcf, then calculatePercentile
+        StockDailyVO lastDayVo = stockDailyDao.findLastOneDayPriceByStockId(id);
+        //if updated, skip to  update
+        String lastOpeningDay = Utils.getLastOpeningDay();
+        if (lastDayVo.getDay().toString().equals(lastOpeningDay)
+                && lastDayVo.getTtm() != null) {
+            //skip to update
+            return;
+        }
+        //start to  calculate
+        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdOrderByDay(id, easymoneyRangeCount);
+        if (dailyVOS.isEmpty()) {
+            String stockIdOrNameByMap = holdingService.getStockIdOrNameByMap(id);
+            logger.info("======Enter calculatePercentile =======id={}, name = {}, no data", id, stockIdOrNameByMap);
+            return;
+        }
+        //get all ttm,pbr,pcf from daily data
+        List<BigDecimal> ttmList = new ArrayList<>();
+        for (int i = 0; i < dailyVOS.size(); i++) {
+            StockDailyVO vo = dailyVOS.get(i);
+            if (vo.getTtm() == null || vo.getPbr() == null || vo.getPcf() == null) {
+                String name = holdingService.getStockIdOrNameByMap(id);
+                logger.info("======Enter calculatePercentile =======id={}, name = {}, day ={} has no data", id, name, vo.getDay());
+                return;
+            }
+            //add all of list ttm
+            ttmList.add(new BigDecimal(vo.getTtm()));
+        }
+        BigDecimal ttmWavePercentile = null;
+        BigDecimal ttmRangePercentile = null;
+        if (!ttmList.isEmpty()) {
+            ttmWavePercentile = FormulaUtils.calculateWavePercentile(ttmList, ttmList.get(0));
+            ttmRangePercentile = FormulaUtils.calculateRangePercentile(ttmList, ttmList.get(0));
+        }
+        StockNameVO stockVo = stockDao.findById(id).get();
+        stockVo.setPe(ttmList.get(0) == null ? null : ttmList.get(0).doubleValue());
         stockVo.setTtmWavePct(ttmWavePercentile.doubleValue());
         stockVo.setTtmRangePct(ttmRangePercentile.doubleValue());
-        logger.info("======Enter calculatePercentile =====insert data ==id={}, name = {}", id, holdingService.getStockIdOrNameByMap(id));
+        logger.info("======Enter calculatePEPercentile =====insert data ==id={}, name = {}", id, holdingService.getStockIdOrNameByMap(id));
         stockVo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
         stockDao.save(stockVo);
     }

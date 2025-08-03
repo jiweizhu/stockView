@@ -267,6 +267,7 @@ public class BaiDuController {
     }
 
 
+    //temp api
     @RequestMapping(value = {"/bd/fixNullTtm"})
     @ResponseBody
     public String fixNullTtm() {
@@ -287,7 +288,7 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateIndicatorTTM"})
     @ResponseBody
     public ResponseEntity updateIndicatorTTM() throws InterruptedException {
-        valuationService.getFromBdAndUpdateIndicatorTTM();
+        valuationService.getFromBdAndUpdatePEByIndicator();
         valuationService.getFromBdAndUpdateIndicatorPBR();
         valuationService.getFromBdAndUpdateIndicatorPCF();
         return ResponseEntity.ofNullable("finish updateIndicatorTTM");

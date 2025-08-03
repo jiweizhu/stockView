@@ -26,7 +26,7 @@ public interface StockDailyDao extends JpaRepository<StockDailyVO, StockDailyKey
     List<StockDailyVO> multiKFindByStockIdOrderByDay(String stock_id);
 
     @Query(value = "SELECT * FROM daily_price where stock_id = ?1 order by day desc limit ?2 ", nativeQuery = true)
-    List<StockDailyVO> multiKFindByStockIdWithTTMOrderByDay(String stock_id, Integer rangeCount);
+    List<StockDailyVO> multiKFindByStockIdOrderByDay(String stock_id, Integer rangeCount);
 
     @Query(value = "SELECT day FROM daily_price where stock_id = ?1 order by day ", nativeQuery = true)
     List<String> findStockDaysByStockId(String stock_id);
@@ -36,6 +36,9 @@ public interface StockDailyDao extends JpaRepository<StockDailyVO, StockDailyKey
 
     @Query(value = "SELECT * FROM daily_price where stock_id = ?1 and day = ?2 ", nativeQuery = true)
     StockDailyVO findDayPriceByStockIdAndDay(String stock_id, Date date);
+
+    @Query(value = "SELECT * FROM daily_price where stock_id = ?1 and ttm is null ", nativeQuery = true)
+    List<StockDailyVO> findDayNullPEByStockId(String stock_id);
 
     @Query(value = "SELECT * FROM daily_price where stock_id = ?1 and day <= ?2  order by day desc limit 1 ", nativeQuery = true)
     StockDailyVO findLastPriceByStockIdAndDay(String stock_id, Date date);

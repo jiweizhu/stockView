@@ -109,7 +109,7 @@ public class BdRestRequest {
     private static String PBR_URL = "PBR_URL";
     private static String PCF_URL = "PCF_URL";
 
-    public List<TTMVo> queryDataFromBd(String stockId, String urlType) {
+    public List<TTMVo> queryStockValuationFromBd(String stockId, String urlType) {
         logger.info("Enter method queryDataFromBd ===============" + stockId);
         String url = "";
         if (urlType == TTM_URL) {
