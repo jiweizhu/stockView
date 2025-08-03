@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 view: detailview,
                 autoUpdateDetail: true,
-                sortName: 'peratio',
+                sortName: 'ttm',
                 sortOrder: 'asc',
                 detailFormatter: function(rowIndex, rowData) {}
     });
@@ -705,6 +705,18 @@ async function createETFChart(span) {
             width="120">
             TTM
         </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="ttm"
+            width="120">
+            TTM(value)
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="ttmRangePct"
+            width="120">
+            市盈Range%
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="ttmWavePct"
+            width="120">
+            市盈Wave%
+        </th>
         <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="priceSaleRatio"
             width="120">
             市销率
@@ -712,6 +724,26 @@ async function createETFChart(span) {
         <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="bvRatio"
             width="120">
             市净率
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pbrRangePct"
+            width="120">
+            市净高低百分
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pbrWavePct"
+            width="120">
+            市净率百分位
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pcf"
+            width="120">
+            市现率
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pcfRangePct"
+            width="120">
+            市现高低百分
+        </th>
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pcfWavePct"
+            width="120">
+            市现率百分位
         </th>
     </tr>
     </thead>

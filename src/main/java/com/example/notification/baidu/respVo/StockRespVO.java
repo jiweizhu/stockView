@@ -21,4 +21,27 @@ public class StockRespVO {
     private String bvRatio;
     //总市值
     private String capitalization;
+
+    //动态市盈率近N年全部的百分位
+    private Double ttm;
+
+    //动态市盈率近N年全部的百分位
+    private Double ttmWavePct;
+
+    //近N年相对最高最低的百分位
+    private Double ttmRangePct;
+
+    //市净率
+    private Double pbr;
+
+    private Double pbrWavePct;
+
+    private Double pbrRangePct;
+
+    //市现率OCF_TTM
+    private Double pcf;
+
+    private Double pcfWavePct;
+
+    private Double pcfRangePct;
 }

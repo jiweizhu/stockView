@@ -126,6 +126,7 @@ public class StockNameVO {
     @Column(name = "ttm_range_pct", columnDefinition = "DECIMAL(10,2)")
     private Double ttmRangePct;
 
+    //市净率
     @Column(name = "pbr", columnDefinition = "DECIMAL(10,2)")
     private Double pbr;
 
@@ -135,6 +136,7 @@ public class StockNameVO {
     @Column(name = "pbr_range_pct", columnDefinition = "DECIMAL(10,2)")
     private Double pbrRangePct;
 
+    //市现率OCF_TTM
     @Column(name = "pcf", columnDefinition = "DECIMAL(10,2)")
     private Double pcf;
 

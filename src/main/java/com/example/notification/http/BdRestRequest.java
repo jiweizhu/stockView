@@ -30,7 +30,7 @@ public class BdRestRequest {
 
     //PCF_OCF_TTM 市现率
     //gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市现率&code=000651&word=&resource_id=51171&market=ab&tag=市现率&chart_select=近五年&skip_industry=1&finClientType=pc
-    private static String Bd_PCF_URL = "https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市现率&code=000651&word=&resource_id=51171&market=ab&tag=市现率&chart_select=近五年&skip_industry=1&finClientType=pc";
+    private static String Bd_PCF_URL = "https://gushitong.baidu.com/opendata?openapi=1&dspName=iphone&tn=tangram&client=app&query=市现率&code=$code&word=&resource_id=51171&market=ab&tag=市现率&chart_select=近五年&skip_industry=1&finClientType=pc";
 
 
     @Autowired

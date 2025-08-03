@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.example.notification.constant.Constants.*;
 
@@ -62,6 +63,7 @@ public class ValuationService {
             stockIdsAndIndicatorId = new ArrayList<>();
             BdIndicatorVO e = new BdIndicatorVO("730200");
             e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
             stockIdsAndIndicatorId.add(e);
         }
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
@@ -97,6 +99,7 @@ public class ValuationService {
             stockIdsAndIndicatorId = new ArrayList<>();
             BdIndicatorVO e = new BdIndicatorVO("730200");
             e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
             stockIdsAndIndicatorId.add(e);
         }
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
@@ -128,6 +131,7 @@ public class ValuationService {
             stockIdsAndIndicatorId = new ArrayList<>();
             BdIndicatorVO e = new BdIndicatorVO("730200");
             e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
             stockIdsAndIndicatorId.add(e);
         }
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
@@ -152,7 +156,6 @@ public class ValuationService {
     }
 
     //to fix some ttm is null
-    @Async
     public void fixNullTtm() {
         logger.info("Enter method fixNullTtm ====");
         //backward to update null ttm
@@ -160,45 +163,51 @@ public class ValuationService {
         //2.get all daily_price by stockid
         //3.iterator to update ttm, if ttm is null, use previous ttm
         // 获取所有股票ID
-        List<String> stockIds = stockDao.findStockIds();
+        List<String> stockIds = stockDao.findStockIdsHasName();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sz000063");
+            stockIds.add("sh600498");
         }
 
         for (String stockId : stockIds) {
-            if (!stockId.startsWith("s")) {
+            if (!stockId.startsWith("s") && stockId.toLowerCase(Locale.ROOT).contains("st")) {
                 continue;
             }
             // 查询该股票的所有 daily_price 数据，按日期升序排列
-            List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId);
-            logger.info("fixNullTtm ===============" + stockId);
-            Double lastValidTtm = null;
-            Double lastValidPbr = null;
-            Double lastValidPcf = null;
-            for (int i = 0; i < dailyList.size(); i++) {
-                StockDailyVO dailyVO = dailyList.get(i);
-                Double currentTtm = dailyVO.getTtm();
-                Double currentPbr = dailyVO.getPbr();
-                Double currentPcf = dailyVO.getPcf();
-                if (i == 0) continue;
-                StockDailyVO preOneVo = dailyList.get(i - 1);
-                if (currentTtm == null) {
-                    lastValidTtm = preOneVo.getTtm();
-                    dailyVO.setTtm(lastValidTtm);
-                }
-                if (currentPbr == null) {
-                    lastValidPbr = preOneVo.getPbr();
-                    dailyVO.setPbr(lastValidPbr);
-                }
-                if (currentPcf == null) {
-                    lastValidPcf = preOneVo.getPcf();
-                    dailyVO.setPcf(lastValidPcf);
-                }
-                stockDailyDao.save(dailyVO); // 保存更新
-                dailyList.set(i, dailyVO);
-            }
+            extractedFixNull(stockId);
 
+        }
+    }
+
+    @Async
+    private void extractedFixNull(String stockId) {
+        List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId);
+        logger.info("fixNullTtm ===========stockId={}, stockName={}", stockId, holdingService.getStockIdOrNameByMap(stockId));
+        Double lastValidTtm = null;
+        Double lastValidPbr = null;
+        Double lastValidPcf = null;
+        for (int i = 0; i < dailyList.size(); i++) {
+            StockDailyVO dailyVO = dailyList.get(i);
+            Double currentTtm = dailyVO.getTtm();
+            Double currentPbr = dailyVO.getPbr();
+            Double currentPcf = dailyVO.getPcf();
+            if (i == 0) continue;
+            StockDailyVO preOneVo = dailyList.get(i - 1);
+            if (currentTtm == null) {
+                lastValidTtm = preOneVo.getTtm();
+                dailyVO.setTtm(lastValidTtm);
+            }
+            if (currentPbr == null) {
+                lastValidPbr = preOneVo.getPbr();
+                dailyVO.setPbr(lastValidPbr);
+            }
+            if (currentPcf == null) {
+                lastValidPcf = preOneVo.getPcf();
+                dailyVO.setPcf(lastValidPcf);
+            }
+            stockDailyDao.save(dailyVO); // 保存更新
+            dailyList.set(i, dailyVO);
         }
     }
 
@@ -209,10 +218,11 @@ public class ValuationService {
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
             stockIds.add("sz000063");
+            stockIds.add("sh600498");
         }
         stockIds.stream().filter(vo -> {
             String codeId = vo.toLowerCase();
-            return codeId.startsWith("s");
+            return codeId.startsWith("s") && !codeId.contains("st");
         }).forEach(id -> {
             calculatePercentile(id);
         });

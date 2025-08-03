@@ -301,8 +301,8 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
     public ResponseEntity updateManually() throws InterruptedException {
-        valuationService.getFromBdAndUpdateIndicatorTTM();
-        valuationService.getFromBdAndUpdateIndicatorPBR();
+//        valuationService.getFromBdAndUpdateIndicatorTTM();
+//        valuationService.getFromBdAndUpdateIndicatorPBR();
         valuationService.getFromBdAndUpdateIndicatorPCF();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
