@@ -66,32 +66,36 @@ public class ValuationService {
             stockIdsAndIndicatorId.add(e);
         }
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
-            logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO.getStockName());
-            for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
-                logger.info("getFromBdAndUpdatePE ===============" + stockId);
-                Thread.sleep(100);
-                List<StockDailyVO> dbVoList = stockDailyDao.findDayNullPEByStockId(stockId);
-                if (dbVoList.isEmpty()) {
-                    continue;
-                }
-                Map<String, TTMVo> ttmVoMap = new HashMap<>();
-                List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
-                ttmVoList.forEach(dailyVO -> {
-                    ttmVoMap.put(dailyVO.getDate(), dailyVO);
-                });
-                dbVoList.forEach(dailyVO -> {
-                    String nullDay = dailyVO.getDay().toString();
-                    TTMVo ttmVo = ttmVoMap.get(nullDay);
-                    if (ttmVo != null && dailyVO.getTtm() == null) {
-                        dailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
-                        stockDailyDao.save(dailyVO);
-                    }
-                });
-            }
+            extractedPEFromBD(bdIndicatorVO);
         }
     }
 
     @Async
+    private void extractedPEFromBD(BdIndicatorVO bdIndicatorVO) throws InterruptedException {
+        logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO.getStockName());
+        for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
+            logger.info("getFromBdAndUpdatePE ===============" + stockId);
+            Thread.sleep(100);
+            List<StockDailyVO> dbVoList = stockDailyDao.findDayNullPEByStockId(stockId);
+            if (dbVoList.isEmpty()) {
+                continue;
+            }
+            Map<String, TTMVo> ttmVoMap = new HashMap<>();
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
+            ttmVoList.forEach(dailyVO -> {
+                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            });
+            dbVoList.forEach(dailyVO -> {
+                String nullDay = dailyVO.getDay().toString();
+                TTMVo ttmVo = ttmVoMap.get(nullDay);
+                if (ttmVo != null && dailyVO.getTtm() == null) {
+                    dailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
+                    stockDailyDao.save(dailyVO);
+                }
+            });
+        }
+    }
+
     public void getFromBdAndUpdateIndicatorPCF() {
         List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
         if (Utils.isWinSystem()) {
@@ -177,7 +181,7 @@ public class ValuationService {
         }
 
         for (String stockId : stockIds) {
-            if (!stockId.startsWith("s") && stockId.toLowerCase(Locale.ROOT).contains("st")) {
+            if (!stockId.startsWith("s")) {
                 continue;
             }
             // 查询该股票的所有 daily_price 数据，按日期升序排列
@@ -352,7 +356,6 @@ public class ValuationService {
         stockVo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
         stockDao.save(stockVo);
     }
-
 
 
     private void calculatePEPercentile(String id) {
