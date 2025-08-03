@@ -275,11 +275,11 @@ public class BaiDuController {
         return "ok";
     }
 
-    @RequestMapping(value = {"/bd/updateStockEvaluationData"})
+    @RequestMapping(value = {"/bd/updateStockPercentile"})
     @ResponseBody
-    public String updateStockEvaluationData() {
+    public String updateStockPercentile() {
         logger.info("Enter method updateStockEvaluationData ====");
-        valuationService.updateStockEvaluationData();
+        valuationService.updateStockPercentile();
         return "ok";
     }
 

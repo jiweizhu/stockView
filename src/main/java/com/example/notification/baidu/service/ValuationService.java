@@ -15,11 +15,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -213,7 +215,7 @@ public class ValuationService {
 
 
     //update stock wave/range of ttm, pbr, pcf
-    public void updateStockEvaluationData() {
+    public void updateStockPercentile() {
         List<String> stockIds = stockDao.findStockIdsHasName();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
@@ -231,10 +233,25 @@ public class ValuationService {
     @Autowired
     private HoldingService holdingService;
 
+    @Value("${notification.easymoney.band.range.count}")
+    private String easymoneyRangeCount;
+
     @Async
     private void calculatePercentile(String id) {
         logger.info("======Enter calculatePercentile =======id={}", id);
-        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdWithTTMOrderByDay(id);
+        //every friday to update
+        //first to update daily_price price, then update daily_price ttm/pcf, then calculatePercentile
+        StockDailyVO lastDayVo = stockDailyDao.findLastOneDayPriceByStockId(id);
+        //if updated, skip to  update
+        String lastOpeningDay = Utils.getLastOpeningDay();
+        if (lastDayVo.getDay().toString().equals(lastOpeningDay)
+                && lastDayVo.getTtm() != null
+                && lastDayVo.getPbr() != null && lastDayVo.getPcf() != null) {
+            //skip to update
+            return;
+        }
+        //start to  calculate
+        List<StockDailyVO> dailyVOS = stockDailyDao.multiKFindByStockIdWithTTMOrderByDay(id, easymoneyRangeCount);
         if (dailyVOS.isEmpty()) {
             String stockIdOrNameByMap = holdingService.getStockIdOrNameByMap(id);
             logger.info("======Enter calculatePercentile =======id={}, name = {}, no data", id, stockIdOrNameByMap);
@@ -275,18 +292,19 @@ public class ValuationService {
             pcfWavePercentile = FormulaUtils.calculateWavePercentile(pcfList, pcfList.get(0));
             pcfRangePercentile = FormulaUtils.calculateRangePercentile(pcfList, pcfList.get(0));
         }
-        StockNameVO stockNameVO = stockDao.findById(id).get();
-        stockNameVO.setTtm(ttmList.get(0) == null ? null : ttmList.get(0).doubleValue());
-        stockNameVO.setPbr(pbrList.get(0) == null ? null : pbrList.get(0).doubleValue());
-        stockNameVO.setPcf(pcfList.get(0) == null ? null : pcfList.get(0).doubleValue());
-        stockNameVO.setPbrWavePct(pbrWavePercentile.doubleValue());
-        stockNameVO.setPbrRangePct(pbrRangePercentile.doubleValue());
-        stockNameVO.setPcfWavePct(pcfWavePercentile.doubleValue());
-        stockNameVO.setPcfRangePct(pcfRangePercentile.doubleValue());
-        stockNameVO.setTtmWavePct(ttmWavePercentile.doubleValue());
-        stockNameVO.setTtmRangePct(ttmRangePercentile.doubleValue());
+        StockNameVO stockVo = stockDao.findById(id).get();
+        stockVo.setTtm(ttmList.get(0) == null ? null : ttmList.get(0).doubleValue());
+        stockVo.setPbr(pbrList.get(0) == null ? null : pbrList.get(0).doubleValue());
+        stockVo.setPcf(pcfList.get(0) == null ? null : pcfList.get(0).doubleValue());
+        stockVo.setPbrWavePct(pbrWavePercentile.doubleValue());
+        stockVo.setPbrRangePct(pbrRangePercentile.doubleValue());
+        stockVo.setPcfWavePct(pcfWavePercentile.doubleValue());
+        stockVo.setPcfRangePct(pcfRangePercentile.doubleValue());
+        stockVo.setTtmWavePct(ttmWavePercentile.doubleValue());
+        stockVo.setTtmRangePct(ttmRangePercentile.doubleValue());
         logger.info("======Enter calculatePercentile =====insert data ==id={}, name = {}", id, holdingService.getStockIdOrNameByMap(id));
-        stockDao.save(stockNameVO);
+        stockVo.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+        stockDao.save(stockVo);
     }
 
 }

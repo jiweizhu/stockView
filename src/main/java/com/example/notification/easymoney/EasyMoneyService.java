@@ -128,8 +128,7 @@ public class EasyMoneyService {
     }
 
     @Value("${notification.easymoney.band.range.count}")
-    private String rangeCount;
-
+    private String easymoneyRangeCount;
     public Object getStockJsonDataDay(String stockId) {
         ArrayList<String[]> result = new ArrayList<>();
         logger.info("enter EasyMoneyService getStockJsonDataDay stockId =============" + stockId);
@@ -138,7 +137,7 @@ public class EasyMoneyService {
         }
 
 
-        List<EmBandDailyVO> voList = emBandDailyDao.findByIndexStockIdOrderByDay(stockId, Integer.valueOf(rangeCount))
+        List<EmBandDailyVO> voList = emBandDailyDao.findByIndexStockIdOrderByDay(stockId, Integer.valueOf(easymoneyRangeCount))
                 .stream().sorted(Comparator.comparing(EmBandDailyVO::getTradeDate)).toList();
         //as baidu restrict to query
         // return db data

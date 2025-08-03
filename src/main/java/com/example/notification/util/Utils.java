@@ -1,8 +1,14 @@
 package com.example.notification.util;
 
 import com.example.notification.vo.StockDailyVO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -137,6 +143,39 @@ public class Utils {
         return today;
     }
 
+    static String baseLineStockId = "sh000001";
+    static String dailyQueryUrl = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayhfq&param=sh000001,day,,,5,qfq";
+    private static ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    //get last opening day, return format is yyyy-MM-dd
+    public static String getLastOpeningDay() {
+        logger.info("Enter getLastOpeningDay =============");
+        String queryUrl = dailyQueryUrl;
+        String ret = new RestTemplate().getForObject(queryUrl, String.class);
+        ret = ret.replaceFirst("kline_dayhfq=", "");
+        String openingDay = null;
+        try {
+            JsonNode root = objectMapper.readTree(ret);
+            JsonNode dayNode = root.path("data")
+                    .path(baseLineStockId)
+                    .path("day");
+
+            var dayList = objectMapper.convertValue(
+                    dayNode,
+                    new TypeReference<List<List<String>>>() {
+                    }
+            );
+
+            List<String> stringList = dayList.get(dayList.size() - 1);
+            openingDay = stringList.get(0);
+            logger.info("End getLastOpeningDay ====last Opening-day is ==== " + openingDay);
+        } catch (JsonProcessingException e) {
+            //send an alarm email and stop to work
+            logger.error("getLastOpeningDay error!! ", e);
+        }
+        return openingDay;
+    }
+
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static String getYesterDay() {
@@ -242,11 +281,11 @@ public class Utils {
     }
 
 
-   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-public static java.sql.Date stringToDate(String date) {
-    LocalDate localDate = LocalDate.parse(date, DATE_FORMATTER);
-    return java.sql.Date.valueOf(localDate);
-}
+    public static java.sql.Date stringToDate(String date) {
+        LocalDate localDate = LocalDate.parse(date, DATE_FORMATTER);
+        return java.sql.Date.valueOf(localDate);
+    }
 
 }
