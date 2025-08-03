@@ -288,6 +288,7 @@ price_book_ratio DECIMAL(10,2),
 price_sale_ratio DECIMAL(10,2)
 PRIMARY KEY(stock_id, day)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+create index stock_id_day_index on daily_price(stock_id, day);
 
 CREATE TABLE  stock(
 stock_id VARCHAR(12) primary key,
