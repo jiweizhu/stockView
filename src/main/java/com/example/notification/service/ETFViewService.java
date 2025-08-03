@@ -403,7 +403,7 @@ public class ETFViewService {
             StockBisVO stock = ret.get(index);
 
             boolean isETF = false;
-            if (stock.getStockName().contains("ETF")) {
+            if (stock.getStockName() != null && stock.getStockName().toLowerCase().contains("etf")) {
                 isETF = true;
             }
 
@@ -471,7 +471,7 @@ public class ETFViewService {
             }
             nameDiv.append("<b style=font-size:20px >").append(id_name.split("_")[1]);
 
-            if (!stock.getStockId().startsWith("s") || stock.getStockName().contains("ETF")) {
+            if (!stock.getStockId().startsWith("s") || (stock.getStockName() != null && stock.getStockName().contains("ETF"))) {
                 int favoriteStockNum = favoriteDao.findGroupByIndicatorId(stockId).size();
                 if (favoriteStockNum > 0) {
                     nameDiv.append("(").append(belongStockNum).append("|").append(favoriteStockNum).append(")");

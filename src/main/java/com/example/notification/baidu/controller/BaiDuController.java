@@ -284,16 +284,26 @@ public class BaiDuController {
     }
 
 
+    @RequestMapping(value = {"/bd/updateIndicatorTTM"})
+    @ResponseBody
+    public ResponseEntity updateIndicatorTTM() throws InterruptedException {
+        valuationService.getFromBdAndUpdateIndicatorTTM();
+        valuationService.getFromBdAndUpdateIndicatorPBR();
+        valuationService.getFromBdAndUpdateIndicatorPCF();
+        return ResponseEntity.ofNullable("finish updateIndicatorTTM");
+    }
+
+
     @Autowired
     ValuationService valuationService;
 
     // manually update config data
     @RequestMapping(value = {"/bd/updateManually"})
     @ResponseBody
-    public ResponseEntity updateManually() {
-        valuationService.getFromBdAndUpdateTTM();
-        valuationService.getFromBdAndUpdatePBR();
-        valuationService.getFromBdAndUpdatePCF();
+    public ResponseEntity updateManually() throws InterruptedException {
+        valuationService.getFromBdAndUpdateIndicatorTTM();
+        valuationService.getFromBdAndUpdateIndicatorPBR();
+        valuationService.getFromBdAndUpdateIndicatorPCF();
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 
