@@ -184,7 +184,15 @@ public class ValuationService {
 
     @Async
     private void extractedFixNull(String stockId) {
-        List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId);
+        //as i get time range is five year, baidu may lost some data, so i use five year data to fix it
+        //if updated, skip to update it
+        StockDailyVO nullRow = stockDailyDao.findByStockIdWithNullTTMPBRPCF(stockId);
+        if (nullRow == null) {
+            //no need update again
+            return;
+        }
+        List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
+        //start to fix
         logger.info("fixNullTtm ===========stockId={}, stockName={}", stockId, holdingService.getStockIdOrNameByMap(stockId));
         Double lastValidTtm = null;
         Double lastValidPbr = null;
@@ -234,7 +242,7 @@ public class ValuationService {
     private HoldingService holdingService;
 
     @Value("${notification.easymoney.band.range.count}")
-    private String easymoneyRangeCount;
+    private Integer easymoneyRangeCount;
 
     @Async
     private void calculatePercentile(String id) {
