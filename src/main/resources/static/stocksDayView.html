@@ -90,6 +90,18 @@
       return a==b?0:(a>b?1:-1);
   }
 
+function pctStyler(value, row, index){
+    // 先确保 value 不为空
+    if (value !== null && value !== undefined && value !== ''){
+        // 转成数字，防止字符串比较
+        const num = Number(value);
+        // 再判断范围
+        if (!isNaN(num) && num >= 0 && num < 30){
+            return 'background-color:#ffff99;';   // 淡黄色
+        }
+    }
+}
+
 function indicatorSorter(a, b) {
     // 处理 "亏损" 的情况，将其视为最小
     if (a === '亏损' && b !== '亏损') {
@@ -709,11 +721,11 @@ async function createETFChart(span) {
             width="120">
             TTM(value)
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="ttmRangePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="ttmRangePct"
             width="120">
             市盈Range%
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="ttmWavePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="ttmWavePct"
             width="120">
             市盈Wave%
         </th>
@@ -725,11 +737,11 @@ async function createETFChart(span) {
             width="120">
             市净率
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pbrRangePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="pbrRangePct"
             width="120">
             市净高低百分
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pbrWavePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="pbrWavePct"
             width="120">
             市净率百分位
         </th>
@@ -737,11 +749,11 @@ async function createETFChart(span) {
             width="120">
             市现率
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pcfRangePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="pcfRangePct"
             width="120">
             市现高低百分
         </th>
-        <th align="left" data-options="sortable:true,sorter:indicatorSorter" field="pcfWavePct"
+        <th align="left" data-options="sortable:true,sorter:indicatorSorter,styler:pctStyler" field="pcfWavePct"
             width="120">
             市现率百分位
         </th>
