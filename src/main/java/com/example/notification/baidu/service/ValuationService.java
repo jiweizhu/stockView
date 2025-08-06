@@ -68,26 +68,25 @@ public class ValuationService {
         logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO);
         String[] stockList = bdIndicatorVO.getStockIds().split(",");
         for (String stockId : stockList) {
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
+            if (ttmVoList.isEmpty()) {
+                continue;
+            }
             List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
             if (dbVoList.isEmpty()) {
                 continue;
             }
-            Map<String, TTMVo> ttmVoMap = new HashMap<>();
-            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
-            ttmVoList.forEach(dailyVO -> {
-                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            Map<String, StockDailyVO> dbVoMap = new HashMap<>();
+            dbVoList.forEach(dbVo -> {
+                dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
-            dbVoList.forEach(dailyVO -> {
-                if (dailyVO.getTtm() == null) {
-                    return;
-                }
-                String nullDay = dailyVO.getDay().toString();
-                TTMVo ttmVo = ttmVoMap.get(nullDay);
-                if (ttmVo != null) {
-                    dailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
+            ttmVoList.forEach(ttmVo -> {
+                StockDailyVO dbVo = dbVoMap.get(ttmVo.getDate().toString());
+                if (dbVo != null) {
+                    dbVo.setTtm(Double.valueOf(ttmVo.getValue()));
                     count.getAndIncrement();
-                    stockDailyDao.save(dailyVO);
+                    stockDailyDao.save(dbVo);
                 }
             });
             logger.info("getFromBdAndUpdatePE ======stockId={}, ==inserted=count==={}", stockId, count);
@@ -104,26 +103,25 @@ public class ValuationService {
     private void extractedPCF(BdIndicatorVO bdIndicatorVO) {
         String[] stockList = bdIndicatorVO.getStockIds().split(",");
         for (String stockId : stockList) {
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PCF_URL);
+            if (ttmVoList.isEmpty()) {
+                continue;
+            }
             List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
             if (dbVoList.isEmpty()) {
                 continue;
             }
-            Map<String, TTMVo> ttmVoMap = new HashMap<>();
-            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
-            ttmVoList.forEach(dailyVO -> {
-                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            Map<String, StockDailyVO> dbVoMap = new HashMap<>();
+            dbVoList.forEach(dbVo -> {
+                dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
-            dbVoList.forEach(dailyVO -> {
-                if (dailyVO.getPbr() == null) {
-                    return;
-                }
-                String nullDay = dailyVO.getDay().toString();
-                TTMVo ttmVo = ttmVoMap.get(nullDay);
-                if (ttmVo != null) {
-                    dailyVO.setPcf(Double.valueOf(ttmVo.getValue()));
+            ttmVoList.forEach(ttmVo -> {
+                StockDailyVO dbVo = dbVoMap.get(ttmVo.getDate().toString());
+                if (dbVo != null) {
+                    dbVo.setPcf(Double.valueOf(ttmVo.getValue()));
                     count.getAndIncrement();
-                    stockDailyDao.save(dailyVO);
+                    stockDailyDao.save(dbVo);
                 }
             });
             logger.info("getFromBdAndUpdatePCF ======stockId={}, ==inserted=count==={}", stockId, count);
@@ -140,26 +138,25 @@ public class ValuationService {
     private void extractedPBR(BdIndicatorVO bdIndicatorVO) {
         String[] stockList = bdIndicatorVO.getStockIds().split(",");
         for (String stockId : stockList) {
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PBR_URL);
+            if (ttmVoList.isEmpty()) {
+                continue;
+            }
             List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
             if (dbVoList.isEmpty()) {
                 continue;
             }
-            Map<String, TTMVo> ttmVoMap = new HashMap<>();
-            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
-            ttmVoList.forEach(dailyVO -> {
-                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            Map<String, StockDailyVO> dbVoMap = new HashMap<>();
+            dbVoList.forEach(dbVo -> {
+                dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
-            dbVoList.forEach(dailyVO -> {
-                if (dailyVO.getPbr() == null) {
-                    return;
-                }
-                String nullDay = dailyVO.getDay().toString();
-                TTMVo ttmVo = ttmVoMap.get(nullDay);
-                if (ttmVo != null) {
-                    dailyVO.setPbr(Double.valueOf(ttmVo.getValue()));
+            ttmVoList.forEach(ttmVo -> {
+                StockDailyVO dbVo = dbVoMap.get(ttmVo.getDate().toString());
+                if (dbVo != null) {
+                    dbVo.setPbr(Double.valueOf(ttmVo.getValue()));
                     count.getAndIncrement();
-                    stockDailyDao.save(dailyVO);
+                    stockDailyDao.save(dbVo);
                 }
             });
             logger.info("getFromBdAndUpdatePBR ======stockId={}, ==inserted=count==={}", stockId, count);
