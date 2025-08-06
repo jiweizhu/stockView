@@ -288,9 +288,17 @@ public class BaiDuController {
     @RequestMapping(value = {"/bd/updateIndicatorTTM"})
     @ResponseBody
     public ResponseEntity updateIndicatorTTM() throws InterruptedException {
-        valuationService.getFromBdAndUpdatePEByIndicator();
-        valuationService.getFromBdAndUpdateIndicatorPBR();
-        valuationService.getFromBdAndUpdateIndicatorPCF();
+        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
+        if (Utils.isWinSystem()) {
+            stockIdsAndIndicatorId = new ArrayList<>();
+            BdIndicatorVO e = new BdIndicatorVO("730200");
+            e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
+            stockIdsAndIndicatorId.add(e);
+        }
+        valuationService.getFromBdAndUpdateIndicatorPE(stockIdsAndIndicatorId);
+        valuationService.getFromBdAndUpdateIndicatorPBR(stockIdsAndIndicatorId);
+        valuationService.getFromBdAndUpdateIndicatorPCF(stockIdsAndIndicatorId);
         return ResponseEntity.ofNullable("finish updateIndicatorTTM");
     }
 
@@ -304,7 +312,7 @@ public class BaiDuController {
     public ResponseEntity updateManually() throws InterruptedException {
 //        valuationService.getFromBdAndUpdateIndicatorTTM();
 //        valuationService.getFromBdAndUpdateIndicatorPBR();
-        valuationService.getFromBdAndUpdateIndicatorPCF();
+//        valuationService.getFromBdAndUpdateIndicatorPCF(stockIdsAndIndicatorId);
         return ResponseEntity.ofNullable("finish updateIndicatorBelongStocks");
     }
 

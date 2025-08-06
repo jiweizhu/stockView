@@ -3,15 +3,20 @@ package com.example.notification.util;
 import com.example.notification.baidu.service.BaiduInfoService;
 import com.example.notification.baidu.service.ValuationService;
 import com.example.notification.easymoney.EasyMoneyService;
+import com.example.notification.repository.BdIndicatorDao;
 import com.example.notification.service.ETFViewService;
 import com.example.notification.service.IntraDayService;
 import com.example.notification.service.KLineMarketClosedService;
 import com.example.notification.service.KLineService;
+import com.example.notification.vo.BdIndicatorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class Timer {
@@ -98,22 +103,51 @@ public class Timer {
 
     @Autowired
     private ValuationService valuationService;
+
     //   every updateEvery Friday
     @Scheduled(cron = "0 0 16 * * 5")
     public void updateEveryFriday() {
         try {
             logger.info("====cron==start updateEveryFriday=====");
-
+            List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
+            if (Utils.isWinSystem()) {
+                stockIdsAndIndicatorId = new ArrayList<>();
+                BdIndicatorVO e = new BdIndicatorVO("730200");
+                e.setStockIds("sz000063");
+                e.setStockIds("sh600498");
+                stockIdsAndIndicatorId.add(e);
+            }
 
             easymoneyService.updateBandDailyDet();
 
-            valuationService.getFromBdAndUpdatePEByIndicator();
-            valuationService.getFromBdAndUpdateIndicatorPBR();
-            valuationService.getFromBdAndUpdateIndicatorPCF();
+            valuationService.getFromBdAndUpdateIndicatorPE(stockIdsAndIndicatorId);
+            valuationService.getFromBdAndUpdateIndicatorPBR(stockIdsAndIndicatorId);
+            valuationService.getFromBdAndUpdateIndicatorPCF(stockIdsAndIndicatorId);
         } catch (Exception e) {
             logger.error("==== Timer run error! ===== Detail is: ", e);
         }
         logger.info("====cron==end updateEveryFriday=====");
+    }
+
+
+    @Autowired
+    private BdIndicatorDao bdIndicatorDao;
+
+    //for temp
+    @Scheduled(cron = "0 59 3 * * ?")
+    public void fixNull() {
+        try {
+            logger.info("====cron==start fixNull=====");
+//            valuationService.fixNullTtm();
+            valuationService.updateStockPercentile();
+//todo
+            //think not to fix null, and update percentile by first data!
+            //because some stock only has last 400 ttm rows, some has 500!
+
+        } catch (Exception e) {
+            logger.error("==== Timer run error! ===== Detail is: ", e);
+        }
+        logger.info("====cron==end fixNull=====");
     }
 
 

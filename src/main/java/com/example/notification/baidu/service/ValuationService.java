@@ -57,26 +57,18 @@ public class ValuationService {
     @Autowired
     private StockDao stockDao;
 
-    public void getFromBdAndUpdatePEByIndicator() throws InterruptedException {
-        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
-        if (Utils.isWinSystem()) {
-            stockIdsAndIndicatorId = new ArrayList<>();
-            BdIndicatorVO e = new BdIndicatorVO("730200");
-            e.setStockIds("sz000063");
-            e.setStockIds("sh600498");
-            stockIdsAndIndicatorId.add(e);
-        }
+    public void getFromBdAndUpdateIndicatorPE(List<BdIndicatorVO> stockIdsAndIndicatorId) throws InterruptedException {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
             extractedPEFromBD(bdIndicatorVO);
         }
     }
 
     @Async
-    private void extractedPEFromBD(BdIndicatorVO bdIndicatorVO) throws InterruptedException {
-        logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO.getStockName());
-        for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
-            Thread.sleep(100);
-            List<StockDailyVO> dbVoList = stockDailyDao.findDayNullPEByStockId(stockId);
+    private void extractedPEFromBD(BdIndicatorVO bdIndicatorVO) {
+        logger.info("getFromBdAndUpdatePE =======bdIndicatorVO===name={}", bdIndicatorVO);
+        String[] stockList = bdIndicatorVO.getStockIds().split(",");
+        for (String stockId : stockList) {
+            List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
             if (dbVoList.isEmpty()) {
                 continue;
             }
@@ -87,9 +79,12 @@ public class ValuationService {
             });
             AtomicInteger count = new AtomicInteger();
             dbVoList.forEach(dailyVO -> {
+                if (dailyVO.getTtm() == null) {
+                    return;
+                }
                 String nullDay = dailyVO.getDay().toString();
                 TTMVo ttmVo = ttmVoMap.get(nullDay);
-                if (ttmVo != null && dailyVO.getTtm() == null) {
+                if (ttmVo != null) {
                     dailyVO.setTtm(Double.valueOf(ttmVo.getValue()));
                     count.getAndIncrement();
                     stockDailyDao.save(dailyVO);
@@ -99,78 +94,76 @@ public class ValuationService {
         }
     }
 
-    public void getFromBdAndUpdateIndicatorPCF() {
-        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
-        if (Utils.isWinSystem()) {
-            stockIdsAndIndicatorId = new ArrayList<>();
-            BdIndicatorVO e = new BdIndicatorVO("730200");
-            e.setStockIds("sz000063");
-            e.setStockIds("sh600498");
-            stockIdsAndIndicatorId.add(e);
-        }
-        String lastOpeningDay = Utils.getLastOpeningDay();
+    public void getFromBdAndUpdateIndicatorPCF(List<BdIndicatorVO> stockIdsAndIndicatorId) {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
-            for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
-                extractedPCF(stockId, lastOpeningDay);
-            }
+            extractedPCF(bdIndicatorVO);
         }
     }
 
     @Async
-    private void extractedPCF(String stockId, String lastOpeningDay) {
-        logger.info("getFromBdAndUpdatePCF ===============" + stockId);
-        //skip updated pcf
-
-        StockDailyVO lastVo = stockDailyDao.findLastOneDayPriceByStockId(stockId);
-        if (lastVo == null || lastVo.getPcf() != null) {
-            logger.info("getFromBdAndUpdatePCF ===skip update======stockId={}=name={}", stockId, holdingService.getStockIdOrNameByMap(stockId));
-            return;
-        }
-        List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PCF_URL);
-        int count = 0;
-        for (TTMVo pcfVo : ttmVoList) {
-            String date = pcfVo.getDate();
-            StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
-            if (stockDailyVO != null && stockDailyVO.getPcf() == null) {
-                stockDailyVO.setPcf(Double.valueOf(pcfVo.getValue()));
-                count++;
-                stockDailyDao.save(stockDailyVO);
+    private void extractedPCF(BdIndicatorVO bdIndicatorVO) {
+        String[] stockList = bdIndicatorVO.getStockIds().split(",");
+        for (String stockId : stockList) {
+            List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
+            if (dbVoList.isEmpty()) {
+                continue;
             }
+            Map<String, TTMVo> ttmVoMap = new HashMap<>();
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
+            ttmVoList.forEach(dailyVO -> {
+                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            });
+            AtomicInteger count = new AtomicInteger();
+            dbVoList.forEach(dailyVO -> {
+                if (dailyVO.getPbr() == null) {
+                    return;
+                }
+                String nullDay = dailyVO.getDay().toString();
+                TTMVo ttmVo = ttmVoMap.get(nullDay);
+                if (ttmVo != null) {
+                    dailyVO.setPcf(Double.valueOf(ttmVo.getValue()));
+                    count.getAndIncrement();
+                    stockDailyDao.save(dailyVO);
+                }
+            });
+            logger.info("getFromBdAndUpdatePCF ======stockId={}, ==inserted=count==={}", stockId, count);
         }
-        logger.info("getFromBdAndUpdatePCF ======stockId={}, ==inserted=count==={}", stockId, count);
     }
 
-    public void getFromBdAndUpdateIndicatorPBR() {
-        logger.info("Enter method getFromBdAndUpdatePBR ====");
-        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
-        if (Utils.isWinSystem()) {
-            stockIdsAndIndicatorId = new ArrayList<>();
-            BdIndicatorVO e = new BdIndicatorVO("730200");
-            e.setStockIds("sz000063");
-            e.setStockIds("sh600498");
-            stockIdsAndIndicatorId.add(e);
-        }
+    public void getFromBdAndUpdateIndicatorPBR(List<BdIndicatorVO> stockIdsAndIndicatorId) {
         for (BdIndicatorVO bdIndicatorVO : stockIdsAndIndicatorId) {
-            for (String stockId : bdIndicatorVO.getStockIds().split(",")) {
-                extractedPBR(stockId);
-            }
+            extractedPBR(bdIndicatorVO);
         }
     }
 
     @Async
-    private void extractedPBR(String stockId) {
-        List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, PBR_URL);
-        int count = 0;
-        for (TTMVo ttmVo : ttmVoList) {
-            String date = ttmVo.getDate();
-            StockDailyVO stockDailyVO = stockDailyDao.findDayPriceByStockIdAndDay(stockId, Utils.stringToDate(date));
-            if (stockDailyVO != null && stockDailyVO.getPbr() == null) {
-                stockDailyVO.setPbr(Double.valueOf(ttmVo.getValue()));
-                count++;
-                stockDailyDao.save(stockDailyVO);
+    private void extractedPBR(BdIndicatorVO bdIndicatorVO) {
+        String[] stockList = bdIndicatorVO.getStockIds().split(",");
+        for (String stockId : stockList) {
+            List<StockDailyVO> dbVoList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
+            if (dbVoList.isEmpty()) {
+                continue;
             }
+            Map<String, TTMVo> ttmVoMap = new HashMap<>();
+            List<TTMVo> ttmVoList = bdRestRequest.queryStockValuationFromBd(stockId, TTM_URL);
+            ttmVoList.forEach(dailyVO -> {
+                ttmVoMap.put(dailyVO.getDate(), dailyVO);
+            });
+            AtomicInteger count = new AtomicInteger();
+            dbVoList.forEach(dailyVO -> {
+                if (dailyVO.getPbr() == null) {
+                    return;
+                }
+                String nullDay = dailyVO.getDay().toString();
+                TTMVo ttmVo = ttmVoMap.get(nullDay);
+                if (ttmVo != null) {
+                    dailyVO.setPbr(Double.valueOf(ttmVo.getValue()));
+                    count.getAndIncrement();
+                    stockDailyDao.save(dailyVO);
+                }
+            });
+            logger.info("getFromBdAndUpdatePBR ======stockId={}, ==inserted=count==={}", stockId, count);
         }
-        logger.info("getFromBdAndUpdateIndicatorPBR ======stockId={}, ==inserted=count==={}", stockId, count);
     }
 
     //to fix some ttm is null
@@ -181,25 +174,29 @@ public class ValuationService {
         //2.get all daily_price by stockid
         //3.iterator to update ttm, if ttm is null, use previous ttm
         // 获取所有股票ID
-        List<String> stockIds = stockDao.findStockIdsHasName();
+        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
         if (Utils.isWinSystem()) {
-            stockIds = new ArrayList<>();
-            stockIds.add("sz000063");
-            stockIds.add("sh600498");
+            stockIdsAndIndicatorId = new ArrayList<>();
+            BdIndicatorVO e = new BdIndicatorVO("730200");
+            e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
+            stockIdsAndIndicatorId.add(e);
         }
-
-        for (String stockId : stockIds) {
-            if (!stockId.startsWith("s")) {
-                continue;
+        for (BdIndicatorVO vo : stockIdsAndIndicatorId) {
+            String[] strings = vo.getStockIds().split(",");
+            int length = strings.length;
+            if (length == 0) {
+                return;
             }
-            // 查询该股票的所有 daily_price 数据，按日期升序排列
-            extractedFixNull(stockId);
-
+            Arrays.stream(strings).forEach(this::extractedFixNull);
         }
     }
 
-    @Async
+    //    @Async
     private void extractedFixNull(String stockId) {
+        if (stockId == null || stockId.isEmpty() || !stockId.toLowerCase().startsWith("s")) {
+            return;
+        }
         //as i get time range is five year, baidu may lost some data, so i use five year data to fix it
         //if updated, skip to update it
         StockDailyVO nullRow = stockDailyDao.findByStockIdWithNullTTMPBRPCF(stockId);
@@ -210,54 +207,79 @@ public class ValuationService {
         }
         List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
         //start to fix
-        Double lastValidTtm = null;
-        Double lastValidPbr = null;
-        Double lastValidPcf = null;
-        int count = 0;
+        Double prePB = null;
+        Double prePE = null;
+        Double prePC = null;
+        int countPE = 0;
+        int countPB = 0;
+        int countPC = 0;
         for (int i = 0; i < dailyList.size(); i++) {
             StockDailyVO dailyVO = dailyList.get(i);
-            Double currentTtm = dailyVO.getTtm();
-            Double currentPbr = dailyVO.getPbr();
-            Double currentPcf = dailyVO.getPcf();
-            if (i == 0) continue;
-            StockDailyVO preOneVo = dailyList.get(i - 1);
-            if (currentTtm == null) {
-                lastValidTtm = preOneVo.getTtm();
-                dailyVO.setTtm(lastValidTtm);
+            Double currentPE = dailyVO.getTtm();
+            if (currentPE == null && prePE == null) {
+                continue;
+            } else if (currentPE != null) {
+                prePE = currentPE;
+            } else if (currentPE == null && prePE != null) {
+                dailyVO.setTtm(prePE);
+                stockDailyDao.save(dailyVO);
+                countPE++;
             }
-            if (currentPbr == null) {
-                lastValidPbr = preOneVo.getPbr();
-                dailyVO.setPbr(lastValidPbr);
-            }
-            if (currentPcf == null) {
-                lastValidPcf = preOneVo.getPcf();
-                dailyVO.setPcf(lastValidPcf);
-            }
-            stockDailyDao.save(dailyVO); // 保存更新
-            count++;
-            dailyList.set(i, dailyVO);
         }
-        logger.info("fixNullTtm ===========stockId={}, stockName={}, count={}", stockId, holdingService.getStockIdOrNameByMap(stockId), count);
+
+        for (int i = 0; i < dailyList.size(); i++) {
+            StockDailyVO dailyVO = dailyList.get(i);
+            Double currentPB = dailyVO.getPbr();
+            if (currentPB == null && prePB == null) {
+                continue;
+            } else if (currentPB != null) {
+                prePB = currentPB;
+            } else if (currentPB == null && prePB != null) {
+                dailyVO.setPbr(prePB);
+                stockDailyDao.save(dailyVO);
+                countPB++;
+            }
+        }
+
+        for (int i = 0; i < dailyList.size(); i++) {
+            StockDailyVO dailyVO = dailyList.get(i);
+            Double currentPC = dailyVO.getPcf();
+            if (currentPC == null && prePC == null) {
+                continue;
+            } else if (currentPC != null) {
+                prePC = currentPC;
+            } else if (currentPC == null && prePC != null) {
+                dailyVO.setPcf(prePC);
+                stockDailyDao.save(dailyVO);
+                countPC++;
+            }
+        }
+        logger.info("fixNullTtm ===========stockId={}, stockName={}, countPE={}, countPB={}, countPC={}",
+                stockId, holdingService.getStockIdOrNameByMap(stockId), countPE, countPB, countPC);
     }
 
 
     //update stock wave/range of ttm, pbr, pcf
     public void updateStockPercentile() {
-        List<String> stockIds = stockDao.findStockIdsHasName();
+        List<BdIndicatorVO> stockIdsAndIndicatorId = bdIndicatorDao.findStockIdsAndIndicatorId();
         if (Utils.isWinSystem()) {
-            stockIds = new ArrayList<>();
-            stockIds.add("sz000063");
-            stockIds.add("sh600498");
+            stockIdsAndIndicatorId = new ArrayList<>();
+            BdIndicatorVO e = new BdIndicatorVO("730200");
+            e.setStockIds("sz000063");
+            e.setStockIds("sh600498");
+            stockIdsAndIndicatorId.add(e);
         }
-        stockIds.stream().filter(vo -> {
-            String codeId = vo.toLowerCase();
-            return codeId.startsWith("s");
-        }).forEach(id -> {
-            updatePct(id);
-        });
+        for (BdIndicatorVO vo : stockIdsAndIndicatorId) {
+            String[] strings = vo.getStockIds().split(",");
+            int length = strings.length;
+            if (length == 0) {
+                return;
+            }
+            Arrays.stream(strings).filter(s -> s.toLowerCase().startsWith("s")).forEach(this::updatePct);
+        }
     }
 
-    @Async
+    //    @Async
     private void updatePct(String id) {
         calculatePCFPercentile(id);
         calculatePEPercentile(id);
@@ -270,7 +292,6 @@ public class ValuationService {
     @Value("${notification.easymoney.band.range.count}")
     private Integer easymoneyRangeCount;
 
-    @Async
     private void calculatePBRPercentile(String id) {
         logger.info("======Enter calculatePBRPercentile =======id={}", id);
         //every friday to update
