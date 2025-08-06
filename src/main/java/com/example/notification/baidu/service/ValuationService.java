@@ -77,7 +77,7 @@ public class ValuationService {
                 continue;
             }
             Map<String, StockDailyVO> dbVoMap = new HashMap<>();
-            dbVoList.forEach(dbVo -> {
+            dbVoList.stream().filter(dbVo -> dbVo.getTtm() == null).forEach(dbVo -> {
                 dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
@@ -112,7 +112,7 @@ public class ValuationService {
                 continue;
             }
             Map<String, StockDailyVO> dbVoMap = new HashMap<>();
-            dbVoList.forEach(dbVo -> {
+            dbVoList.stream().filter(dbVo -> dbVo.getPcf() == null).forEach(dbVo -> {
                 dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
@@ -147,7 +147,7 @@ public class ValuationService {
                 continue;
             }
             Map<String, StockDailyVO> dbVoMap = new HashMap<>();
-            dbVoList.forEach(dbVo -> {
+            dbVoList.stream().filter(dbVo -> dbVo.getPbr() == null).forEach(dbVo -> {
                 dbVoMap.put(dbVo.getDay().toString(), dbVo);
             });
             AtomicInteger count = new AtomicInteger();
