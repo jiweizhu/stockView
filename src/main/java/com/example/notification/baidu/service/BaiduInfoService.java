@@ -990,13 +990,16 @@ public class BaiduInfoService {
         String dayOfMonth = String.valueOf(today.getDayOfMonth());
         Integer todayInt = Integer.parseInt(month + dayOfMonth);
         List<String> stockIdsToUpdataFinacialReport = new ArrayList<>();
+        logger.info("======Enter BaiDuController queryBaiduIncomeDataFromNetForAllStocks==month={}=dayOfMonth={}=todayInt={}=", month, dayOfMonth, todayInt);
         for (int i = 0; i < integerLists.size() - 1; i++) {
             if (integerLists.get(i) < todayInt && todayInt < integerLists.get(i + 1)) {
                 //query this seasonNum financial report!
                 String seasonReportDay = getSeasonDayMap().get(integerLists.get(i));
                 //find stock which has no season report yet, then to query again
                 Set<String> reportUpdatedStockIds = new HashSet<>(bdFinacialDao.findStockIdsNoSeasonReport(Date.valueOf(year + seasonReportDay)));
-                stockIdsToUpdataFinacialReport = new HashSet<>(stockDao.findStockIds()).stream().filter(element -> !reportUpdatedStockIds.contains(element)).filter(element -> element.startsWith("s")).collect(Collectors.toList());
+                stockIdsToUpdataFinacialReport = new HashSet<>(stockDao.findStockIds())
+                        .stream().filter(element -> !reportUpdatedStockIds.contains(element))
+                        .filter(element -> element.startsWith("s")).collect(Collectors.toList());
                 logger.info("====queryBaiduIncomeDataFromNetForAllStocks======size={} =stockIdsToUpdataFinacialReport:{}", stockIdsToUpdataFinacialReport.size(), stockIdsToUpdataFinacialReport);
                 break;
             }
@@ -1013,7 +1016,6 @@ public class BaiduInfoService {
                 continue;
             }
             try {
-                Thread.sleep(500);
                 queryBaiduIncomeDataFromNet(id);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
@@ -1022,6 +1024,7 @@ public class BaiduInfoService {
     }
 
     public void queryBaiduIncomeDataFromNet(String stockId) throws JsonProcessingException {
+        logger.info("========enter=queryBaiduIncomeDataFromNet=======stockId={},", stockId);
         JsonNode jsonNode = restRequest.queryBaiduIncomeDataFromNet(stockId.replaceAll("sh|sz", ""));
         if (jsonNode != null && jsonNode.isArray()) {
             for (JsonNode node : jsonNode) {
@@ -1037,7 +1040,7 @@ public class BaiduInfoService {
                     target.setReportDay(reportDay);
                 }
                 String content = objectMapper.writeValueAsString(bdFinancialVO.getContent());
-                target.setContent(content);
+//                target.setContent(content);
 
                 JsonNode rootNode = objectMapper.readTree(content);
                 for (JsonNode tmpNode : rootNode) {
@@ -1075,6 +1078,7 @@ public class BaiduInfoService {
                 }
                 target.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
                 bdFinacialDao.save(target);
+                logger.info("=========saveFinancialReport=======stockId={}, reportDay={}", target.getStockId(), target.getReportDay());
             }
         }
     }

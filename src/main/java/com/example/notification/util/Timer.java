@@ -138,7 +138,7 @@ public class Timer {
     public void fixNull() {
         try {
             logger.info("====cron==start fixNull=====");
-//            valuationService.fixNullTtm();
+            valuationService.fixNullTtm();
             valuationService.updateStockPercentile();
 //todo
             //think not to fix null, and update percentile by first data!

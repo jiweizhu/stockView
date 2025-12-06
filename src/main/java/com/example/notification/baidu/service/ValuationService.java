@@ -195,13 +195,6 @@ public class ValuationService {
             return;
         }
         //as i get time range is five year, baidu may lost some data, so i use five year data to fix it
-        //if updated, skip to update it
-        StockDailyVO nullRow = stockDailyDao.findByStockIdWithNullTTMPBRPCF(stockId);
-        if (nullRow == null) {
-            logger.info("fixNullTtm ===========stockId={}, stockName={}=====already fixed===", stockId, holdingService.getStockIdOrNameByMap(stockId));
-            //no need update again
-            return;
-        }
         List<StockDailyVO> dailyList = stockDailyDao.findByStockIdOrderByDayAsc(stockId, easymoneyRangeCount);
         //start to fix
         Double prePB = null;
@@ -251,7 +244,7 @@ public class ValuationService {
                 countPC++;
             }
         }
-        logger.info("fixNullTtm ===========stockId={}, stockName={}, countPE={}, countPB={}, countPC={}",
+        logger.info("fixNullTtm ====stockId={}, stockName={}, countPE={}, countPB={}, countPC={}",
                 stockId, holdingService.getStockIdOrNameByMap(stockId), countPE, countPB, countPC);
     }
 

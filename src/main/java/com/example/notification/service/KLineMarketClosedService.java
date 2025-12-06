@@ -499,7 +499,7 @@ public class KLineMarketClosedService {
     }
 
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        logger.info("Enter handleStocksFlipDaysAndGainReport ====");
+            logger.info("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
         if (Utils.isWinSystem()) {
