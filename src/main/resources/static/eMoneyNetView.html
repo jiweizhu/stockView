@@ -112,67 +112,83 @@ setTimeout(function() {
 
 
 async function createETFChart(span, data_300) {
+    // 1. 取个股原始数据
     let rawData = await fetch(`http://${serverIp}:8888/em/${isWeekly ? 'wk/' : ''}band/` + span.id.replace('span_', '')).then(response => response.json());
 
+    // 个股日期 & K 线
     let dates = rawData.map(item => item[0]);
     let stockData = rawData.map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    let data_300_tmp = data_300.slice(0, rawData.length).map(item => [+item[1], +item[2], +item[4], +item[3]]);
-    let line_data_300 = data_300_tmp.map(item => item[1]);
 
-    let stock_min = Math.min(...stockData.flat());
-    let stock_max = Math.max(...stockData.flat());
-    let data_300_min = Math.min(...data_300_tmp.flat());
-    let data_300_max = Math.max(...data_300_tmp.flat());
+    // 2. 把沪深 300 数据先做成 date -> ohlc 的 Map（按你原来的顺序 1,2,4,3）
+    const data300Map = new Map(
+        (data_300 || []).map(item => [
+            item[0],                                // 日期，比如 "2022/07/21"
+            [+item[1], +item[2], +item[4], +item[3]]
+        ])
+    );
 
+    // 3. 以个股日期为基准，按日期对齐沪深 300，前面没有数据就填 null
+    let data_300_tmp = dates.map(d => data300Map.get(d) || [null, null, null, null]);
+    let line_data_300 = data_300_tmp.map(item => item[1]); // 取 close 画线
 
-const rawDataOriginal = [...rawData];
-const datesOriginal = [...dates];
-const stockDataOriginal = [...stockData];
-const data_300_tmpOriginal = [...data_300_tmp];
-const line_data_300Original = [...line_data_300];
-let is300Displayed = true;
+    // 工具函数：忽略 null 计算 min/max
+    const validMinMax = arr => {
+        const flat = arr.flat().filter(v => v != null && !isNaN(v));
+        return {
+            min: flat.length ? Math.min(...flat) : 0,
+            max: flat.length ? Math.max(...flat) : 0
+        };
+    };
 
-function filterRecentDays(dayCount) {
-    rawData = rawDataOriginal.slice(-dayCount);
-    dates = datesOriginal.slice(-dayCount);
-    stockData = stockDataOriginal.slice(-dayCount);
-    data_300_tmp = data_300_tmpOriginal.slice(-dayCount);
-    line_data_300 = line_data_300Original.slice(-dayCount);
+    let stockMM = validMinMax(stockData);
+    let data300MM = validMinMax(data_300_tmp);
 
-    const stock_min = Math.min(...stockData.flat());
-    const stock_max = Math.max(...stockData.flat());
+    const rawDataOriginal = [...rawData];
+    const datesOriginal = [...dates];
+    const stockDataOriginal = [...stockData];
+    const data_300_tmpOriginal = [...data_300_tmp];
+    const line_data_300Original = [...line_data_300];
+    let is300Displayed = true;
 
-    const data_300_min = Math.min(...data_300_tmp.flat());
-    const data_300_max = Math.max(...data_300_tmp.flat());
+    function filterRecentDays(dayCount) {
+        rawData = rawDataOriginal.slice(-dayCount);
+        dates = datesOriginal.slice(-dayCount);
+        stockData = stockDataOriginal.slice(-dayCount);
+        data_300_tmp = data_300_tmpOriginal.slice(-dayCount);
+        line_data_300 = line_data_300Original.slice(-dayCount);
 
-    option.yAxis[0].min = stock_min;
-    option.yAxis[0].max = stock_max;
+        const stockMM = validMinMax(stockData);
+        const data300MM = validMinMax(data_300_tmp);
 
-    if (option.yAxis.length > 2 && option.yAxis[2]) {
-        option.yAxis[1].min = data_300_min;
-        option.yAxis[1].max = data_300_max;
+        option.xAxis.data = dates;
+        option.yAxis[0].min = stockMM.min;
+        option.yAxis[0].max = stockMM.max;
+
+        if (option.yAxis.length > 1 && option.yAxis[1]) {
+            option.yAxis[1].min = data300MM.min;
+            option.yAxis[1].max = data300MM.max;
+        }
+
+        option.series[0].data = stockData;
+        option.series[1].data = calculateMA(5, stockData);
+        option.series[2].data = calculateMA(10, stockData);
+        if (is300Displayed) {
+            const s300 = option.series.find(s => s.name === '300K');
+            if (s300) s300.data = line_data_300;
+        }
+
+        myChart.setOption(option, true);
+        window.addEventListener('resize', () => myChart.resize());
     }
-
-    option.series[0].data = stockData;
-    option.series[1].data = calculateMA(5, stockData);
-    option.series[2].data = calculateMA(10, stockData);
-    if (is300Displayed) {
-        option.series.find(series => series.name === '300日K').data = line_data_300; // 更新 300 日K
-    }
-
-    myChart.setOption(option, true);
-    window.addEventListener('resize', () => myChart.resize());
-}
 
     let yAxisFormatter = (value, min, max) => (value * (max - min) + min).toFixed(2);
 
-        var myChart = echarts.init(span, null, {
-            renderer: 'canvas',
-            useDirtyRect: false
-        });
+    var myChart = echarts.init(span, null, {
+        renderer: 'canvas',
+        useDirtyRect: false
+    });
 
-
-       function calculateMA(dayCount, data) {
+    function calculateMA(dayCount, data) {
         var result = [];
         for (var i = 0, len = data.length; i < len; i++) {
             if (i < dayCount) {
@@ -188,14 +204,13 @@ function filterRecentDays(dayCount) {
         return result;
     }
 
-
     const originalYAxis300 = {
         type: 'value',
         scale: true,
         name: '300 Index',
         position: 'right',
-        min: Math.min(...data_300_tmp.flat()), // 300真实最小值
-        max: Math.max(...data_300_tmp.flat()), // 300真实最大值
+        min: data300MM.min,
+        max: data300MM.max,
         axisLine: { lineStyle: { color: '#EE9A00' } },
         axisLabel: { show: false },
         splitLine: { show: false },
@@ -215,16 +230,15 @@ function filterRecentDays(dayCount) {
         yAxisIndex: 1
     };
 
-
     const option = {
-       yAxis: [
+        yAxis: [
             {
                 type: 'value',
                 scale: true,
                 name: 'Stock',
                 position: 'left',
-                min: Math.min(...stockData.flat()), // 真实最小值
-                max: Math.max(...stockData.flat()), // 真实最大值
+                min: stockMM.min,
+                max: stockMM.max,
                 axisLine: { lineStyle: { color: '#8392A5' } },
                 splitLine: { show: false }
             },
@@ -249,9 +263,7 @@ function filterRecentDays(dayCount) {
                 data: calculateMA(5, stockData),
                 smooth: true,
                 showSymbol: false,
-                lineStyle: {
-                    width: 1
-                },
+                lineStyle: { width: 1 },
                 yAxisIndex: 0
             },
             {
@@ -260,14 +272,12 @@ function filterRecentDays(dayCount) {
                 data: calculateMA(10, stockData),
                 smooth: true,
                 showSymbol: false,
-                lineStyle: {
-                    width: 1
-                },
+                lineStyle: { width: 1 },
                 yAxisIndex: 0
             },
             originalSeries300
         ],
-         tooltip: {
+        tooltip: {
             trigger: 'axis',
             axisPointer: {
                 animation: false,
@@ -288,8 +298,8 @@ function filterRecentDays(dayCount) {
             axisLine: { lineStyle: { color: '#8392A5' } }
         },
         grid: {
-           top: '3%',
-           bottom: 80
+            top: '3%',
+            bottom: 80
         },
         dataZoom: [
             {
@@ -299,29 +309,19 @@ function filterRecentDays(dayCount) {
                 handleIcon:
                     'path://M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
                 dataBackground: {
-                    areaStyle: {
-                        color: '#8392A5'
-                    },
-                    lineStyle: {
-                        opacity: 0.8,
-                        color: '#8392A5'
-                    }
+                    areaStyle: { color: '#8392A5' },
+                    lineStyle: { opacity: 0.8, color: '#8392A5' }
                 },
                 brushSelect: true
             },
-            {
-                type: 'inside'
-            }
-        ],
+            { type: 'inside' }
+        ]
     };
 
-    if (option && typeof option === 'object') {
-        myChart.setOption(option);
-    }
-
+    myChart.setOption(option);
     window.addEventListener('resize', () => myChart.resize(), { passive: true });
 
-    function filterDaysData(){
+    function filterDaysData() {
         option.xAxis.data = dates;
         option.series[0].data = stockData;
         option.series[1].data = calculateMA(5, stockData);
@@ -337,6 +337,7 @@ function filterRecentDays(dayCount) {
         filterDaysData();
     });
 }
+
 </script>
 </body>
 </html>

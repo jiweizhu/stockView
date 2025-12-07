@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"/>
+    <title>行业量化估值网格（Quantile版）</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+          margin: 0;
+          padding: 10px;
+          font-family: Arial, "PingFang SC";
+          background: #f4f6fa;
+        }
+        .toolbar {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 12px;
+          align-items: center;
+        }
+        .toolbar button {
+          border: 1px solid #d0d0d7;
+          padding: 4px 12px;
+          border-radius: 16px;
+          background: #fff;
+          cursor: pointer;
+        }
+        .toolbar button.active {
+          background: #1677ff;
+          color: white;
+          border-color: #1677ff;
+        }
+        .toolbar button.sort-asc::after {
+          content: " ↑";
+        }
+        .toolbar button.sort-desc::after {
+          content: " ↓";
+        }
+        #grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+          gap: 12px;
+        }
+        .chart-card {
+          background: white;
+          padding: 8px;
+          border-radius: 10px;
+          box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+          display: flex;
+          flex-direction: column;
+        }
+        .chart-header {
+          display: flex;
+          justify-content: space-between;
+          font-size: 13px;
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+        .chart-meta {
+          font-size: 11px;
+          color: #666;
+        }
+        .chart-sub {
+          font-size: 11px;
+          color: #999;
+          margin-bottom: 4px;
+        }
+        .chart-body {
+          height: 240px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="toolbar">
+    <span>指标：</span>
+    <button data-metric="add_ttm" class="active sort-asc">TTM分位</button>
+    <button data-metric="add_lyr">PE分位</button>
+    <button data-metric="add_pb">PB分位</button>
+
+    <span id="globalStatus" style="color:#888;font-size:12px;">加载中...</span>
+</div>
+
+<div id="grid"></div>
+
+<script>
+    // ================================
+    // 1. 配置
+    // ================================
+    const BASE_PATH = "/api/sw";                  // 按你的后端前缀改
+    const INDUSTRIES_API = BASE_PATH + "/industries";
+    const DAILY_API = BASE_PATH + "/industry-daily";
+
+    // 每个按钮：折线用 valueField，排序/分位 用 quantField
+    const METRICS = {
+        add_ttm: {
+            key: "add_ttm",
+            label: "PE TTM",
+            valueField: "peTtm",
+            quantField: "addTtmPeQuantile"
+        },
+        add_lyr: {
+            key: "add_lyr",
+            label: "PE",
+            valueField: "pe",
+            quantField: "addLyrPeQuantile"
+        },
+        add_pb: {
+            key: "add_pb",
+            label: "PB",
+            valueField: "pb",
+            quantField: "addPbQuantile"
+        }
+    };
+
+    // 默认：TTM 分位，从小到大
+    let currentMetric = METRICS.add_ttm;
+    let sortAsc = true;
+
+    const gridEl = document.getElementById("grid");
+    const globalStatusEl = document.getElementById("globalStatus");
+
+    // code -> { meta, rows, cardEl, chart }
+    const stateMap = new Map();
+
+    init();
+
+    // ================================
+    // 2. 初始化
+    // ================================
+    async function init() {
+        const resp = await fetch(INDUSTRIES_API);
+        const industries = await resp.json();
+
+        globalStatusEl.textContent = `共 ${industries.length} 个行业，加载行情...`;
+
+        // 先搭卡片骨架
+        industries.forEach(meta => createCardSkeleton(meta));
+
+        // 再逐个加载日线
+        for (const meta of industries) {
+            await loadDaily(meta.industryCode);
+            await sleep(80);
+        }
+
+        globalStatusEl.textContent = "";
+        initToolbarEvents();
+
+        window.addEventListener("resize", () => {
+            stateMap.forEach(st => st.chart && st.chart.resize());
+        });
+    }
+
+    function sleep(ms) {
+        return new Promise(r => setTimeout(r, ms));
+    }
+
+    // ================================
+    // 3. 卡片骨架
+    // ================================
+    function createCardSkeleton(meta) {
+        const card = document.createElement("div");
+        card.className = "chart-card";
+        card.dataset.code = meta.industryCode;
+        card.dataset.lastValue = "999"; // 先给个大值，防止排序异常
+
+        card.innerHTML = `
+          <div class="chart-header">
+             <span>${meta.industryName}</span>
+             <span class="chart-meta"></span>
+          </div>
+          <div class="chart-sub">${meta.parentName ?? ""}</div>
+          <div class="chart-body"></div>
+        `;
+
+        gridEl.appendChild(card);
+        const chart = echarts.init(card.querySelector(".chart-body"));
+
+        stateMap.set(meta.industryCode, {
+            meta,
+            rows: [],
+            cardEl: card,
+            chart
+        });
+    }
+
+    // ================================
+    // 4. 加载单个行业日线
+    // ================================
+    async function loadDaily(code) {
+        const st = stateMap.get(code);
+        if (!st) return;
+
+        const params = new URLSearchParams({
+            codes: code,
+            startDate: "2021-01-01"
+        });
+
+        const resp = await fetch(DAILY_API + "?" + params.toString());
+        const arr = await resp.json();    // List<IndustrySeriesDto>
+
+        if (!Array.isArray(arr) || arr.length === 0) return;
+        st.rows = arr[0].rows ?? [];
+
+        renderChart(st);
+        updateMetricText(st);
+        sortCards();
+    }
+
+    // ================================
+    // 5. 渲染：折线用真实 PE / PB，指数线始终显示
+    // ================================
+   function renderChart(st) {
+    const rows = st.rows;
+    if (!rows.length) return;
+
+    const valueField = currentMetric.valueField;
+
+    // 主指标折线：真实值（pe / peTtm / pb），过滤掉无效
+    const mainSeries = rows
+        .filter(r => r[valueField] != null && !isNaN(Number(r[valueField])))
+        .map(r => [r.date, Number(r[valueField])]);
+
+    // 指数线：过滤掉 null / 0 / NaN，保持折线连续
+    const indexCloseSeries = rows
+        .filter(r =>
+            r.indexClose != null &&
+            !isNaN(Number(r.indexClose)) &&
+            Number(r.indexClose) !== 0
+        )
+        .map(r => [r.date, Number(r.indexClose)]);
+
+    // 计算左轴范围，避免因为没有数据或全为0导致轴“消失”
+    let yMin, yMax;
+    if (mainSeries.length > 0) {
+        const ys = mainSeries.map(p => p[1]);
+        let minVal = Math.min(...ys);
+        let maxVal = Math.max(...ys);
+
+        if (minVal === maxVal) {
+            // 单一值，给一点上下缓冲
+            const base = minVal === 0 ? 1 : Math.abs(minVal) || 1;
+            yMin = minVal - base * 0.1;
+            yMax = maxVal + base * 0.1;
+        } else {
+            const margin = (maxVal - minVal) * 0.1;
+            yMin = minVal - margin;
+            yMax = maxVal + margin;
+        }
+    } else {
+        // 没有有效主指标数据时，给一个默认范围，保证纵轴可见
+        yMin = 0;
+        yMax = 1;
+    }
+
+    const option = {
+        tooltip: {
+            trigger: "axis",
+            axisPointer: { type: "cross" },
+            formatter: params => {
+                let lines = [];
+                if (params.length) {
+                    const dateStr = echarts.format.formatTime("yyyy-MM-dd", params[0].value[0]);
+                    lines.push(dateStr);
+                }
+                params.forEach(p => {
+                    lines.push(
+                        p.marker + p.seriesName + ": " +
+                        (p.value[1] == null || isNaN(p.value[1])
+                            ? "-"
+                            : p.value[1].toFixed(2))
+                    );
+                });
+                return lines.join("<br/>");
+            }
+        },
+        legend: {
+            data: [currentMetric.label, "指数"]
+        },
+        grid: { left: 50, right: 60, top: 35, bottom: 35 },
+        xAxis: {
+            type: "time",
+            axisLabel: {
+                fontSize: 10,
+                formatter: v => echarts.format.formatTime("yyyy-MM-dd", v)
+            }
+        },
+        yAxis: [
+            {
+                type: "value",
+                name: currentMetric.label,
+                min: yMin,
+                max: yMax,
+                axisLabel: { fontSize: 10 }
+            },
+            {
+                type: "value",
+                name: "指数",
+                position: "right",
+                scale: true,
+                axisLabel: { fontSize: 10 }
+            }
+        ],
+        dataZoom: [
+            {
+                type: "inside",
+                xAxisIndex: 0,
+                zoomOnMouseWheel: true,
+                moveOnMouseWheel: true,
+                moveOnMouseMove: true
+            },
+            {
+                type: "slider",
+                xAxisIndex: 0,
+                height: 16,
+                bottom: 6
+            }
+        ],
+        series: [
+            {
+                name: currentMetric.label,
+                type: "line",
+                smooth: true,
+                showSymbol: false,
+                yAxisIndex: 0,
+                data: mainSeries,
+                lineStyle: { width: 1.4 }
+            },
+            {
+                name: "指数",
+                type: "line",
+                smooth: true,
+                showSymbol: false,
+                yAxisIndex: 1,
+                data: indexCloseSeries,
+                lineStyle: { width: 1, opacity: 0.7 }
+            }
+        ]
+    };
+
+    st.chart.setOption(option, true);
+}
+
+
+    // ================================
+    // 6. 更新右上角当前值文本 + lastValue(用于排序)
+    // ================================
+    function updateMetricText(st) {
+        const valueField = currentMetric.valueField;
+        const quantField = currentMetric.quantField;
+        const rows = st.rows;
+        const cardMeta = st.cardEl.querySelector(".chart-meta");
+
+        const lastVal = findLastValid(rows.map(r => Number(r[valueField])));
+        const lastQuant = findLastValid(rows.map(r => Number(r[quantField])));
+
+        if (isNaN(lastVal) && isNaN(lastQuant)) {
+            cardMeta.textContent = "";
+            st.cardEl.dataset.lastValue = "999";
+            return;
+        }
+
+        let text = "";
+        if (!isNaN(lastVal)) {
+            text += lastVal.toFixed(2);         // 当前真实 PE / PB
+        }
+        if (!isNaN(lastQuant)) {
+            if (text) text += " | ";
+            text += "分位 " + (lastQuant * 100).toFixed(1) + "%";
+        }
+        cardMeta.textContent = text;
+
+        // 排序用：永远按分位（Quantile）
+        st.cardEl.dataset.lastValue = isNaN(lastQuant) ? "999" : String(lastQuant);
+    }
+
+    function findLastValid(arr) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+            const v = arr[i];
+            if (!isNaN(v)) return v;
+        }
+        return NaN;
+    }
+
+    // ================================
+    // 7. 排序：按当前指标的分位（Quantile）
+    // ================================
+    function sortCards() {
+        const cards = Array.from(gridEl.children);
+        cards.sort((a, b) => {
+            const va = Number(a.dataset.lastValue || 999);
+            const vb = Number(b.dataset.lastValue || 999);
+            return sortAsc ? va - vb : vb - va;
+        });
+        cards.forEach(c => gridEl.appendChild(c));
+    }
+
+    // ================================
+    // 8. 顶部按钮事件：切指标 + 切排序方向
+    // ================================
+    function initToolbarEvents() {
+        const buttons = document.querySelectorAll(".toolbar button[data-metric]");
+
+        buttons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const key = btn.dataset.metric;
+                const metric = METRICS[key];
+
+                const isSameMetric = (metric.key === currentMetric.key);
+
+                if (isSameMetric) {
+                    // 同一个指标：翻转排序方向
+                    sortAsc = !sortAsc;
+                } else {
+                    // 新指标：默认从小到大（低分位在前）
+                    currentMetric = metric;
+                    sortAsc = true;
+                }
+
+                // 更新按钮样式
+                buttons.forEach(b => b.classList.remove("active", "sort-asc", "sort-desc"));
+                btn.classList.add("active");
+                btn.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+
+                // 重画所有行业 + 重新更新文本 + 排序
+                stateMap.forEach(st => {
+                    renderChart(st);
+                    updateMetricText(st);
+                });
+                sortCards();
+            });
+        });
+    }
+</script>
+
+
+</body>
+</html>

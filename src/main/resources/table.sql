@@ -333,3 +333,66 @@ customer_range_gain_post DECIMAL(10,2)
 
 ALTER TABLE stock
 ADD COLUMN ttm DECIMAL(10,2);
+
+
+CREATE TABLE sw_industry_daily (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  industry_code VARCHAR(20)     NOT NULL COMMENT '申万三级行业代码，如 851941.SI',
+  trade_date    DATE            NOT NULL COMMENT '交易日期',
+  pe            DECIMAL(16,4)   NULL COMMENT '静态市盈率，对应 lyrPe',
+  pe_ttm        DECIMAL(16,4)   NULL COMMENT 'TTM 市盈率，对应 ttmPe',
+  pb            DECIMAL(16,4)   NULL COMMENT '市净率 pb',
+  index_close   DECIMAL(16,4)   NULL COMMENT '行业指数收盘，indexClose',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_code_date (industry_code, trade_date),
+  KEY idx_trade_date (trade_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='申万三级行业-日指标';
+
+ALTER TABLE sw_industry_daily
+  ADD COLUMN lyr_pe_quantile              DECIMAL(10,5)   NULL COMMENT '静态PE分位',
+  ADD COLUMN ttm_pe_quantile              DECIMAL(10,5)   NULL COMMENT 'TTM PE分位',
+  ADD COLUMN pb_quantile                  DECIMAL(10,5)   NULL COMMENT 'PB分位',
+  ADD COLUMN dv_ratio                     DECIMAL(16,4)   NULL COMMENT '股息率',
+  ADD COLUMN dv_ratio_quantile            DECIMAL(10,5)   NULL COMMENT '股息率分位',
+  ADD COLUMN dv_ttm                       DECIMAL(16,4)   NULL COMMENT 'TTM股息率',
+  ADD COLUMN dv_ttm_quantile              DECIMAL(10,5)   NULL COMMENT 'TTM股息率分位',
+  ADD COLUMN add_lyr_pe                   DECIMAL(16,4)   NULL,
+  ADD COLUMN add_lyr_pe_quantile          DECIMAL(10,5)   NULL,
+  ADD COLUMN add_ttm_pe                   DECIMAL(16,4)   NULL,
+  ADD COLUMN add_ttm_pe_quantile          DECIMAL(10,5)   NULL,
+  ADD COLUMN add_pb                       DECIMAL(16,4)   NULL,
+  ADD COLUMN add_pb_quantile              DECIMAL(10,5)   NULL,
+  ADD COLUMN add_dv_ratio                 DECIMAL(16,4)   NULL,
+  ADD COLUMN add_dv_ttm                   DECIMAL(16,4)   NULL,
+  ADD COLUMN turnover_rate                DECIMAL(16,4)   NULL,
+  ADD COLUMN turnover_rate_f              DECIMAL(16,4)   NULL,
+  ADD COLUMN add_turnover_rate            DECIMAL(16,4)   NULL,
+  ADD COLUMN add_turnover_rate_f          DECIMAL(16,4)   NULL,
+  ADD COLUMN turnover_rate_f_quantile     DECIMAL(10,5)   NULL,
+  ADD COLUMN total_mv                     DECIMAL(20,2)   NULL,
+  ADD COLUMN close_price                  DECIMAL(16,4)   NULL,
+  ADD COLUMN add_close                    DECIMAL(16,4)   NULL,
+  ADD COLUMN middle_lyr_pe                DECIMAL(16,4)   NULL,
+  ADD COLUMN middle_lyr_pe_quantile       DECIMAL(10,5)   NULL,
+  ADD COLUMN middle_ttm_pe                DECIMAL(16,4)   NULL,
+  ADD COLUMN middle_ttm_pe_quantile       DECIMAL(10,5)   NULL,
+  ADD COLUMN middle_pb                    DECIMAL(16,4)   NULL,
+  ADD COLUMN middle_pb_quantile           DECIMAL(10,5)   NULL,
+  ADD COLUMN below_net_asset_percent      DECIMAL(10,4)   NULL,
+  ADD COLUMN below_net_asset_count        INT             NULL,
+  ADD COLUMN total                        INT             NULL;
+
+
+
+
+CREATE TABLE sw_industry (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    industry_code VARCHAR(20) NOT NULL COMMENT '申万三级行业代码',
+    industry_name VARCHAR(100) NOT NULL COMMENT '名称，如 种子',
+    stock_count INT NULL COMMENT '括号内公司数量',
+    parent_name VARCHAR(100) NULL COMMENT '所属申万二级，如 种植业',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_code (industry_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='申万三级行业元数据';
+
+

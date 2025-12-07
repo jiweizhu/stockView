@@ -144,11 +144,12 @@ public class EasyMoneyService {
         for (EmBandDailyVO vo : voList) {
             String[] strings = new String[7];
             strings[0] = Utils.getFormat(vo.getTradeDate());
-            String format = String.format("%.2f", vo.getPeTtm());
-            strings[1] = format;
-            strings[2] = format;
-            strings[3] = format;
-            strings[4] = format;
+            String peTTM = String.format("%.2f", vo.getPeTtm());
+            String peLar = String.format("%.2f", vo.getPeLar());
+            strings[1] = peTTM;
+            strings[2] = peLar;
+            strings[3] = peTTM;
+            strings[4] = peTTM;
             result.add(strings);
         }
         return result;
