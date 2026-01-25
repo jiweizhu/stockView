@@ -39,12 +39,19 @@ public class BaiDuController {
     @Autowired
     private KLineMarketClosedService kLineMarketClosedService;
 
+    //api is not allowed to query data from bd.
     //=========Start========Get from Net=====================//
-    @RequestMapping(value = {"/bd/getFromBd/commonData"})
+//    @RequestMapping(value = {"/bd/getFromBd/commonData"})
+//    @ResponseBody
+//    public void updateCommonData() throws InterruptedException {
+//        logger.info("======Enter BaiDuController commonData========");
+//        baiduInfoService.updateStockBasicDataFromBd();
+
+    @RequestMapping(value = {"/bd/test"})
     @ResponseBody
-    public void updateCommonData() throws InterruptedException {
-        logger.info("======Enter BaiDuController commonData========");
-        baiduInfoService.updateStockBasicDataFromBd();
+    public String test() throws InterruptedException {
+        logger.info("======Enter BaiDuController test========");
+        return "OK";
     }
 
 
