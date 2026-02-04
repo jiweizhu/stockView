@@ -1,0 +1,5022 @@
+{
+  "ResultCode": 0,
+  "ResultNum": 0,
+  "QueryID": "9489039530599619193",
+  "Result": {
+    "list": {
+      "headers": [
+        {
+          "canSort": 0,
+          "key": "codeName",
+          "name": "名称/代码"
+        },
+        {
+          "canSort": 1,
+          "key": "pxChangeRate",
+          "name": "板块涨跌幅",
+          "sortType": "down"
+        },
+        {
+          "canSort": 1,
+          "key": "riseCount",
+          "name": "上涨数"
+        },
+        {
+          "canSort": 0,
+          "key": "flatCount",
+          "name": "持平数"
+        },
+        {
+          "canSort": 1,
+          "key": "fallCount",
+          "name": "下跌数"
+        },
+        {
+          "canSort": 0,
+          "key": "riseFirst",
+          "name": "领涨股"
+        }
+      ],
+      "body": [
+        {
+          "code": "240400",
+          "fallCount": 0,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "6493.82",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资源开发_44583.png"
+          },
+          "market": "ab",
+          "memberCount": 11,
+          "name": "贵金属",
+          "pxChange": "+238.10",
+          "pxChangeRate": "+3.81%",
+          "riseCount": 11,
+          "riseFirst": [
+            {
+              "code": "000506",
+              "name": "招金黄金",
+              "market": "ab",
+              "price": {
+                "value": "13.26",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+7.80%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000506",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630800",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4396.19",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/硬件基建_63743.png"
+          },
+          "market": "ab",
+          "memberCount": 123,
+          "name": "电网设备",
+          "pxChange": "+148.69",
+          "pxChangeRate": "+3.50%",
+          "riseCount": 111,
+          "riseFirst": [
+            {
+              "code": "300062",
+              "name": "中能电气",
+              "market": "ab",
+              "price": {
+                "value": "10.78",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+20.04%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300062",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630300",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "10980.94",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 29,
+          "name": "其他电源设备Ⅱ",
+          "pxChange": "+371.16",
+          "pxChangeRate": "+3.50%",
+          "riseCount": 26,
+          "riseFirst": [
+            {
+              "code": "688719",
+              "name": "爱科赛博",
+              "market": "ab",
+              "price": {
+                "value": "55.25",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+12.76%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688719",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270600",
+          "fallCount": 7,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "6621.20",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/化学工业_61245.png"
+          },
+          "market": "ab",
+          "memberCount": 34,
+          "name": "电子化学品Ⅱ",
+          "pxChange": "+196.58",
+          "pxChangeRate": "+3.06%",
+          "riseCount": 27,
+          "riseFirst": [
+            {
+              "code": "300285",
+              "name": "国瓷材料",
+              "market": "ab",
+              "price": {
+                "value": "28.0",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+20.02%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300285",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "240200",
+          "fallCount": 4,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "5294.94",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/先进材料_58747.png"
+          },
+          "market": "ab",
+          "memberCount": 30,
+          "name": "金属新材料",
+          "pxChange": "+137.22",
+          "pxChangeRate": "+2.66%",
+          "riseCount": 26,
+          "riseFirst": [
+            {
+              "code": "920576",
+              "name": "天力复合",
+              "market": "ab",
+              "price": {
+                "value": "60.84",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+30.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920576",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270100",
+          "fallCount": 28,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "10170.03",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/半导体_47896.png"
+          },
+          "market": "ab",
+          "memberCount": 166,
+          "name": "半导体",
+          "pxChange": "+212.50",
+          "pxChangeRate": "+2.13%",
+          "riseCount": 137,
+          "riseFirst": [
+            {
+              "code": "688368",
+              "name": "晶丰明源半导体",
+              "market": "ab",
+              "price": {
+                "value": "116.02",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+20.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688368",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "650200",
+          "fallCount": 12,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3245.76",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 46,
+          "name": "航空装备Ⅱ",
+          "pxChange": "+61.96",
+          "pxChangeRate": "+1.95%",
+          "riseCount": 34,
+          "riseFirst": [
+            {
+              "code": "688239",
+              "name": "贵州航宇科技",
+              "market": "ab",
+              "price": {
+                "value": "67.2",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+19.85%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688239",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "650500",
+          "fallCount": 20,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "5064.11",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 63,
+          "name": "军工电子Ⅱ",
+          "pxChange": "+91.02",
+          "pxChangeRate": "+1.83%",
+          "riseCount": 43,
+          "riseFirst": [
+            {
+              "code": "301306",
+              "name": "西测测试",
+              "market": "ab",
+              "price": {
+                "value": "78.65",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+14.60%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301306",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630600",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "6165.32",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/光伏产业_44135.png"
+          },
+          "market": "ab",
+          "memberCount": 28,
+          "name": "风电设备",
+          "pxChange": "+103.06",
+          "pxChangeRate": "+1.70%",
+          "riseCount": 18,
+          "riseFirst": [
+            {
+              "code": "301232",
+              "name": "飞沃科技",
+              "market": "ab",
+              "price": {
+                "value": "109.5",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.28%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301232",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "640600",
+          "fallCount": 6,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "4283.36",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 28,
+          "name": "工程机械",
+          "pxChange": "+69.36",
+          "pxChangeRate": "+1.65%",
+          "riseCount": 22,
+          "riseFirst": [
+            {
+              "code": "301079",
+              "name": "邵阳液压",
+              "market": "ab",
+              "price": {
+                "value": "30.86",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+19.98%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301079",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "240500",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "4256.20",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资源开发_44583.png"
+          },
+          "market": "ab",
+          "memberCount": 24,
+          "name": "小金属",
+          "pxChange": "+67.39",
+          "pxChangeRate": "+1.61%",
+          "riseCount": 22,
+          "riseFirst": [
+            {
+              "code": "002149",
+              "name": "西部材料",
+              "market": "ab",
+              "price": {
+                "value": "28.93",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002149",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "230500",
+          "fallCount": 4,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4152.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 12,
+          "name": "特钢Ⅱ",
+          "pxChange": "+64.71",
+          "pxChangeRate": "+1.58%",
+          "riseCount": 7,
+          "riseFirst": [
+            {
+              "code": "002478",
+              "name": "常宝股份",
+              "market": "ab",
+              "price": {
+                "value": "8.33",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.04%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002478",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "490200",
+          "fallCount": 0,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "4316.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融服务_59050.png"
+          },
+          "market": "ab",
+          "memberCount": 5,
+          "name": "保险Ⅱ",
+          "pxChange": "+65.84",
+          "pxChangeRate": "+1.55%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "601318",
+              "name": "中国平安",
+              "market": "ab",
+              "price": {
+                "value": "63.91",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.21%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601318",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "650100",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "7109.34",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 8,
+          "name": "航天装备Ⅱ",
+          "pxChange": "+105.63",
+          "pxChangeRate": "+1.51%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "688523",
+              "name": "航天环宇科技",
+              "market": "ab",
+              "price": {
+                "value": "43.23",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.99%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688523",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "730200",
+          "fallCount": 33,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "5533.29",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/电子元件_44863.png"
+          },
+          "market": "ab",
+          "memberCount": 85,
+          "name": "通信设备",
+          "pxChange": "+74.36",
+          "pxChangeRate": "+1.36%",
+          "riseCount": 51,
+          "riseFirst": [
+            {
+              "code": "301205",
+              "name": "联特科技",
+              "market": "ab",
+              "price": {
+                "value": "154.77",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+15.87%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301205",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "410100",
+          "fallCount": 23,
+          "financeType": "block",
+          "flatCount": 4,
+          "lastPx": "3269.06",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/电力系统_35846.png"
+          },
+          "market": "ab",
+          "memberCount": 102,
+          "name": "电力",
+          "pxChange": "+39.93",
+          "pxChangeRate": "+1.24%",
+          "riseCount": 75,
+          "riseFirst": [
+            {
+              "code": "002256",
+              "name": "兆新股份",
+              "market": "ab",
+              "price": {
+                "value": "3.91",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.14%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002256",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220900",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "13430.19",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/建材配套_55163.png"
+          },
+          "market": "ab",
+          "memberCount": 7,
+          "name": "非金属材料Ⅱ",
+          "pxChange": "+161.89",
+          "pxChangeRate": "+1.22%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "001296",
+              "name": "长江材料",
+              "market": "ab",
+              "price": {
+                "value": "28.38",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-001296",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270400",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "7337.59",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/电子元件_44863.png"
+          },
+          "market": "ab",
+          "memberCount": 33,
+          "name": "其他电子Ⅱ",
+          "pxChange": "+83.79",
+          "pxChangeRate": "+1.16%",
+          "riseCount": 23,
+          "riseFirst": [
+            {
+              "code": "688662",
+              "name": "广东富信科技",
+              "market": "ab",
+              "price": {
+                "value": "59.0",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+6.90%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688662",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "650400",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3005.70",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 9,
+          "name": "航海装备Ⅱ",
+          "pxChange": "+33.31",
+          "pxChangeRate": "+1.12%",
+          "riseCount": 7,
+          "riseFirst": [
+            {
+              "code": "300008",
+              "name": "天海防务",
+              "market": "ab",
+              "price": {
+                "value": "8.2",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.19%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300008",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "240300",
+          "fallCount": 17,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3591.12",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资源开发_44583.png"
+          },
+          "market": "ab",
+          "memberCount": 60,
+          "name": "工业金属",
+          "pxChange": "+38.95",
+          "pxChangeRate": "+1.10%",
+          "riseCount": 43,
+          "riseFirst": [
+            {
+              "code": "920634",
+              "name": "新威凌",
+              "market": "ab",
+              "price": {
+                "value": "26.08",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+8.67%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920634",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630500",
+          "fallCount": 17,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "5641.64",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/光伏产业_44135.png"
+          },
+          "market": "ab",
+          "memberCount": 64,
+          "name": "光伏设备",
+          "pxChange": "+52.85",
+          "pxChangeRate": "+0.95%",
+          "riseCount": 47,
+          "riseFirst": [
+            {
+              "code": "002865",
+              "name": "钧达股份",
+              "market": "ab",
+              "price": {
+                "value": "40.33",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.01%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002865",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "640100",
+          "fallCount": 92,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "4485.15",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 217,
+          "name": "通用设备",
+          "pxChange": "+41.15",
+          "pxChangeRate": "+0.93%",
+          "riseCount": 122,
+          "riseFirst": [
+            {
+              "code": "300445",
+              "name": "康斯特",
+              "market": "ab",
+              "price": {
+                "value": "25.61",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+20.01%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300445",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110800",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3981.66",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 11,
+          "name": "动物保健Ⅱ",
+          "pxChange": "+35.37",
+          "pxChangeRate": "+0.90%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "600201",
+              "name": "生物股份",
+              "market": "ab",
+              "price": {
+                "value": "15.7",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+6.73%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600201",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "620400",
+          "fallCount": 17,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2119.04",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工程建设_55716.png"
+          },
+          "market": "ab",
+          "memberCount": 39,
+          "name": "专业工程",
+          "pxChange": "+18.95",
+          "pxChangeRate": "+0.90%",
+          "riseCount": 21,
+          "riseFirst": [
+            {
+              "code": "603929",
+              "name": "亚翔集成",
+              "market": "ab",
+              "price": {
+                "value": "89.19",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603929",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "720600",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "1577.67",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/线下娱乐_61865.png"
+          },
+          "market": "ab",
+          "memberCount": 19,
+          "name": "影视院线",
+          "pxChange": "+13.45",
+          "pxChangeRate": "+0.86%",
+          "riseCount": 9,
+          "riseFirst": [
+            {
+              "code": "001330",
+              "name": "博纳影业",
+              "market": "ab",
+              "price": {
+                "value": "13.35",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.97%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-001330",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "410300",
+          "fallCount": 13,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "1572.96",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/公共供应_47638.png"
+          },
+          "market": "ab",
+          "memberCount": 29,
+          "name": "燃气Ⅱ",
+          "pxChange": "+13.20",
+          "pxChangeRate": "+0.85%",
+          "riseCount": 14,
+          "riseFirst": [
+            {
+              "code": "001331",
+              "name": "胜通能源",
+              "market": "ab",
+              "price": {
+                "value": "16.23",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.03%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-001331",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330200",
+          "fallCount": 4,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3350.26",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 10,
+          "name": "黑色家电",
+          "pxChange": "+27.93",
+          "pxChangeRate": "+0.84%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "000801",
+              "name": "四川九洲",
+              "market": "ab",
+              "price": {
+                "value": "17.85",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.98%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000801",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370600",
+          "fallCount": 19,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "5616.94",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医疗服务_36846.png"
+          },
+          "market": "ab",
+          "memberCount": 51,
+          "name": "医疗服务",
+          "pxChange": "+41.51",
+          "pxChangeRate": "+0.74%",
+          "riseCount": 29,
+          "riseFirst": [
+            {
+              "code": "688710",
+              "name": "益诺思生物",
+              "market": "ab",
+              "price": {
+                "value": "48.3",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+12.06%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688710",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "760200",
+          "fallCount": 13,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4487.80",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/环保治理_35197.png"
+          },
+          "market": "ab",
+          "memberCount": 27,
+          "name": "环保设备Ⅱ",
+          "pxChange": "+32.13",
+          "pxChangeRate": "+0.72%",
+          "riseCount": 13,
+          "riseFirst": [
+            {
+              "code": "688376",
+              "name": "美埃科技",
+              "market": "ab",
+              "price": {
+                "value": "53.57",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.91%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688376",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "490100",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "1992.63",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资本工具_43963.png"
+          },
+          "market": "ab",
+          "memberCount": 50,
+          "name": "证券Ⅱ",
+          "pxChange": "+13.45",
+          "pxChangeRate": "+0.68%",
+          "riseCount": 44,
+          "riseFirst": [
+            {
+              "code": "601456",
+              "name": "国联民生",
+              "market": "ab",
+              "price": {
+                "value": "10.89",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.93%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601456",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110300",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2129.76",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/种植养殖_36442.png"
+          },
+          "market": "ab",
+          "memberCount": 4,
+          "name": "林业Ⅱ",
+          "pxChange": "+13.28",
+          "pxChangeRate": "+0.63%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "000592",
+              "name": "平潭发展",
+              "market": "ab",
+              "price": {
+                "value": "13.51",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.14%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000592",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "640200",
+          "fallCount": 80,
+          "financeType": "block",
+          "flatCount": 4,
+          "lastPx": "3632.25",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 177,
+          "name": "专用设备",
+          "pxChange": "+20.24",
+          "pxChangeRate": "+0.56%",
+          "riseCount": 93,
+          "riseFirst": [
+            {
+              "code": "920091",
+              "name": "大鹏工业",
+              "market": "ab",
+              "price": {
+                "value": "75.56",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.79%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920091",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "461000",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1512.02",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 23,
+          "name": "旅游及景区",
+          "pxChange": "+8.06",
+          "pxChangeRate": "+0.54%",
+          "riseCount": 14,
+          "riseFirst": [
+            {
+              "code": "002627",
+              "name": "三峡旅游",
+              "market": "ab",
+              "price": {
+                "value": "6.93",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.74%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002627",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "721000",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1504.98",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传播渠道_65356.png"
+          },
+          "market": "ab",
+          "memberCount": 14,
+          "name": "电视广播Ⅱ",
+          "pxChange": "+6.90",
+          "pxChangeRate": "+0.46%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "600936",
+              "name": "广西广电",
+              "market": "ab",
+              "price": {
+                "value": "4.11",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.89%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600936",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "770100",
+          "fallCount": 6,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3392.33",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 12,
+          "name": "个护用品",
+          "pxChange": "+14.54",
+          "pxChangeRate": "+0.43%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "300658",
+              "name": "延江股份",
+              "market": "ab",
+              "price": {
+                "value": "11.88",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+6.83%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300658",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630100",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "8576.79",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 25,
+          "name": "电机Ⅱ",
+          "pxChange": "+35.57",
+          "pxChangeRate": "+0.42%",
+          "riseCount": 16,
+          "riseFirst": [
+            {
+              "code": "000922",
+              "name": "佳电股份",
+              "market": "ab",
+              "price": {
+                "value": "13.15",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.61%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000922",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330100",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "7429.83",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 10,
+          "name": "白色家电",
+          "pxChange": "+30.99",
+          "pxChangeRate": "+0.42%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "600336",
+              "name": "澳柯玛",
+              "market": "ab",
+              "price": {
+                "value": "8.42",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.69%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600336",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220400",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "6195.47",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/化学工业_61245.png"
+          },
+          "market": "ab",
+          "memberCount": 26,
+          "name": "化学纤维",
+          "pxChange": "+23.26",
+          "pxChangeRate": "+0.38%",
+          "riseCount": 15,
+          "riseFirst": [
+            {
+              "code": "300876",
+              "name": "蒙泰高新",
+              "market": "ab",
+              "price": {
+                "value": "35.46",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.60%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300876",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "710400",
+          "fallCount": 46,
+          "financeType": "block",
+          "flatCount": 4,
+          "lastPx": "3593.13",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/软件生态_63094.png"
+          },
+          "market": "ab",
+          "memberCount": 133,
+          "name": "软件开发",
+          "pxChange": "+13.55",
+          "pxChangeRate": "+0.38%",
+          "riseCount": 83,
+          "riseFirst": [
+            {
+              "code": "688615",
+              "name": "合合信息",
+              "market": "ab",
+              "price": {
+                "value": "222.0",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+13.80%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688615",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "360200",
+          "fallCount": 21,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "2661.91",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/内容生产_64252.png"
+          },
+          "market": "ab",
+          "memberCount": 41,
+          "name": "包装印刷",
+          "pxChange": "+9.44",
+          "pxChangeRate": "+0.36%",
+          "riseCount": 17,
+          "riseFirst": [
+            {
+              "code": "002565",
+              "name": "顺灏股份",
+              "market": "ab",
+              "price": {
+                "value": "15.95",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002565",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "460900",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1056.19",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 9,
+          "name": "酒店餐饮",
+          "pxChange": "+3.56",
+          "pxChangeRate": "+0.34%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "000721",
+              "name": "西安饮食",
+              "market": "ab",
+              "price": {
+                "value": "9.89",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.10%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000721",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "230400",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "1405.34",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 23,
+          "name": "普钢",
+          "pxChange": "+4.62",
+          "pxChangeRate": "+0.33%",
+          "riseCount": 12,
+          "riseFirst": [
+            {
+              "code": "000932",
+              "name": "华菱钢铁",
+              "market": "ab",
+              "price": {
+                "value": "5.37",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.68%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000932",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110700",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3136.04",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/种植养殖_36442.png"
+          },
+          "market": "ab",
+          "memberCount": 23,
+          "name": "养殖业",
+          "pxChange": "+10.24",
+          "pxChangeRate": "+0.33%",
+          "riseCount": 14,
+          "riseFirst": [
+            {
+              "code": "002157",
+              "name": "正邦科技",
+              "market": "ab",
+              "price": {
+                "value": "3.57",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.48%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002157",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "450600",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1556.01",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/零售渠道_42232.png"
+          },
+          "market": "ab",
+          "memberCount": 18,
+          "name": "互联网电商",
+          "pxChange": "+4.59",
+          "pxChangeRate": "+0.30%",
+          "riseCount": 9,
+          "riseFirst": [
+            {
+              "code": "300518",
+              "name": "新迅达",
+              "market": "ab",
+              "price": {
+                "value": "18.46",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+8.08%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300518",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370300",
+          "fallCount": 22,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "2964.99",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医药制造_38533.png"
+          },
+          "market": "ab",
+          "memberCount": 51,
+          "name": "生物制品",
+          "pxChange": "+8.72",
+          "pxChangeRate": "+0.30%",
+          "riseCount": 26,
+          "riseFirst": [
+            {
+              "code": "000534",
+              "name": "万泽股份",
+              "market": "ab",
+              "price": {
+                "value": "24.31",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000534",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "710300",
+          "fallCount": 54,
+          "financeType": "block",
+          "flatCount": 5,
+          "lastPx": "3376.76",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/软件生态_63094.png"
+          },
+          "market": "ab",
+          "memberCount": 119,
+          "name": "IT服务Ⅱ",
+          "pxChange": "+9.96",
+          "pxChangeRate": "+0.30%",
+          "riseCount": 60,
+          "riseFirst": [
+            {
+              "code": "688227",
+              "name": "品高股份",
+              "market": "ab",
+              "price": {
+                "value": "74.9",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+8.24%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688227",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110200",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "657.88",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/种植养殖_36442.png"
+          },
+          "market": "ab",
+          "memberCount": 6,
+          "name": "渔业",
+          "pxChange": "+1.89",
+          "pxChangeRate": "+0.29%",
+          "riseCount": 3,
+          "riseFirst": [
+            {
+              "code": "600257",
+              "name": "大湖股份",
+              "market": "ab",
+              "price": {
+                "value": "6.43",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.55%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600257",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "450400",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1350.21",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/零售渠道_42232.png"
+          },
+          "market": "ab",
+          "memberCount": 7,
+          "name": "专业连锁Ⅱ",
+          "pxChange": "+3.91",
+          "pxChangeRate": "+0.29%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "000829",
+              "name": "天音控股",
+              "market": "ab",
+              "price": {
+                "value": "10.78",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.96%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000829",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "720400",
+          "fallCount": 7,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "2016.83",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/软件生态_63094.png"
+          },
+          "market": "ab",
+          "memberCount": 26,
+          "name": "游戏Ⅱ",
+          "pxChange": "+5.09",
+          "pxChangeRate": "+0.25%",
+          "riseCount": 17,
+          "riseFirst": [
+            {
+              "code": "300467",
+              "name": "迅游科技",
+              "market": "ab",
+              "price": {
+                "value": "27.53",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.57%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300467",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "280600",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3163.31",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/运输装备_54767.png"
+          },
+          "market": "ab",
+          "memberCount": 13,
+          "name": "商用车",
+          "pxChange": "+6.94",
+          "pxChangeRate": "+0.22%",
+          "riseCount": 7,
+          "riseFirst": [
+            {
+              "code": "000550",
+              "name": "江铃汽车",
+              "market": "ab",
+              "price": {
+                "value": "18.51",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.81%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000550",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270500",
+          "fallCount": 39,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "8610.47",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 90,
+          "name": "消费电子",
+          "pxChange": "+15.13",
+          "pxChangeRate": "+0.18%",
+          "riseCount": 48,
+          "riseFirst": [
+            {
+              "code": "600363",
+              "name": "联创光电",
+              "market": "ab",
+              "price": {
+                "value": "60.06",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+7.06%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600363",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220600",
+          "fallCount": 6,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "3106.85",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 16,
+          "name": "橡胶",
+          "pxChange": "+5.20",
+          "pxChangeRate": "+0.17%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "603650",
+              "name": "彤程新材",
+              "market": "ab",
+              "price": {
+                "value": "46.65",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.09%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603650",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "640500",
+          "fallCount": 14,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3207.49",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 31,
+          "name": "轨交设备Ⅱ",
+          "pxChange": "+5.57",
+          "pxChangeRate": "+0.17%",
+          "riseCount": 16,
+          "riseFirst": [
+            {
+              "code": "688033",
+              "name": "天宜新材",
+              "market": "ab",
+              "price": {
+                "value": "7.29",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.13%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688033",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "280500",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3280.64",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/运输装备_54767.png"
+          },
+          "market": "ab",
+          "memberCount": 8,
+          "name": "乘用车",
+          "pxChange": "+5.69",
+          "pxChangeRate": "+0.17%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "601633",
+              "name": "长城汽车",
+              "market": "ab",
+              "price": {
+                "value": "22.69",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.95%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601633",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370500",
+          "fallCount": 67,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "3498.63",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医疗器械_43258.png"
+          },
+          "market": "ab",
+          "memberCount": 126,
+          "name": "医疗器械",
+          "pxChange": "+5.56",
+          "pxChangeRate": "+0.16%",
+          "riseCount": 57,
+          "riseFirst": [
+            {
+              "code": "688607",
+              "name": "康众数字医疗科技",
+              "market": "ab",
+              "price": {
+                "value": "37.05",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.20%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688607",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340500",
+          "fallCount": 6,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4443.83",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 20,
+          "name": "白酒Ⅱ",
+          "pxChange": "+7.04",
+          "pxChangeRate": "+0.16%",
+          "riseCount": 13,
+          "riseFirst": [
+            {
+              "code": "000799",
+              "name": "酒鬼酒",
+              "market": "ab",
+              "price": {
+                "value": "55.74",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.01%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000799",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "740200",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1368.64",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传统能源_40782.png"
+          },
+          "market": "ab",
+          "memberCount": 7,
+          "name": "焦炭Ⅱ",
+          "pxChange": "+2.05",
+          "pxChangeRate": "+0.15%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "600408",
+              "name": "安泰集团",
+              "market": "ab",
+              "price": {
+                "value": "4.57",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.66%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600408",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "490300",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1857.30",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融服务_59050.png"
+          },
+          "market": "ab",
+          "memberCount": 27,
+          "name": "多元金融",
+          "pxChange": "+2.81",
+          "pxChangeRate": "+0.15%",
+          "riseCount": 18,
+          "riseFirst": [
+            {
+              "code": "002961",
+              "name": "瑞达期货",
+              "market": "ab",
+              "price": {
+                "value": "28.66",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.48%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002961",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "710100",
+          "fallCount": 39,
+          "financeType": "block",
+          "flatCount": 4,
+          "lastPx": "3874.17",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 84,
+          "name": "计算机设备",
+          "pxChange": "+5.48",
+          "pxChangeRate": "+0.14%",
+          "riseCount": 41,
+          "riseFirst": [
+            {
+              "code": "301600",
+              "name": "慧翰股份",
+              "market": "ab",
+              "price": {
+                "value": "136.26",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+8.83%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301600",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270300",
+          "fallCount": 48,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2725.41",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/电子元件_44863.png"
+          },
+          "market": "ab",
+          "memberCount": 92,
+          "name": "光学光电子",
+          "pxChange": "+2.06",
+          "pxChangeRate": "+0.08%",
+          "riseCount": 43,
+          "riseFirst": [
+            {
+              "code": "688195",
+              "name": "腾景科技",
+              "market": "ab",
+              "price": {
+                "value": "196.6",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+7.66%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688195",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330300",
+          "fallCount": 13,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "639.43",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 20,
+          "name": "小家电",
+          "pxChange": "+0.31",
+          "pxChangeRate": "+0.05%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "603486",
+              "name": "科沃斯",
+              "market": "ab",
+              "price": {
+                "value": "79.6",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.22%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603486",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220300",
+          "fallCount": 88,
+          "financeType": "block",
+          "flatCount": 8,
+          "lastPx": "4633.80",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/化学工业_61245.png"
+          },
+          "market": "ab",
+          "memberCount": 170,
+          "name": "化学制品",
+          "pxChange": "+1.90",
+          "pxChangeRate": "+0.04%",
+          "riseCount": 74,
+          "riseFirst": [
+            {
+              "code": "301286",
+              "name": "侨源股份",
+              "market": "ab",
+              "price": {
+                "value": "44.92",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+16.89%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301286",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "770300",
+          "fallCount": 1,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3049.26",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 3,
+          "name": "医疗美容",
+          "pxChange": "+0.58",
+          "pxChangeRate": "+0.02%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "920982",
+              "name": "锦波生物",
+              "market": "ab",
+              "price": {
+                "value": "275.5",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.02%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920982",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "640700",
+          "fallCount": 44,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "6686.11",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 78,
+          "name": "自动化设备",
+          "pxChange": "+0.35",
+          "pxChangeRate": "+0.01%",
+          "riseCount": 33,
+          "riseFirst": [
+            {
+              "code": "920396",
+              "name": "常辅股份",
+              "market": "ab",
+              "price": {
+                "value": "37.18",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+11.38%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920396",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "421000",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1354.16",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 12,
+          "name": "航空机场",
+          "pxChange": "-0.13",
+          "pxChangeRate": "-0.01%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "601111",
+              "name": "中国国航",
+              "market": "ab",
+              "price": {
+                "value": "8.37",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.95%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601111",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "270200",
+          "fallCount": 32,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "9191.07",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/电子元件_44863.png"
+          },
+          "market": "ab",
+          "memberCount": 57,
+          "name": "元件",
+          "pxChange": "-1.45",
+          "pxChangeRate": "-0.02%",
+          "riseCount": 25,
+          "riseFirst": [
+            {
+              "code": "600237",
+              "name": "铜峰电子",
+              "market": "ab",
+              "price": {
+                "value": "8.99",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.04%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600237",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "480300",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1368.54",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融机构_49221.png"
+          },
+          "market": "ab",
+          "memberCount": 9,
+          "name": "股份制银行Ⅱ",
+          "pxChange": "-0.39",
+          "pxChangeRate": "-0.03%",
+          "riseCount": 3,
+          "riseFirst": [
+            {
+              "code": "600000",
+              "name": "浦发银行",
+              "market": "ab",
+              "price": {
+                "value": "11.61",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.49%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600000",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "461100",
+          "fallCount": 10,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1139.57",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 16,
+          "name": "教育",
+          "pxChange": "-0.73",
+          "pxChangeRate": "-0.06%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "600730",
+              "name": "中国高科",
+              "market": "ab",
+              "price": {
+                "value": "15.91",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.03%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600730",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "740100",
+          "fallCount": 20,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4171.63",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传统能源_40782.png"
+          },
+          "market": "ab",
+          "memberCount": 30,
+          "name": "煤炭开采",
+          "pxChange": "-3.28",
+          "pxChangeRate": "-0.08%",
+          "riseCount": 9,
+          "riseFirst": [
+            {
+              "code": "600348",
+              "name": "华阳股份",
+              "market": "ab",
+              "price": {
+                "value": "7.99",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.17%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600348",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "750200",
+          "fallCount": 7,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2006.09",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传统能源_40782.png"
+          },
+          "market": "ab",
+          "memberCount": 13,
+          "name": "油服工程",
+          "pxChange": "-2.30",
+          "pxChangeRate": "-0.11%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "002629",
+              "name": "仁智股份",
+              "market": "ab",
+              "price": {
+                "value": "7.65",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002629",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "350300",
+          "fallCount": 7,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2338.01",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 15,
+          "name": "饰品",
+          "pxChange": "-3.16",
+          "pxChangeRate": "-0.13%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "603900",
+              "name": "莱绅通灵",
+              "market": "ab",
+              "price": {
+                "value": "8.78",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.86%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603900",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "280200",
+          "fallCount": 129,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "5968.26",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/运输装备_54767.png"
+          },
+          "market": "ab",
+          "memberCount": 235,
+          "name": "汽车零部件",
+          "pxChange": "-8.49",
+          "pxChangeRate": "-0.14%",
+          "riseCount": 104,
+          "riseFirst": [
+            {
+              "code": "301005",
+              "name": "超捷股份",
+              "market": "ab",
+              "price": {
+                "value": "96.78",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+20.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-301005",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "730100",
+          "fallCount": 19,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "2676.55",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/软件生态_63094.png"
+          },
+          "market": "ab",
+          "memberCount": 39,
+          "name": "通信服务",
+          "pxChange": "-3.64",
+          "pxChangeRate": "-0.14%",
+          "riseCount": 18,
+          "riseFirst": [
+            {
+              "code": "300442",
+              "name": "润泽科技",
+              "market": "ab",
+              "price": {
+                "value": "53.41",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+6.91%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300442",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "420800",
+          "fallCount": 22,
+          "financeType": "block",
+          "flatCount": 5,
+          "lastPx": "2253.71",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/货运物流_52822.png"
+          },
+          "market": "ab",
+          "memberCount": 47,
+          "name": "物流",
+          "pxChange": "-3.63",
+          "pxChangeRate": "-0.16%",
+          "riseCount": 20,
+          "riseFirst": [
+            {
+              "code": "002682",
+              "name": "龙洲股份",
+              "market": "ab",
+              "price": {
+                "value": "10.85",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.04%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002682",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "630700",
+          "fallCount": 46,
+          "financeType": "block",
+          "flatCount": 4,
+          "lastPx": "8617.48",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/储能技术_64977.png"
+          },
+          "market": "ab",
+          "memberCount": 95,
+          "name": "电池",
+          "pxChange": "-16.85",
+          "pxChangeRate": "-0.20%",
+          "riseCount": 45,
+          "riseFirst": [
+            {
+              "code": "300128",
+              "name": "锦富技术",
+              "market": "ab",
+              "price": {
+                "value": "7.72",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.13%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300128",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "620300",
+          "fallCount": 26,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3613.13",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工程建设_55716.png"
+          },
+          "market": "ab",
+          "memberCount": 44,
+          "name": "基础建设",
+          "pxChange": "-7.47",
+          "pxChangeRate": "-0.21%",
+          "riseCount": 17,
+          "riseFirst": [
+            {
+              "code": "601611",
+              "name": "中国核建",
+              "market": "ab",
+              "price": {
+                "value": "13.01",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.97%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601611",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "460800",
+          "fallCount": 15,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3843.20",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 29,
+          "name": "专业服务",
+          "pxChange": "-8.42",
+          "pxChangeRate": "-0.22%",
+          "riseCount": 13,
+          "riseFirst": [
+            {
+              "code": "688334",
+              "name": "西高院",
+              "market": "ab",
+              "price": {
+                "value": "19.36",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.03%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-688334",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220500",
+          "fallCount": 42,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "2790.44",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 71,
+          "name": "塑料",
+          "pxChange": "-6.08",
+          "pxChangeRate": "-0.22%",
+          "riseCount": 27,
+          "riseFirst": [
+            {
+              "code": "300487",
+              "name": "蓝晓科技",
+              "market": "ab",
+              "price": {
+                "value": "61.52",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+12.69%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300487",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330600",
+          "fallCount": 16,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "4325.83",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 30,
+          "name": "家电零部件Ⅱ",
+          "pxChange": "-10.53",
+          "pxChangeRate": "-0.24%",
+          "riseCount": 12,
+          "riseFirst": [
+            {
+              "code": "300342",
+              "name": "天银机电",
+              "market": "ab",
+              "price": {
+                "value": "24.42",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.40%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300342",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330700",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1264.23",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 3,
+          "name": "其他家电Ⅱ",
+          "pxChange": "-3.05",
+          "pxChangeRate": "-0.24%",
+          "riseCount": 1,
+          "riseFirst": [
+            {
+              "code": "300247",
+              "name": "融捷健康",
+              "market": "ab",
+              "price": {
+                "value": "4.89",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.88%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300247",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "230300",
+          "fallCount": 4,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3173.27",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资源开发_44583.png"
+          },
+          "market": "ab",
+          "memberCount": 9,
+          "name": "冶钢原料",
+          "pxChange": "-8.99",
+          "pxChangeRate": "-0.28%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "000629",
+              "name": "钒钛股份",
+              "market": "ab",
+              "price": {
+                "value": "3.0",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.35%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000629",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "480400",
+          "fallCount": 12,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "1765.37",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融机构_49221.png"
+          },
+          "market": "ab",
+          "memberCount": 17,
+          "name": "城商行Ⅱ",
+          "pxChange": "-4.91",
+          "pxChangeRate": "-0.28%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "601009",
+              "name": "南京银行",
+              "market": "ab",
+              "price": {
+                "value": "11.36",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.26%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601009",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "360300",
+          "fallCount": 42,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "3022.20",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 73,
+          "name": "家居用品",
+          "pxChange": "-9.22",
+          "pxChangeRate": "-0.30%",
+          "riseCount": 28,
+          "riseFirst": [
+            {
+              "code": "603610",
+              "name": "麒盛科技",
+              "market": "ab",
+              "price": {
+                "value": "20.99",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.01%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603610",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "620100",
+          "fallCount": 4,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3149.98",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工程建设_55716.png"
+          },
+          "market": "ab",
+          "memberCount": 8,
+          "name": "房屋建设Ⅱ",
+          "pxChange": "-10.70",
+          "pxChangeRate": "-0.34%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "000628",
+              "name": "高新发展",
+              "market": "ab",
+              "price": {
+                "value": "42.24",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.54%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000628",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "450700",
+          "fallCount": 1,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1406.05",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/零售渠道_42232.png"
+          },
+          "market": "ab",
+          "memberCount": 1,
+          "name": "旅游零售Ⅱ",
+          "pxChange": "-4.97",
+          "pxChangeRate": "-0.35%",
+          "riseCount": 0,
+          "riseFirst": [
+            {
+              "code": "601888",
+              "name": "中国中免",
+              "market": "ab",
+              "price": {
+                "value": "79.2",
+                "status": "down"
+              },
+              "ratio": {
+                "value": "-0.35%",
+                "status": "down"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601888",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "610300",
+          "fallCount": 18,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "3433.60",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/建材配套_55163.png"
+          },
+          "market": "ab",
+          "memberCount": 35,
+          "name": "装修建材",
+          "pxChange": "-12.07",
+          "pxChangeRate": "-0.35%",
+          "riseCount": 14,
+          "riseFirst": [
+            {
+              "code": "002718",
+              "name": "友邦吊顶",
+              "market": "ab",
+              "price": {
+                "value": "29.21",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.70%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002718",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "750300",
+          "fallCount": 18,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "3079.11",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传统能源_40782.png"
+          },
+          "market": "ab",
+          "memberCount": 30,
+          "name": "炼化及贸易",
+          "pxChange": "-11.01",
+          "pxChangeRate": "-0.36%",
+          "riseCount": 10,
+          "riseFirst": [
+            {
+              "code": "002476",
+              "name": "宝莫股份",
+              "market": "ab",
+              "price": {
+                "value": "5.74",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.17%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002476",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330400",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2472.34",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/消费电子_33851.png"
+          },
+          "market": "ab",
+          "memberCount": 9,
+          "name": "厨卫电器",
+          "pxChange": "-8.97",
+          "pxChangeRate": "-0.36%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "002508",
+              "name": "老板电器",
+              "market": "ab",
+              "price": {
+                "value": "19.75",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.44%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002508",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220200",
+          "fallCount": 38,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3171.99",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/化学工业_61245.png"
+          },
+          "market": "ab",
+          "memberCount": 57,
+          "name": "化学原料",
+          "pxChange": "-12.76",
+          "pxChangeRate": "-0.40%",
+          "riseCount": 18,
+          "riseFirst": [
+            {
+              "code": "000510",
+              "name": "新金路",
+              "market": "ab",
+              "price": {
+                "value": "9.77",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.02%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000510",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "350100",
+          "fallCount": 21,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2494.98",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 31,
+          "name": "纺织制造",
+          "pxChange": "-10.50",
+          "pxChangeRate": "-0.42%",
+          "riseCount": 9,
+          "riseFirst": [
+            {
+              "code": "600493",
+              "name": "凤竹纺织",
+              "market": "ab",
+              "price": {
+                "value": "8.32",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.05%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600493",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "760100",
+          "fallCount": 65,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "2417.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/环保治理_35197.png"
+          },
+          "market": "ab",
+          "memberCount": 106,
+          "name": "环境治理",
+          "pxChange": "-11.04",
+          "pxChangeRate": "-0.45%",
+          "riseCount": 39,
+          "riseFirst": [
+            {
+              "code": "000546",
+              "name": "金圆股份",
+              "market": "ab",
+              "price": {
+                "value": "6.59",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.02%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000546",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "610200",
+          "fallCount": 13,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "4420.76",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/建材配套_55163.png"
+          },
+          "market": "ab",
+          "memberCount": 15,
+          "name": "玻璃玻纤",
+          "pxChange": "-20.29",
+          "pxChangeRate": "-0.46%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "603601",
+              "name": "再升科技",
+              "market": "ab",
+              "price": {
+                "value": "8.43",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.05%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603601",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340700",
+          "fallCount": 14,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3715.59",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 26,
+          "name": "饮料乳品",
+          "pxChange": "-17.66",
+          "pxChangeRate": "-0.47%",
+          "riseCount": 11,
+          "riseFirst": [
+            {
+              "code": "002946",
+              "name": "新乳业",
+              "market": "ab",
+              "price": {
+                "value": "17.3",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.10%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002946",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "720900",
+          "fallCount": 16,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "5064.59",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/内容生产_64252.png"
+          },
+          "market": "ab",
+          "memberCount": 29,
+          "name": "出版",
+          "pxChange": "-25.19",
+          "pxChangeRate": "-0.49%",
+          "riseCount": 10,
+          "riseFirst": [
+            {
+              "code": "603230",
+              "name": "内蒙新华",
+              "market": "ab",
+              "price": {
+                "value": "13.29",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.70%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603230",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370100",
+          "fallCount": 90,
+          "financeType": "block",
+          "flatCount": 6,
+          "lastPx": "3665.88",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医药制造_38533.png"
+          },
+          "market": "ab",
+          "memberCount": 151,
+          "name": "化学制药",
+          "pxChange": "-18.42",
+          "pxChangeRate": "-0.50%",
+          "riseCount": 55,
+          "riseFirst": [
+            {
+              "code": "300194",
+              "name": "福安药业",
+              "market": "ab",
+              "price": {
+                "value": "4.72",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.36%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300194",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340900",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2010.14",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 14,
+          "name": "调味发酵品Ⅱ",
+          "pxChange": "-10.24",
+          "pxChangeRate": "-0.51%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "920726",
+              "name": "朱老六",
+              "market": "ab",
+              "price": {
+                "value": "22.9",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.77%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920726",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110900",
+          "fallCount": 1,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1674.48",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/种植养殖_36442.png"
+          },
+          "market": "ab",
+          "memberCount": 2,
+          "name": "农业综合Ⅱ",
+          "pxChange": "-8.94",
+          "pxChangeRate": "-0.53%",
+          "riseCount": 1,
+          "riseFirst": [
+            {
+              "code": "300021",
+              "name": "大禹节水",
+              "market": "ab",
+              "price": {
+                "value": "4.52",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.67%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300021",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "650300",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4704.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 12,
+          "name": "地面兵装Ⅱ",
+          "pxChange": "-26.12",
+          "pxChangeRate": "-0.55%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "600967",
+              "name": "内蒙一机",
+              "market": "ab",
+              "price": {
+                "value": "16.42",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.11%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600967",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340800",
+          "fallCount": 14,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2854.00",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 23,
+          "name": "休闲食品",
+          "pxChange": "-15.83",
+          "pxChangeRate": "-0.55%",
+          "riseCount": 9,
+          "riseFirst": [
+            {
+              "code": "002956",
+              "name": "西麦食品",
+              "market": "ab",
+              "price": {
+                "value": "23.94",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.09%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002956",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "280400",
+          "fallCount": 10,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "4225.91",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/运输装备_54767.png"
+          },
+          "market": "ab",
+          "memberCount": 16,
+          "name": "摩托车及其他",
+          "pxChange": "-23.73",
+          "pxChangeRate": "-0.56%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "003033",
+              "name": "征和工业",
+              "market": "ab",
+              "price": {
+                "value": "68.48",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.01%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-003033",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "480500",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1700.52",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融机构_49221.png"
+          },
+          "market": "ab",
+          "memberCount": 10,
+          "name": "农商行Ⅱ",
+          "pxChange": "-9.95",
+          "pxChangeRate": "-0.58%",
+          "riseCount": 1,
+          "riseFirst": [
+            {
+              "code": "601077",
+              "name": "渝农商行",
+              "market": "ab",
+              "price": {
+                "value": "6.32",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.16%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601077",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "421100",
+          "fallCount": 22,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2017.10",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 34,
+          "name": "航运港口",
+          "pxChange": "-12.19",
+          "pxChangeRate": "-0.60%",
+          "riseCount": 11,
+          "riseFirst": [
+            {
+              "code": "601872",
+              "name": "招商轮船",
+              "market": "ab",
+              "price": {
+                "value": "8.38",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.20%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601872",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110500",
+          "fallCount": 15,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2740.02",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 22,
+          "name": "农产品加工",
+          "pxChange": "-17.78",
+          "pxChangeRate": "-0.64%",
+          "riseCount": 7,
+          "riseFirst": [
+            {
+              "code": "300138",
+              "name": "晨光生物",
+              "market": "ab",
+              "price": {
+                "value": "12.68",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.68%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300138",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340400",
+          "fallCount": 16,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3459.04",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 25,
+          "name": "食品加工",
+          "pxChange": "-24.13",
+          "pxChangeRate": "-0.69%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "605338",
+              "name": "巴比食品",
+              "market": "ab",
+              "price": {
+                "value": "27.2",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.09%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-605338",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "720500",
+          "fallCount": 15,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "1660.11",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/内容生产_64252.png"
+          },
+          "market": "ab",
+          "memberCount": 27,
+          "name": "广告营销",
+          "pxChange": "-11.93",
+          "pxChangeRate": "-0.71%",
+          "riseCount": 10,
+          "riseFirst": [
+            {
+              "code": "002027",
+              "name": "分众传媒",
+              "market": "ab",
+              "price": {
+                "value": "7.16",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.99%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002027",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "340600",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1921.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 16,
+          "name": "非白酒",
+          "pxChange": "-13.90",
+          "pxChangeRate": "-0.72%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "601579",
+              "name": "会稽山",
+              "market": "ab",
+              "price": {
+                "value": "21.62",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.81%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601579",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "220800",
+          "fallCount": 42,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "2117.88",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/化学工业_61245.png"
+          },
+          "market": "ab",
+          "memberCount": 58,
+          "name": "农化制品",
+          "pxChange": "-15.71",
+          "pxChangeRate": "-0.74%",
+          "riseCount": 13,
+          "riseFirst": [
+            {
+              "code": "600227",
+              "name": "赤天化",
+              "market": "ab",
+              "price": {
+                "value": "2.73",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.87%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600227",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "620600",
+          "fallCount": 30,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "2412.85",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工程建设_55716.png"
+          },
+          "market": "ab",
+          "memberCount": 41,
+          "name": "工程咨询服务Ⅱ",
+          "pxChange": "-19.47",
+          "pxChangeRate": "-0.80%",
+          "riseCount": 10,
+          "riseFirst": [
+            {
+              "code": "300492",
+              "name": "华图山鼎",
+              "market": "ab",
+              "price": {
+                "value": "75.04",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+5.33%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300492",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370200",
+          "fallCount": 46,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1449.50",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医药制造_38533.png"
+          },
+          "market": "ab",
+          "memberCount": 67,
+          "name": "中药Ⅱ",
+          "pxChange": "-11.81",
+          "pxChangeRate": "-0.81%",
+          "riseCount": 20,
+          "riseFirst": [
+            {
+              "code": "600080",
+              "name": "金花股份",
+              "market": "ab",
+              "price": {
+                "value": "7.93",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.72%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600080",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110100",
+          "fallCount": 15,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1795.41",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/种植养殖_36442.png"
+          },
+          "market": "ab",
+          "memberCount": 20,
+          "name": "种植业",
+          "pxChange": "-15.02",
+          "pxChangeRate": "-0.83%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "603336",
+              "name": "宏辉果蔬",
+              "market": "ab",
+              "price": {
+                "value": "8.88",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.37%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603336",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "330500",
+          "fallCount": 8,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1575.69",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工业装备_49683.png"
+          },
+          "market": "ab",
+          "memberCount": 12,
+          "name": "照明设备Ⅱ",
+          "pxChange": "-13.58",
+          "pxChangeRate": "-0.85%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "920339",
+              "name": "恒太照明",
+              "market": "ab",
+              "price": {
+                "value": "11.01",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+4.66%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920339",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "350200",
+          "fallCount": 41,
+          "financeType": "block",
+          "flatCount": 2,
+          "lastPx": "2529.77",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 59,
+          "name": "服装家纺",
+          "pxChange": "-22.04",
+          "pxChangeRate": "-0.86%",
+          "riseCount": 16,
+          "riseFirst": [
+            {
+              "code": "601566",
+              "name": "九牧王",
+              "market": "ab",
+              "price": {
+                "value": "15.03",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.03%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601566",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "720700",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2913.29",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/内容生产_64252.png"
+          },
+          "market": "ab",
+          "memberCount": 14,
+          "name": "数字媒体",
+          "pxChange": "-25.66",
+          "pxChangeRate": "-0.87%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "000681",
+              "name": "视觉中国",
+              "market": "ab",
+              "price": {
+                "value": "22.32",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.45%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000681",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "280300",
+          "fallCount": 5,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1041.10",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/运输装备_54767.png"
+          },
+          "market": "ab",
+          "memberCount": 10,
+          "name": "汽车服务",
+          "pxChange": "-9.22",
+          "pxChangeRate": "-0.88%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "920030",
+              "name": "德众汽车",
+              "market": "ab",
+              "price": {
+                "value": "6.64",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.22%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "BJ",
+              "url": "https://gushitong.baidu.com/stock/ab-920030",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "620200",
+          "fallCount": 18,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "793.95",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/工程建设_55716.png"
+          },
+          "market": "ab",
+          "memberCount": 23,
+          "name": "装修装饰Ⅱ",
+          "pxChange": "-7.34",
+          "pxChangeRate": "-0.92%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "002989",
+              "name": "中天精装",
+              "market": "ab",
+              "price": {
+                "value": "25.77",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.99%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002989",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "610100",
+          "fallCount": 18,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "3011.82",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/建材配套_55163.png"
+          },
+          "market": "ab",
+          "memberCount": 21,
+          "name": "水泥",
+          "pxChange": "-27.83",
+          "pxChangeRate": "-0.92%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "601992",
+              "name": "金隅集团",
+              "market": "ab",
+              "price": {
+                "value": "1.67",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.83%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601992",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "750100",
+          "fallCount": 3,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2514.89",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/传统能源_40782.png"
+          },
+          "market": "ab",
+          "memberCount": 4,
+          "name": "油气开采Ⅱ",
+          "pxChange": "-23.95",
+          "pxChangeRate": "-0.94%",
+          "riseCount": 1,
+          "riseFirst": [
+            {
+              "code": "600938",
+              "name": "中国海油",
+              "market": "ab",
+              "price": {
+                "value": "28.4",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.67%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600938",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "430100",
+          "fallCount": 61,
+          "financeType": "block",
+          "flatCount": 5,
+          "lastPx": "1475.51",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/不动产_57074.png"
+          },
+          "market": "ab",
+          "memberCount": 89,
+          "name": "房地产开发",
+          "pxChange": "-14.48",
+          "pxChangeRate": "-0.97%",
+          "riseCount": 23,
+          "riseFirst": [
+            {
+              "code": "000863",
+              "name": "三湘印象",
+              "market": "ab",
+              "price": {
+                "value": "4.91",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.72%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-000863",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "360100",
+          "fallCount": 14,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "2985.40",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/基础材料_54985.png"
+          },
+          "market": "ab",
+          "memberCount": 22,
+          "name": "造纸",
+          "pxChange": "-30.04",
+          "pxChangeRate": "-1.00%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "603165",
+              "name": "荣晟环保",
+              "market": "ab",
+              "price": {
+                "value": "12.38",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.73%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-603165",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "770200",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "3940.43",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 14,
+          "name": "化妆品",
+          "pxChange": "-41.27",
+          "pxChangeRate": "-1.04%",
+          "riseCount": 3,
+          "riseFirst": [
+            {
+              "code": "300957",
+              "name": "贝泰妮",
+              "market": "ab",
+              "price": {
+                "value": "40.95",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.82%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300957",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "110400",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "5523.21",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/农产品加工_55183.png"
+          },
+          "market": "ab",
+          "memberCount": 17,
+          "name": "饲料",
+          "pxChange": "-59.71",
+          "pxChangeRate": "-1.07%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "300673",
+              "name": "佩蒂股份",
+              "market": "ab",
+              "price": {
+                "value": "18.0",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+2.33%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-300673",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "450200",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1991.60",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/零售渠道_42232.png"
+          },
+          "market": "ab",
+          "memberCount": 13,
+          "name": "贸易Ⅱ",
+          "pxChange": "-23.21",
+          "pxChangeRate": "-1.15%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "601061",
+              "name": "中信金属",
+              "market": "ab",
+              "price": {
+                "value": "13.9",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.53%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601061",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "480200",
+          "fallCount": 6,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2179.19",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/金融机构_49221.png"
+          },
+          "market": "ab",
+          "memberCount": 6,
+          "name": "国有大型银行Ⅱ",
+          "pxChange": "-26.50",
+          "pxChangeRate": "-1.20%",
+          "riseCount": 0,
+          "riseFirst": [
+            {
+              "code": "601328",
+              "name": "交通银行",
+              "market": "ab",
+              "price": {
+                "value": "7.35",
+                "status": "down"
+              },
+              "ratio": {
+                "value": "-0.14%",
+                "status": "down"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-601328",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "360500",
+          "fallCount": 16,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2320.36",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/日用消费_54678.png"
+          },
+          "market": "ab",
+          "memberCount": 22,
+          "name": "文娱用品",
+          "pxChange": "-30.15",
+          "pxChangeRate": "-1.28%",
+          "riseCount": 6,
+          "riseFirst": [
+            {
+              "code": "002862",
+              "name": "实丰文化",
+              "market": "ab",
+              "price": {
+                "value": "21.79",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+9.99%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002862",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "240600",
+          "fallCount": 9,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "4339.22",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/资源开发_44583.png"
+          },
+          "market": "ab",
+          "memberCount": 13,
+          "name": "能源金属",
+          "pxChange": "-59.44",
+          "pxChangeRate": "-1.35%",
+          "riseCount": 4,
+          "riseFirst": [
+            {
+              "code": "605376",
+              "name": "博迁新材",
+              "market": "ab",
+              "price": {
+                "value": "56.81",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+3.05%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-605376",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "420900",
+          "fallCount": 27,
+          "financeType": "block",
+          "flatCount": 3,
+          "lastPx": "2301.75",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/交通设备_64962.png"
+          },
+          "market": "ab",
+          "memberCount": 33,
+          "name": "铁路公路",
+          "pxChange": "-31.70",
+          "pxChangeRate": "-1.36%",
+          "riseCount": 3,
+          "riseFirst": [
+            {
+              "code": "001965",
+              "name": "招商公路",
+              "market": "ab",
+              "price": {
+                "value": "9.95",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+0.40%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-001965",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "370400",
+          "fallCount": 27,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "2102.25",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/医药制造_38533.png"
+          },
+          "market": "ab",
+          "memberCount": 32,
+          "name": "医药商业",
+          "pxChange": "-30.43",
+          "pxChangeRate": "-1.43%",
+          "riseCount": 5,
+          "riseFirst": [
+            {
+              "code": "002788",
+              "name": "鹭燕医药",
+              "market": "ab",
+              "price": {
+                "value": "11.18",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+6.27%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-002788",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "450300",
+          "fallCount": 49,
+          "financeType": "block",
+          "flatCount": 1,
+          "lastPx": "1905.70",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/零售渠道_42232.png"
+          },
+          "market": "ab",
+          "memberCount": 58,
+          "name": "一般零售",
+          "pxChange": "-41.38",
+          "pxChangeRate": "-2.13%",
+          "riseCount": 8,
+          "riseFirst": [
+            {
+              "code": "600865",
+              "name": "百大集团",
+              "market": "ab",
+              "price": {
+                "value": "11.88",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+10.00%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600865",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "510100",
+          "fallCount": 13,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1389.25",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/民生服务_45516.png"
+          },
+          "market": "ab",
+          "memberCount": 15,
+          "name": "综合Ⅱ",
+          "pxChange": "-31.25",
+          "pxChangeRate": "-2.20%",
+          "riseCount": 2,
+          "riseFirst": [
+            {
+              "code": "600770",
+              "name": "综艺股份",
+              "market": "ab",
+              "price": {
+                "value": "5.15",
+                "status": "up"
+              },
+              "ratio": {
+                "value": "+1.38%",
+                "status": "up"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600770",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "430300",
+          "fallCount": 11,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "1574.20",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/不动产_57074.png"
+          },
+          "market": "ab",
+          "memberCount": 11,
+          "name": "房地产服务",
+          "pxChange": "-46.77",
+          "pxChangeRate": "-2.89%",
+          "riseCount": 0,
+          "riseFirst": [
+            {
+              "code": "001914",
+              "name": "招商积余",
+              "market": "ab",
+              "price": {
+                "value": "11.02",
+                "status": "down"
+              },
+              "ratio": {
+                "value": "-0.36%",
+                "status": "down"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SZ",
+              "url": "https://gushitong.baidu.com/stock/ab-001914",
+              "webAppUrl": ""
+            }
+          ]
+        },
+        {
+          "code": "460600",
+          "fallCount": 2,
+          "financeType": "block",
+          "flatCount": 0,
+          "lastPx": "864.78",
+          "logo": {
+            "type": "img",
+            "logo": "https://baidu-finance.cdn.bcebos.com/imgs/logo/block/线下娱乐_61865.png"
+          },
+          "market": "ab",
+          "memberCount": 2,
+          "name": "体育Ⅱ",
+          "pxChange": "-29.65",
+          "pxChangeRate": "-3.31%",
+          "riseCount": 0,
+          "riseFirst": [
+            {
+              "code": "600158",
+              "name": "中体产业",
+              "market": "ab",
+              "price": {
+                "value": "8.62",
+                "status": "down"
+              },
+              "ratio": {
+                "value": "-1.37%",
+                "status": "down"
+              },
+              "outMarketInfo": {
+
+              },
+              "exchange": "SH",
+              "url": "https://gushitong.baidu.com/stock/ab-600158",
+              "webAppUrl": ""
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

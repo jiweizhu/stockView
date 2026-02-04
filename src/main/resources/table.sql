@@ -331,10 +331,6 @@ customer_range_gain_post DECIMAL(10,2)
 
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE stock
-ADD COLUMN ttm DECIMAL(10,2);
-
-
 CREATE TABLE sw_industry_daily (
   id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   industry_code VARCHAR(20)     NOT NULL COMMENT '申万三级行业代码，如 851941.SI',
@@ -395,4 +391,16 @@ CREATE TABLE sw_industry (
     UNIQUE KEY uk_code (industry_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='申万三级行业元数据';
 
+
+CREATE TABLE sw_industry_l2 (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    industry_code VARCHAR(20) NOT NULL COMMENT '申万二级行业代码',
+    industry_name VARCHAR(100) NOT NULL COMMENT '名称，如 种子',
+    stock_count INT NULL COMMENT '括号内公司数量',
+    parent_name VARCHAR(100) NULL COMMENT '所属申万二级，如 种植业',
+    stock_ids TEXT NULL COMMENT '行业成分股代码，逗号分隔',
+    update_date DATE NULL COMMENT '行业成分最后更新日期',
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_code (industry_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='申万二级行业元数据';
 

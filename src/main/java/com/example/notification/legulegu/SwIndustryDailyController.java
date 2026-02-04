@@ -30,7 +30,7 @@ public class SwIndustryDailyController {
     @GetMapping("/admin/import-sw-industry")
     public String importIndustry() throws Exception {
         if(Utils.isWinSystem()){
-            path = "C:\\kiwi\\notification\\src\\main\\resources\\stockFolder\\shenwan_index.txt";
+            path = "C:\\kiwi\\notification\\src\\main\\resources\\stockFolder\\shenwan_index_l3.txt";
         }
         int count = service.importFromTxt(path);
         return "成功导入行业数量: " + count;
