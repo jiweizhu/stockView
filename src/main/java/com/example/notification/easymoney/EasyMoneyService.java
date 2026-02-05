@@ -97,6 +97,11 @@ public class EasyMoneyService {
         return buildHtml(all);
     }
 
+    public Object eMoneyNetViewIds() {
+        List<EmIndicatorVO> all = emIndicatorDao.findAllOrderByTtmPercentileAsc();
+        return all;
+    }
+
     private Object buildHtml(List<EmIndicatorVO> bandVOs) {
         logger.info("====Enter==EasyMoneyService buildHtml=====");
         String serverIp = Utils.getServerIp();

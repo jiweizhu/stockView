@@ -21,4 +21,6 @@ public class BdPanKouInfoVO {
     
     //总市值
     private String capitalization;
+
+    private String stockId;
 }

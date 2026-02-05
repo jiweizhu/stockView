@@ -51,6 +51,7 @@ public class BaiDuController {
     @ResponseBody
     public String test() throws InterruptedException {
         logger.info("======Enter BaiDuController test========");
+        baiduInfoService.updateStockBasicDataFromBd();
         return "OK";
     }
 

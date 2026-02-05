@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jsoup.helper.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,11 @@ public class RestRequest {
     private static final String Bd_StockHolder_Day_URL = "https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=$code&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail&hold_type=1&hold_date=$day&finClientType=pc";
     private static final String Bd_StockHolder_Last_URL = "https://finance.pae.baidu.com/selfselect/openapi?srcid=5539&code=000001&market=ab&company_code=3&inner_code=3&listedSector=1&group=holder_equity_detail";
 
+
+    //https://finance.pae.baidu.com/vapi/v1/overviewwidget?market=ab&code=000550&financeType=stock&modules=sentiment&finClientType=pc
+    private static final String Bd_Basic_INFO_URL = "https://finance.pae.baidu.com/vapi/v1/overviewwidget?market=ab&code=$code&financeType=stock&modules=sentiment&finClientType=pc";
+
+
     //https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=930693&startDate=20241008
     private static final String CNIndustry_KLine_Url = "https://www.csindex.com.cn/csindex-home/perf/index-perf?indexCode=$code&startDate=$startTime";
 
@@ -79,6 +85,28 @@ public class RestRequest {
         List<IndicatorVO> blockList = objectMapper.readValue(str, objectMapper.getTypeFactory().constructCollectionType(List.class, IndicatorVO.class));
         System.out.printf(String.valueOf(blockList.size()));
     }
+
+    public BdPanKouInfoVO queryBasicDataFromBd(String code) {
+        String url = Bd_Basic_INFO_URL.replace("$code", code);
+        try {
+            Map ret = restTemplate.getForObject(url, Map.class);
+            Map result = (Map) ret.get("Result");
+            Map newMarketData = (Map) result.get("sentiment");
+            Map data = (Map) newMarketData.get("data");
+            Map basicInfo = (Map) data.get("basicInfo");
+            String name = basicInfo.get("name").toString();
+            if (!StringUtil.isBlank(name)) {
+                BdPanKouInfoVO bdPanKouInfoVO = new BdPanKouInfoVO();
+                bdPanKouInfoVO.setStockName(name);
+                bdPanKouInfoVO.setStockId(code);
+                return bdPanKouInfoVO;
+            }
+        } catch (Exception e) {
+            logger.error("Fail to queryBaiduCommonData.============ Please have a check: https://finance.pae.baidu.com/vapi/v1/overviewwidget?market=ab&code=000550&financeType=stock&modules=sentiment&finClientType=pc ", e);
+        }
+        return null;
+    }
+
 
     public List<IndicatorVO> queryBaiduIndustriesRealInfo() {
         Map ret = restTemplate.getForObject(Baidu_IndustryIndicators_Url, Map.class);

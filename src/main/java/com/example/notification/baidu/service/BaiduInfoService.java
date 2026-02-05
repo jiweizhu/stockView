@@ -38,9 +38,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.example.notification.constant.Constants.*;
@@ -1527,8 +1525,8 @@ public class BaiduInfoService {
     }
 
     public void updateStockBasicDataFromBd() throws InterruptedException {
-        //get from bd set market value etc.
-        logger.info("======Enter BaiduInfoService updateStockBasicDataFromBd========");
+        logger.info("======Enter BaiduInfoService updateStockBasicDataFromBdMultiThreaded========");
+
         List<String> stockIds = stockDao.findStockIds();
         if (Utils.isWinSystem()) {
             stockIds = new ArrayList<>();
@@ -1537,19 +1535,36 @@ public class BaiduInfoService {
             stockIds.add("sh600498");
             stockIds.add("sh600522");
         }
-        for (String stockId : stockIds) {
-            if (!stockId.startsWith("s")) {
-                //just handle stock
-                continue;
-            }
-            Thread.sleep(1000);//slow to avoid too many request
-            BdPanKouInfoVO retVo = restRequest.queryStockBasicDataFromBd(stockId.substring(2));
-            StockNameVO stockNameVO = stockDao.findById(stockId).get();
-            BeanUtils.copyProperties(retVo, stockNameVO);
-            stockNameVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
-            stockDao.save(stockNameVO);
-        }
-        logger.info("======End BaiduInfoService updateStockBasicDataFromBd========");
+
+        // 创建一个固定大小的线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+        List<CompletableFuture<Void>> futures = stockIds.stream()
+                .filter(stockId -> stockId.startsWith("s")) // 只处理以"s"开头的股票ID
+                .map(stockId -> CompletableFuture.runAsync(() -> {
+                    try {
+                        StockNameVO stockNameVO = stockDao.findById(stockId).orElse(null);
+                        BdPanKouInfoVO retVo = restRequest.queryBasicDataFromBd(stockId.replace("sh|sz",""));
+                        if (retVo == null || retVo.getStockName() == null) {
+                            logger.info("========updateStockBasicDataFromBd=====data not got stockName=====stockVo={}", retVo);
+                            return;
+                        }
+                        stockNameVO.setStockName(retVo.getStockName());
+                        stockNameVO.setLastUpdatedTime(new Timestamp(System.currentTimeMillis()));
+                        stockDao.save(stockNameVO);
+                    } catch (Exception e) {
+                        logger.error("Error updating stock basic data for stockId: " + stockId, e);
+                    }
+                }, executorService))
+                .toList();
+
+        // 等待所有任务完成
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
+        // 关闭线程池
+        executorService.shutdown();
+
+        logger.info("======End BaiduInfoService updateStockBasicDataFromBdMultiThreaded========");
     }
 
     public void getTopHolderFromNet() throws InterruptedException {

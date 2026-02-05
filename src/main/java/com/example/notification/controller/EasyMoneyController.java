@@ -72,6 +72,16 @@ public class EasyMoneyController {
         return ResponseEntity.ofNullable(body);
     }
 
+    @RequestMapping(value = {"/em/bandView/ids"})
+    @ResponseBody
+    public ResponseEntity eMoneyNetViewIds() {
+        logger.info("Enter EasyMoneyController eMoneyNetViewIds ====");
+        Object body = easymoneyService.eMoneyNetViewIds();
+        return ResponseEntity.ofNullable(body);
+    }
+
+
+
     @RequestMapping(value = {"/em/band/{stockId}"})
     @ResponseBody
     public ResponseEntity stockDataById(@PathVariable String stockId) {

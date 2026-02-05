@@ -88,8 +88,7 @@ public class Timer {
 
             baiduInfoService.calculateBdIndicatorDropRange();
 
-            //api is not allowed to query data from bd.
-//            baiduInfoService.updateStockBasicDataFromBd();
+            baiduInfoService.updateStockBasicDataFromBd();
 
             baiduInfoService.queryBaiduIncomeDataFromNetForAllStocks();
 
