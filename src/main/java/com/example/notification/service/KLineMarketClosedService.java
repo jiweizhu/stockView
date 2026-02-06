@@ -299,6 +299,15 @@ public class KLineMarketClosedService {
         webQueryParam.setIdentifier(stockNameVO.getStockId());
         webQueryParam.setToQueryDailyPrice(false);
         QueryFromTencentResponseVO weeklyResponse = restRequest.queryKLine(webQueryParam);
+
+        //update stock name
+        String lowerCaseId = stockNameVO.getStockId().toLowerCase();
+        Map<String, Object> dataMap = (Map) weeklyResponse.getData().get(lowerCaseId);
+        Map<String, Object> qt = (Map) dataMap.get("qt");
+        List<String> obj = (List) qt.get(lowerCaseId);
+        stockNameVO.setStockName(obj.get(1));
+        stockDao.save(stockNameVO);
+
         List<ArrayList<String>> dayList = getWeeklyPriceList(weeklyResponse, stockNameVO);
 
         //use hashmap to judge if the day is stored or not
@@ -499,7 +508,7 @@ public class KLineMarketClosedService {
     }
 
     public Object handleStocksFlipDaysAndGainReport() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-            logger.info("Enter handleStocksFlipDaysAndGainReport ====");
+        logger.info("Enter handleStocksFlipDaysAndGainReport ====");
         StringBuilder retStr = new StringBuilder("<h2>Calculated All Stocks: </h2></br>");
         List<StockNameVO> stocks = storedStocks();
         if (Utils.isWinSystem()) {
